@@ -6,8 +6,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:supportsRtl="true">
         <!--
         windowSoftInputMode="adjustPan  :
             #키보드창이 올라올때, 레이아웃이 변화된 화면에 맞게 재조정되는것 방지.
@@ -16,16 +15,19 @@
             # 대신, 자동으로 포커스라던가 되지 않으니 수동으로 레이아웃을 해줘야? 한다고 함a
             -->
         <activity
-            android:name=".view.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan">
+            android:name=".view.IntroActivity"
+            android:theme="@style/AppTheme.Intro">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.MainActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

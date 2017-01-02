@@ -1,20 +1,27 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- Base application theme.
+    Theme.AppCompat.NoActionBar: 툴바를 v7.widget.Toolbar로 사용하려면 기존버전의 액션바 안사용설정
+    -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="AppTheme.Intro" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <!-- 툴바  -->
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorControlNormal">#848484</item>
+        <!--툴바 옵션열면,,,옵션 내 텍스트 색 -->
+        <item name="android:textColor">#0000ff</item>
+        <!-- 툴바 버튼?(옵션,드로어열기) 색 -->
+        <item name="colorControlNormal">#CBCBCB</item>
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
         <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
     </style>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

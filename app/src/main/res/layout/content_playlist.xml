@@ -9,6 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/colorTextWhite"
     tools:context=".view.fragments.playlist.PlayList">
 
     <!--

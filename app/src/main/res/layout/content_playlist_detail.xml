@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="My Quiz Title"
-        android:textColor="@color/colorTextWhite"
+        android:textColor="@color/colorTextDark"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <!-- my playlists : listview -->
@@ -26,7 +26,7 @@
         android:id="@+id/playlist_detail_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorTextWhite"
+        android:background="@color/colorTextDark"
         android:paddingBottom="16dp"
         android:layout_weight="20"/>
 

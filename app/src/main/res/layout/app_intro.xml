@@ -8,25 +8,26 @@
     android:paddingLeft="50dp"
     android:paddingRight="50dp"
     android:paddingTop="100dp"
-    tools:context="kr.jhha.engquiz.view.fragments.AppIntro">
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="English \nQuizGame"
-        android:textColor="@color/colorTextWhite"
-        android:textSize="45dp"/>
+    tools:context="kr.jhha.engquiz.view.IntroActivity">
 
     <Button
         android:id="@+id/intro_game_play_btn"
         android:layout_width="fill_parent"
         android:layout_height="130dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/btn_next_question"
-        android:text="PLAY"
+        android:text="^_^"
         android:textColor="#BDA649"
         android:textSize="50dp"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="70dp"
+        android:text="English \nQuizGame"
+        android:textColor="@color/colorTextWhite"
+        android:textSize="45dp"/>
 
 </LinearLayout>

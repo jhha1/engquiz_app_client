@@ -22,7 +22,7 @@ import static kr.jhha.engquiz.controller.QuizManager.quizManager;
 
 public class PlayQuizFragment extends Fragment
 {
-    private final String mTITLE = "Quiz Play";
+    private final String mTITLE = "TODO: MyQuiz 이름";
 
     private QuizUnit quiz;
 

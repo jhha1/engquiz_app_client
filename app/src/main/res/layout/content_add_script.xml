@@ -23,7 +23,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="공유할 스크립트를 선택해주세요."
-            android:textColor="@color/colorTextWhite"
+            android:textColor="@color/colorTextDark"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <!-- file location -->
@@ -32,7 +32,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dip"
-            android:textColor="@color/colorTextWhite"
+            android:textColor="@color/colorTextDark"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <!-- file name -->
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dip"
             android:choiceMode="singleChoice"
-            android:background="@color/colorTextWhite"
+            android:background="@color/colorTextDark"
             android:layout_weight="1"/>
 
         <Button

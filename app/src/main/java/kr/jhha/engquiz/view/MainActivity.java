@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.view;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,13 +15,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.Const;
 import kr.jhha.engquiz.view.fragments.AddScriptFragment;
-import kr.jhha.engquiz.view.fragments.AppIntro;
 import kr.jhha.engquiz.view.fragments.PlayQuizFragment;
 import kr.jhha.engquiz.view.fragments.playlist.AddList;
 import kr.jhha.engquiz.view.fragments.playlist.DelList;
@@ -35,7 +32,6 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     private DrawerLayout mNavDrawer;
 
-    private Fragment mAppIntroFragment;
     private Fragment mPlayQuizFragment;
     private Fragment mAddScriptFragment;
 
@@ -49,7 +45,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAppIntroFragment = new AppIntro();
         mPlayQuizFragment = new PlayQuizFragment();
         mPlayListFragment = new PlayList();
         mPlayListDetailFragment = new PlayListDetail();
@@ -59,6 +54,7 @@ public class MainActivity extends AppCompatActivity
 
         // 툴바
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitleTextColor(Color.LTGRAY); // 툴바 글자색
         setSupportActionBar(mToolbar);
 
         // 슬라이딩 네비게이션 드로어
@@ -72,12 +68,9 @@ public class MainActivity extends AppCompatActivity
 
         // 첫 화면 셋팅
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.container, mAppIntroFragment);
+        transaction.add(R.id.container, mPlayQuizFragment);
         transaction.addToBackStack(null);
         transaction.commit();
-
-        mToolbar.setVisibility(View.INVISIBLE);
-        mNavDrawer.setVisibility(View.INVISIBLE);
 
         // 파일에 있는 커스텀리스트를 읽어와 list에 저장.
         // Adapter에서는 getActivity()가 안되서,, 여기서 초기화.
@@ -94,22 +87,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /*
-    Button.OnClickListener listener = new Button.OnClickListener()
-    {
-        public void onClick(View v)
-        {
-            switch(v.getId()){
-                case R.id.showAnswerBtn:
-
-                    break;
-                case R.id.nextQuestionBtn:
-
-                    break;
-            }
-        }
-    };
-*/
 
     @Override
     public void onBackPressed() {
@@ -121,6 +98,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -142,6 +120,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

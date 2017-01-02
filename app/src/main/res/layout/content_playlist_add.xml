@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="제목을 입력해주세요"
-            android:textColorHint="@color/colorTextWhite"
+            android:textColorHint="@color/colorTextDark"
             android:maxLines="1"
             android:maxLength="30"
             android:textColor="@color/colorTextWhite"
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
-        android:textColor="@color/colorTextWhite"
+        android:textColor="@color/colorTextDark"
         android:text="새 퀴즈에 담고 싶은 스크립트들을 체크해주세요." />
 
     <!-- all playlist : chackable listview -->
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
         android:paddingBottom="8dp"
-        android:background="@color/colorTextWhite"
+        android:background="@color/colorTextDark"
         android:layout_weight="20"/>
 
     <!-- complate button  -->

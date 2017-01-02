@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <include
-        layout="@layout/app_intro"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
     <include
         layout="@layout/content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-</FrameLayout>
+    <!-- 반드시 슬라이딩메뉴가 컨텐츠레이아웃보다 나중에 선언되어야 한다!!
+    안그러면, 슬라이딩메뉴 클릭 안됨 -->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer"
+        android:background="@color/colorSlidingDrawerBackground"
+        app:itemTextColor="@color/colorSlidingDrawerMenuIconText"
+        app:itemIconTint="@color/colorSlidingDrawerMenuIconText"/>
+    <!--  layout_gravity: 왼쪽에서 슬라이딩.
+    app:itemTextColor: 메뉴글씨색, itemIconTint:메뉴아이콘색, background: 메뉴배경색
+      app:itemTextColor="@color/colorSlidingDrawerMenuIconText"
+        app:itemIconTint="@color/colorSlidingDrawerMenuIconText"
+        -->
+
+</android.support.v4.widget.DrawerLayout>

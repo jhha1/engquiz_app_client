@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:background="@drawable/side_nav_bar"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:layout_height="?attr/actionBarSize"
+    android:background="@drawable/side_nav_bar">
     <!--
        <ImageView
            android:id="@+id/imageView"
@@ -19,16 +18,16 @@
            android:scaleType="fitXY"
            android:alpha="0.8"/>
            android:background="@android:color/transparent"
-
+ -->
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView"
-        android:paddingTop="110dp"
-        android:gravity="center"
-        android:text="ENGLISH QUIZ"
+        android:paddingTop="20dp"
+        android:paddingLeft="20dp"
+        android:gravity="start|bottom"
+        android:text="MENU"
         android:textColor="#3B170B"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
- -->
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
 </RelativeLayout>

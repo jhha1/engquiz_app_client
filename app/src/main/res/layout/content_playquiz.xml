@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGamePlayBackground"
     tools:context="kr.jhha.engquiz.view.fragments.PlayQuizFragment">
 
     <android.support.v4.widget.NestedScrollView
