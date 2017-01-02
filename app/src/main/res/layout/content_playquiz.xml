@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="kr.jhha.engquiz.view.fragments.PlayQuizFragment">
+
+    <android.support.v4.widget.NestedScrollView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fragment_playquiz_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="30dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="45dp"
+            android:paddingBottom="50dp">
+
+            <TextView style="@style/textForQuizPlaying"
+                android:id="@+id/question"
+                android:text="@string/empty_string"
+                android:paddingBottom="30dp"/>
+
+            <Button
+                android:id="@+id/showAnswerBtn"
+                android:layout_below="@+id/question"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@android:color/transparent"
+                android:text="\?"
+                android:textColor="#BDA649"
+                android:textSize="150sp"
+                android:paddingTop="30dp"
+                android:paddingBottom="50dp"
+                android:visibility="visible"/>
+
+            <TextView style="@style/textForQuizPlaying"
+                android:id="@+id/answer"
+                android:layout_below="@+id/question"
+                android:text="@string/empty_string"
+                android:paddingBottom="40dp"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id ="@+id/nextQuestionBtn"
+                android:layout_below="@+id/answer"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/btn_next_question"
+                android:text="Next"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

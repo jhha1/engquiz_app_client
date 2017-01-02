@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">EngQuiz</string>
+    <string name="empty_string">empty string</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="add_script_dialog_msg"><![CDATA[</br>스크립트를 추가하시겠습니까?
+    </br><b>앱을 사용하는 모든 수강생에게 공유될 수 있으므로,</b></br>
+    반드시!<b>Sonya의 pdf(answer 포함)</b>만 추가하셔야 합니다.
+    </br></br><font color=red>스크립트는 클라우드 서버를 통해 분석 및 추가됩니다.
+    클라우드 서버에 없는 스크립트면, 앱을 사용하는 모든 수강생에게 공유됩니다</font>]]></string>
+
+</resources>

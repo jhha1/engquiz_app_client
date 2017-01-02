@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context=".view.fragments.playlist.DelList">
+
+    <!-- explain how to use -->
+    <TextView
+        android:id="@+id/del_playlist_howtouse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="삭제할 리스트에 체크해주세요."
+        android:textColor="@color/colorTextWhite"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <!-- my playlists : chackable listview -->
+    <ListView
+        android:id="@+id/del_playlist_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:choiceMode="multipleChoice"
+        android:background="@color/colorTextWhite"
+        android:paddingBottom="16dp"
+        android:layout_weight="20"/>
+
+    <!-- complate button  -->
+    <Button
+        android:id="@+id/del_playlist_complate_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_next_question"
+        android:text="Delete"/>
+
+</LinearLayout>

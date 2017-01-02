@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".controller.AddScript">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- explain how to use -->
+        <TextView
+            android:id="@+id/add_script_howtouse"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="공유할 스크립트를 선택해주세요."
+            android:textColor="@color/colorTextWhite"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <!-- file location -->
+        <TextView
+            android:id="@+id/add_script_file_location"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:textColor="@color/colorTextWhite"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <!-- file name -->
+        <ListView
+            android:id="@+id/add_script_filebrower"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:choiceMode="singleChoice"
+            android:background="@color/colorTextWhite"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/add_script_btn_ok"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dip"
+            android:gravity="center"
+            android:text="OK" />
+
+        <!--
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="15dip"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/add_script_btn_ok"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="확인" />
+
+            <Button
+                android:id="@+id/add_script_btn_cancel"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="취소" />
+        </LinearLayout>
+        -->
+
+    </LinearLayout>
+</FrameLayout>
