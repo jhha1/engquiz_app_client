@@ -52,6 +52,8 @@ public class AddScriptDialog extends Dialog
     public AddScriptDialog (Context context) {
         super(context, android.R.style.Theme_Translucent_NoTitleBar);
         this.mContext = context;
+
+        boolean test = true;
     }
 
     @Override
