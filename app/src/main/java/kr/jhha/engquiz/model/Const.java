@@ -11,5 +11,5 @@ public class Const {
     public static final String QuizUnitSeperator = "@@@";
     public static final String Text_New = "New..";
 
-    public enum View{ NONE, PLAYQUIZ, NEW_CUSTOM_QUIZ, DETAILQUIZ };
+    public enum View{ NONE, PLAYQUIZ, NEW_CUSTOM_QUIZ, QUIZ_DETAIL_LIST, SYNC, UPLOAD, UPDATE};
 }

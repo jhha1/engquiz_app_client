@@ -21,12 +21,17 @@
         android:textColor="@color/colorTextDark"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-    <!-- my playlists : listview -->
+    <!-- my playlists : listview
+         # 리스트뷰 line color: row간 간격 벌리고 그 틈에 색을 입힘.
+                             android:dividerHeight - row간격. android:divider - 간격 틈 색
+         # 리스트뷰 text color: content_textstyle_listview.xml
+    -->
     <ListView
         android:id="@+id/playlist_detail_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorTextDark"
+        android:divider="@color/colorPrimary"
+        android:dividerHeight="0.5dp"
         android:paddingBottom="16dp"
         android:layout_weight="20"/>
 

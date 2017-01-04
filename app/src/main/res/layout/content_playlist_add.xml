@@ -53,14 +53,19 @@
         android:textColor="@color/colorTextDark"
         android:text="새 퀴즈에 담고 싶은 스크립트들을 체크해주세요." />
 
-    <!-- all playlist : chackable listview -->
+    <!-- all playlist : chackable listview
+         # 리스트뷰 라인 색: row간 간격 벌리고 그 틈에 색을 입힘.
+            android:dividerHeight - row간격. android:divider - 간격 틈 색
+         # 리스트뷰 텍스트 색: content_textstyle_listview_checked_multiple.xml
+    -->
     <ListView
         android:id="@+id/add_playlist_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
         android:paddingBottom="8dp"
-        android:background="@color/colorTextDark"
+        android:divider="@color/colorPrimary"
+        android:dividerHeight="0.25dp"
         android:layout_weight="20"/>
 
     <!-- complate button  -->

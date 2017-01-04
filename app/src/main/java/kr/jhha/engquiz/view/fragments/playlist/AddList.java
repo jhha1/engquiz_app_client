@@ -43,7 +43,8 @@ public class AddList extends Fragment {
     {
         // 아답터 생성: 기본 안드로이드 아답터 사용
         // 스크립트 전체 제목리스트를 사용.
-        int resourceID = android.R.layout.simple_list_item_multiple_choice;
+        int resourceID = R.layout.content_textstyle_listview_checked_multiple;
+        //int resourceID = android.R.layout.simple_list_item_multiple_choice;
         Object[] quizTitleAll = QuizManager.getInstance().getQuizTitleAll();
         if(quizTitleAll == null) {
             Log.e("TAG", "quiz titles null");

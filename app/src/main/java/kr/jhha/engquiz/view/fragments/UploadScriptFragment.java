@@ -29,9 +29,8 @@ import kr.jhha.engquiz.view.MainActivity;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class AddScriptFragment extends Fragment
+public class UploadScriptFragment extends Fragment
 {
-    private final String mTITLE = "Add Script";
     private AddScript mController = new AddScript();
 
     // 현재 파일 위치 출력 뷰
@@ -112,13 +111,6 @@ public class AddScriptFragment extends Fragment
 
         view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        // 툴바에 현 프래그먼트 제목 출력
-        ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
-        super.onResume();
     }
 
     // 리스트의 row 선택 이벤트.
@@ -204,7 +196,7 @@ public class AddScriptFragment extends Fragment
         //  ->  mAdapter.notifyDataSetChanged(); 가 안먹혀서 이렇게 함.
         //      adapter내부 데이터가 변경 될때 mAdapter.notifyDataSetChanged()가 먹힌다고 함.
         //      ArrayAdapter는 내부데이터 변경이 인지 않된다는건데 잘 이해는 안감.
-        int drawable = android.R.layout.simple_list_item_single_choice;
+        int drawable = R.layout.content_textstyle_listview_checked_simple;
         ArrayAdapter mAdapter = new ArrayAdapter<String>(getActivity(), drawable, mItems);
         // 파일 리스트 아답터 연결
         mItemListView.setAdapter(mAdapter);

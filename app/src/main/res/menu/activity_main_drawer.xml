@@ -13,8 +13,8 @@
             android:icon="@drawable/ic_stars_black_48dp"
             android:title="My Quizs" />
         <item
-            android:id="@+id/nav_sync_script"
-            android:icon="@drawable/ic_add_circle_black_48dp"
-            android:title="Sync Scripts" />
+            android:id="@+id/nav_sync"
+            android:icon="@drawable/ic_cached_black_48dp"
+            android:title="Sync" />
     </group>
 </menu>

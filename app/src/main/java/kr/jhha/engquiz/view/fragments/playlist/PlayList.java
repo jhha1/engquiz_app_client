@@ -171,7 +171,7 @@ public class PlayList extends Fragment
 
             case R.id.playlist_show_detail_btn:
                 // 디테일 보기로 화면 전환
-                ((MainActivity)getActivity()).changeViewFragment( Const.View.DETAILQUIZ );
+                ((MainActivity)getActivity()).changeViewFragment( Const.View.QUIZ_DETAIL_LIST);
                 // 옵션 창 닫기
                 hideOptions();
                 break;

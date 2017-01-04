@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +39,8 @@ public class PlayListDetail extends Fragment {
     public void onCreate(Bundle savedInstanceState)
     {
         // 아답터 생성: 기본 안드로이드 아답터 사용
-        int resourceID = android.R.layout.simple_list_item_1;
+        //int resourceID = android.R.layout.simple_list_item_1;
+        int resourceID = R.layout.content_textstyle_listview;
         String[] items = {"A", "B", "C", "D", "E", Const.Text_New};
         mAdapter = new ArrayAdapter(getActivity(), resourceID, items);
 

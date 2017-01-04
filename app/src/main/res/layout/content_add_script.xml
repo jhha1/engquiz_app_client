@@ -35,14 +35,19 @@
             android:textColor="@color/colorTextDark"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <!-- file name -->
+        <!-- files : listview
+         # 리스트뷰 line color: row간 간격 벌리고 그 틈에 색을 입힘.
+                             android:dividerHeight - row간격. android:divider - 간격 틈 색
+         # 리스트뷰 text color: content_textstyle_listview_checked_simple.xml
+        -->
         <ListView
             android:id="@+id/add_script_filebrower"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dip"
             android:choiceMode="singleChoice"
-            android:background="@color/colorTextDark"
+            android:divider="@color/colorPrimary"
+            android:dividerHeight="0.25dp"
             android:layout_weight="1"/>
 
         <Button

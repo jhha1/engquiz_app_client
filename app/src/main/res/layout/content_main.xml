@@ -23,14 +23,14 @@
     </android.support.design.widget.AppBarLayout>
 
     <!-- Content Container -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context="kr.jhha.engquiz.view.MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </LinearLayout>
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>
 

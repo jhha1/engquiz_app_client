@@ -1,8 +1,10 @@
 package kr.jhha.engquiz.view;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -12,13 +14,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.Const;
-import kr.jhha.engquiz.view.fragments.AddScriptFragment;
+import kr.jhha.engquiz.view.fragments.UploadScriptFragment;
 import kr.jhha.engquiz.view.fragments.PlayQuizFragment;
+import kr.jhha.engquiz.view.fragments.SyncFragment;
+import kr.jhha.engquiz.view.fragments.UpdateFragment;
 import kr.jhha.engquiz.view.fragments.playlist.AddList;
 import kr.jhha.engquiz.view.fragments.playlist.DelList;
 import kr.jhha.engquiz.view.fragments.playlist.PlayList;
@@ -32,8 +37,14 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     private DrawerLayout mNavDrawer;
 
+    // 앱 종료 핸들러 (백 버튼 2번 누르면 종료)
+    private BackPressCloseHandler mBackPressCloseHandler;
+
     private Fragment mPlayQuizFragment;
+
+    private Fragment mSyncFragment;
     private Fragment mAddScriptFragment;
+    private Fragment mUpdateFragment;
 
     private Fragment mPlayListFragment;
     private Fragment mPlayListDetailFragment;
@@ -41,23 +52,32 @@ public class MainActivity extends AppCompatActivity
     private Fragment mDelPlayListFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPlayQuizFragment = new PlayQuizFragment();
-        mPlayListFragment = new PlayList();
-        mPlayListDetailFragment = new PlayListDetail();
-        mMakeCustomQuizFragment = new AddList();
-        mDelPlayListFragment = new DelList();
-        mAddScriptFragment = new AddScriptFragment();
+        // 초기화.
+        initToolbar();
+        initNavigationDrawer();
+        initCloseAppHandler();
+        initFragments();
+        initFirstView(); // 첫 화면. initFragments() 다음에 와야함!!
 
-        // 툴바
+        // 파일에 있는 커스텀리스트를 읽어와 list에 저장.
+        // Adapter에서는 getActivity()가 안되서,, 여기서 초기화.
+        initMyQuizList();
+    }
+
+    // 툴바 초기화
+    private void initToolbar() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setTitleTextColor(Color.LTGRAY); // 툴바 글자색
         setSupportActionBar(mToolbar);
+    }
 
-        // 슬라이딩 네비게이션 드로어
+    // 슬라이딩 네이게이션 드로어
+    private void initNavigationDrawer() {
         mNavDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mNavDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -65,16 +85,31 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
 
-        // 첫 화면 셋팅
+    // 앱 종료 핸들러
+    private void initCloseAppHandler() {
+        mBackPressCloseHandler = new BackPressCloseHandler(this);
+    }
+
+    // 프래그먼트 초기화
+    private void initFragments() {
+        mPlayQuizFragment = new PlayQuizFragment();
+        mPlayListFragment = new PlayList();
+        mPlayListDetailFragment = new PlayListDetail();
+        mMakeCustomQuizFragment = new AddList();
+        mDelPlayListFragment = new DelList();
+        mAddScriptFragment = new UploadScriptFragment();
+        mSyncFragment = new SyncFragment();
+        mUpdateFragment = new UpdateFragment();
+    }
+
+    // 첫 화면 셋팅
+    private void initFirstView() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.container, mPlayQuizFragment);
         transaction.addToBackStack(null);
+        transaction.add(R.id.container, mPlayQuizFragment);
         transaction.commit();
-
-        // 파일에 있는 커스텀리스트를 읽어와 list에 저장.
-        // Adapter에서는 getActivity()가 안되서,, 여기서 초기화.
-        initMyQuizList();
     }
 
     private void initMyQuizList() {
@@ -93,9 +128,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
         }
+        mBackPressCloseHandler.onBackPressed();
+        super.onBackPressed();
     }
 
     /*
@@ -135,10 +170,8 @@ public class MainActivity extends AppCompatActivity
             transaction.replace(R.id.container, mPlayQuizFragment);
         } else if (id == R.id.nav_my_quizs) {
             transaction.replace(R.id.container, mPlayListFragment);
-        } else if (id == R.id.nav_sync_script) {
-            transaction.replace(R.id.container, mAddScriptFragment);
-            //AddScriptDialog dialog = new AddScriptDialog(this);
-            //dialog.show();
+        } else if (id == R.id.nav_sync) {
+            transaction.replace(R.id.container, mSyncFragment);
         }
 
         //transaction.addToBackStack(null);
@@ -181,23 +214,52 @@ public class MainActivity extends AppCompatActivity
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mMakeCustomQuizFragment);
         }
-        else if( Const.View.DETAILQUIZ == view ) {
+        else if( Const.View.QUIZ_DETAIL_LIST == view ) {
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mPlayListDetailFragment);
         }
 
+
         transaction.commit();
-    }
-
-    public void startAppContent()
-    {
-        mToolbar.setVisibility(View.VISIBLE);
-        mNavDrawer.setVisibility(View.VISIBLE);
-
-        changeViewFragment( Const.View.PLAYQUIZ );
     }
 
     public void setActionBarTitle( String title ) {
         getSupportActionBar().setTitle( title );
     }
 }
+
+class BackPressCloseHandler {
+
+    private long backKeyPressedTime = 0;
+    private Toast toast;
+
+    private Activity activity;
+
+    public BackPressCloseHandler(Activity context) {
+        this.activity = context;
+    }
+
+    public void onBackPressed() {
+        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+            backKeyPressedTime = System.currentTimeMillis();
+            showGuide();
+            return;
+        }
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            SystemExit();
+        }
+    }
+    public void SystemExit() {
+        activity.moveTaskToBack(true);
+        activity.finish();
+        toast.cancel();
+        android.os.Process.killProcess(android.os.Process.myPid() );
+        System.exit(0);
+    }
+    public void showGuide() {
+        toast = Toast.makeText(activity,
+                "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT);
+        toast.show();
+    }
+}
+
