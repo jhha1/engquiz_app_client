@@ -1,6 +1,7 @@
 package kr.jhha.engquiz.backend_logic;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -42,6 +43,21 @@ public class Utils {
         try
         {
             return jsonMapper.writeValueAsString(map);
+        }
+        catch ( Exception e )
+        {
+            throw new IllegalStateException("JsonAPI ERR", e);
+        }
+    }
+
+    public static String list2json( List<Object> list )
+    {
+        if( list == null || list.isEmpty() )
+            throw new IllegalArgumentException("list is null or empty:("+ list +")");
+
+        try
+        {
+            return jsonMapper.writeValueAsString(list);
         }
         catch ( Exception e )
         {

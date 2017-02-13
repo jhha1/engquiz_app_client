@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.backend_logic;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import kr.jhha.engquiz.net.EProtocol;
 import kr.jhha.engquiz.net.Http;
@@ -40,6 +42,7 @@ import kr.jhha.engquiz.net.protocols.MatchScriptProtocol;
 public class Initailizer
 {
     private static final Initailizer instance = new Initailizer();
+    private Context mContext = null;
 
     private Initailizer() {}
 
@@ -49,9 +52,10 @@ public class Initailizer
 
     // SharedPreferences : 간단한 설정 값들을 xml형태로 저장 및 로드하도록 돕는 클래스.
     //                      선언은 MainActivity에서 해야함.
-    public boolean initBackend( SharedPreferences preferences  )
+    public boolean initBackend( Context context, SharedPreferences preferences  )
     {
         Log.i("!!!!!!!!!!!!!!","Init Backend..");
+        mContext = context;
 
         SharedPreferences.Editor editor = preferences.edit();
 
@@ -123,14 +127,33 @@ public class Initailizer
                     safeOverwroteScripts.put( scriptIndex, script );
                 }
 
+                // 모든 파싱된 파일을 오프라인 폴더에 저장 실패
                 if( safeOverwroteScripts.isEmpty() ) {
-
+                    Log.e("AppContent",
+                            "Failed overwrite script All.");
+                    return false;
                 }
                 parsedScripts = safeOverwroteScripts;
 
-
-
                 // 내퀴즈 디폴트 폴더를 만들고, 다운 받은 파일 전체를 삽입
+                Log.i("#####################", "Start DB");
+                int orderIndex = 0;
+                String title = "default";
+                List fileIndexes = new ArrayList<Integer>(parsedScripts.keySet());
+                String fileIndexesJson = Utils.list2json( fileIndexes );
+                DBHelper db = new DBHelper( mContext );
+                db.insertNewMyQuiz( orderIndex, title, fileIndexesJson );
+                String selectedRows = db.selectMyQuiz();
+                Log.i("#####################", selectedRows);
+
+
+                String lastplayFolderIndex = "lastplay=0";
+                FileManager.getInstance().overwrite(
+                        FileManager.MyQuizFolder_AndroidPath,
+                        FileManager.MyQuizPlayInfo_AndroidPath,
+                        lastplayFolderIndex);
+
+
 
                 // 내퀴즈 폴더정보를 안드로이드 파일에 저장
             }

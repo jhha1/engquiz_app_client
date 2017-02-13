@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
         //SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
         //Initailizer.getInstance().initBackend(preferences);
 
-        new InitailizeAsync().execute();
+        new InitailizeAsync( this ).execute();
     }
 
     // 툴바 초기화
@@ -243,10 +243,16 @@ public class MainActivity extends AppCompatActivity
 
     class InitailizeAsync extends AsyncTask<String, Void, String>
     {
+        private Context mContext = null;
+
+        public InitailizeAsync( Context context ) {
+            mContext = context;
+        }
+
         @Override
         protected String doInBackground(String... unused) {
             SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
-            Initailizer.getInstance().initBackend(preferences);
+            Initailizer.getInstance().initBackend(mContext, preferences);
             return null;
         }
 

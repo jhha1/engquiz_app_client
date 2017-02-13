@@ -21,9 +21,12 @@ public class FileManager
 {
     private static final FileManager singletonInstance = new FileManager();
 
-    public static final String ParsedFile_AndroidPath = "/MyEnglishQuizGame";
-    public static final String KaKaoDownloadFolder_AndroidPath = "/KakaoTalkDownload";
     public static final String TOP_ROOT_DIR = "/";
+    public static final String KaKaoDownloadFolder_AndroidPath = "/KakaoTalkDownload";
+    public static final String AppRoot_AndroidPath = "/SoynaClassEnglishGame";
+    public static final String ParsedFile_AndroidPath = AppRoot_AndroidPath + "/parsed";
+    public static final String MyQuizFolder_AndroidPath = AppRoot_AndroidPath + "/myQuiz";
+    public static final String MyQuizPlayInfo_AndroidPath = MyQuizFolder_AndroidPath + "/playInfo.txt";
 
     private FileManager() {}
 
@@ -273,31 +276,41 @@ public class FileManager
     }
 
     // 파일이 존재하면 덮어씀
-    public boolean overwrite(String filePath, String fileName, String text)
+    public boolean overwrite(String dirPath, String fileName, String text)
     {
-        String filefullpath = getAndroidAbsolutePath(filePath + "/" + fileName) + ".txt";
-        System.out.println("[DEBUG] WRITE TextFile. path["+filefullpath+"] .");
-
-        File file = new File(filefullpath);
+        String absolutePath = getAndroidAbsolutePath(dirPath);
+        String filePath = absolutePath + "/" + fileName + ".txt";
+        File file = new File( filePath );
         if(file.exists()) {
             Boolean bDeleted = file.delete();
             if(false == bDeleted) {
-                System.out.println("["+filefullpath+"] " + "delete failed.");
+                System.out.println("["+filePath+"] " + "delete failed.");
                 return false;
             }
         }
 
-        return write(filefullpath, text);
+        return write( dirPath, fileName, text );
     }
 
-    private boolean write(String filepath, String text)
+    private boolean write(String dirPath, String fileName, String text)
     {
+        String absoluteDirPath = getAndroidAbsolutePath(dirPath);
+        File file = new File( absoluteDirPath );
+        if( false == file.exists() ) {
+            boolean bMadeDirectory = file.mkdirs();
+            if( false  == bMadeDirectory ) {
+                Log.e("AppContent", "Failed make directory. absoluteDirPath["+absoluteDirPath+"]");
+                return false;
+            }
+        }
+
         try{
+            String filePath = absoluteDirPath + "/" + fileName + ".txt";
 
             // BufferedWriter 와 FileWriter를 조합하여 사용 (속도 향상)
-            BufferedWriter fw = new BufferedWriter(new FileWriter(filepath, true));
+            BufferedWriter fw = new BufferedWriter(new FileWriter(filePath, true));
 
-            //System.out.println("wirte["+fileName+"] " + text);
+            System.out.println("[DEBUG] WRITE TextFile. filePath["+filePath+"] .");
             // 파일안에 문자열 쓰기
             fw.write(text);
             fw.flush();
