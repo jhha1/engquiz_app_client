@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".view.fragments.playlist.PlayListDetail">
+    tools:context=".ui.fragments.playlist.PlayListDetail">
 
     <!-- explain how to use -->
     <TextView

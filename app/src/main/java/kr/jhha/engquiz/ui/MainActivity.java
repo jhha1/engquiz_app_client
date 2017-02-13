@@ -1,10 +1,13 @@
-package kr.jhha.engquiz.view;
+package kr.jhha.engquiz.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -14,21 +17,31 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.Const;
-import kr.jhha.engquiz.view.fragments.UploadScriptFragment;
-import kr.jhha.engquiz.view.fragments.PlayQuizFragment;
-import kr.jhha.engquiz.view.fragments.SyncFragment;
-import kr.jhha.engquiz.view.fragments.UpdateFragment;
-import kr.jhha.engquiz.view.fragments.playlist.AddList;
-import kr.jhha.engquiz.view.fragments.playlist.DelList;
-import kr.jhha.engquiz.view.fragments.playlist.PlayList;
-import kr.jhha.engquiz.view.fragments.playlist.PlayListAdapter;
-import kr.jhha.engquiz.view.fragments.playlist.PlayListDetail;
+import kr.jhha.engquiz.backend_logic.FileManager;
+import kr.jhha.engquiz.backend_logic.Initailizer;
+import kr.jhha.engquiz.ui.fragments.AddScriptFragment;
+import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
+import kr.jhha.engquiz.ui.fragments.SyncFragment;
+import kr.jhha.engquiz.ui.fragments.UpdateFragment;
+import kr.jhha.engquiz.ui.fragments.playlist.AddList;
+import kr.jhha.engquiz.ui.fragments.playlist.DelList;
+import kr.jhha.engquiz.ui.fragments.playlist.PlayList;
+import kr.jhha.engquiz.ui.fragments.playlist.PlayListAdapter;
+import kr.jhha.engquiz.ui.fragments.playlist.PlayListDetail;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -51,9 +64,12 @@ public class MainActivity extends AppCompatActivity
     private Fragment mMakeCustomQuizFragment;
     private Fragment mDelPlayListFragment;
 
+    public static enum FRAGMENT {NONE, PLAYQUIZ, NEW_CUSTOM_QUIZ, QUIZ_DETAIL_LIST, SYNC, UPLOAD, UPDATE}
+
+    ;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -67,6 +83,11 @@ public class MainActivity extends AppCompatActivity
         // 파일에 있는 커스텀리스트를 읽어와 list에 저장.
         // Adapter에서는 getActivity()가 안되서,, 여기서 초기화.
         initMyQuizList();
+
+        //SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
+        //Initailizer.getInstance().initBackend(preferences);
+
+        new InitailizeAsync().execute();
     }
 
     // 툴바 초기화
@@ -99,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         mPlayListDetailFragment = new PlayListDetail();
         mMakeCustomQuizFragment = new AddList();
         mDelPlayListFragment = new DelList();
-        mAddScriptFragment = new UploadScriptFragment();
+        mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
         mUpdateFragment = new UpdateFragment();
     }
@@ -112,10 +133,9 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
     }
 
+    // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
     private void initMyQuizList() {
-        // 초기에는 전체 데이터가 들어간 퀴즈셋 하나.
-        // 지금은 가라 데이터...
-        if(PlayListAdapter.getInstance().getCount() == 0) {
+        if (PlayListAdapter.getInstance().getCount() == 0) {
             Drawable img = ContextCompat.getDrawable(this, R.drawable.ic_format_align_left_grey600_48dp);
             PlayListAdapter.getInstance().addItem(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.");
             PlayListAdapter.getInstance().addItem(img, "Default Quiz", "스크립트 전체가 들어있습니다.");
@@ -159,8 +179,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item)
-    {
+    public boolean onNavigationItemSelected(MenuItem item) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Handle navigation view item clicks here.
@@ -183,20 +202,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPlayListBtnClicked( View v )  {
+    public void onPlayListBtnClicked(View v) {
         try {
             changeViewFragment(v);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void changeViewFragment( View v )
-    {
+    private void changeViewFragment(View v) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        switch( v.getId() )
-        {
+        switch (v.getId()) {
             case R.id.playlist_set_for_play_btn:
                 transaction.replace(R.id.container, mPlayQuizFragment);
                 break;
@@ -204,27 +221,38 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
     }
 
-    public void changeViewFragment( Const.View view )
-    {
+    public void changeViewFragment(FRAGMENT fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if( Const.View.PLAYQUIZ == view ) {
+        if (FRAGMENT.PLAYQUIZ == fragment) {
             transaction.replace(R.id.container, mPlayQuizFragment);
-        }
-        else if( Const.View.NEW_CUSTOM_QUIZ == view ) {
+        } else if (FRAGMENT.NEW_CUSTOM_QUIZ == fragment) {
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mMakeCustomQuizFragment);
-        }
-        else if( Const.View.QUIZ_DETAIL_LIST == view ) {
+        } else if (FRAGMENT.QUIZ_DETAIL_LIST == fragment) {
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mPlayListDetailFragment);
         }
 
-
         transaction.commit();
     }
 
-    public void setActionBarTitle( String title ) {
-        getSupportActionBar().setTitle( title );
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
+
+    class InitailizeAsync extends AsyncTask<String, Void, String>
+    {
+        @Override
+        protected String doInBackground(String... unused) {
+            SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
+            Initailizer.getInstance().initBackend(preferences);
+            return null;
+        }
+
+        protected void onPostExecute(final String... unused) {
+            ;
+        }
     }
 }
 

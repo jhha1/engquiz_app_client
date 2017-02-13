@@ -1,11 +1,10 @@
-package kr.jhha.engquiz.view.fragments;
+package kr.jhha.engquiz.ui.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +21,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.controller.FileManager;
-import kr.jhha.engquiz.model.Const;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.backend_logic.FileManager;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -115,7 +112,7 @@ class DownloadFileAsync extends AsyncTask<String, String, String> {
 
             InputStream input = new BufferedInputStream(url.openStream());
 
-            String tempDownloadFolder = FileManager.getInstance().getAndroidAbsolutePath(Const.KaKaoDownloadFolder_AndroidPath);
+            String tempDownloadFolder = FileManager.getInstance().getAndroidAbsolutePath(FileManager.KaKaoDownloadFolder_AndroidPath);
             OutputStream output = new FileOutputStream( tempDownloadFolder + "Downloadtest.jpg");
 
             byte data[] = new byte[1024];

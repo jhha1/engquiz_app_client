@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 
 import android.content.DialogInterface;
@@ -15,8 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.Const;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.ui.MainActivity;
 
 
 /**
@@ -41,7 +40,7 @@ public class PlayListDetail extends Fragment {
         // 아답터 생성: 기본 안드로이드 아답터 사용
         //int resourceID = android.R.layout.simple_list_item_1;
         int resourceID = R.layout.content_textstyle_listview;
-        String[] items = {"A", "B", "C", "D", "E", Const.Text_New};
+        String[] items = {"A", "B", "C", "D", "E", PlayList.Text_New};
         mAdapter = new ArrayAdapter(getActivity(), resourceID, items);
 
         // 리스트 아이템 삭제확인 다이알로그 만들기
@@ -100,7 +99,7 @@ public class PlayListDetail extends Fragment {
             Drawable iconDrawable = item.getIcon() ;
 
             // 내 커스텀 퀴즈에 스크립트 추가.
-            if( Const.Text_New.equals(titleStr) )
+            if( PlayList.Text_New.equals(titleStr) )
                 ; // activity에게 화면전환요청.
             else
                 ; // nothing

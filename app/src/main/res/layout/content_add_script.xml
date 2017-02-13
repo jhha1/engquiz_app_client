@@ -10,7 +10,7 @@
     android:paddingRight="30dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".controller.AddScript">
+    tools:context=".backend_logic.ParseScript">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:id="@+id/add_script_howtouse"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="공유할 스크립트를 선택해주세요."
+            android:text="추가할 스크립트를 선택해주세요."
             android:textColor="@color/colorTextDark"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 

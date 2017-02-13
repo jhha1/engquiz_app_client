@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,9 +17,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.Const;
-import kr.jhha.engquiz.view.MainActivity;
-import kr.jhha.engquiz.view.fragments.PlayQuizFragment;
+import kr.jhha.engquiz.ui.MainActivity;
+import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -35,6 +34,8 @@ public class PlayList extends Fragment
     private int mSelectedItemIndex = -1;
     // 리스트 아이템 선택시, 보여지는 레이아웃
     private LinearLayout mItemOptionLayout;
+
+    public static final String Text_New = "New..";
 
     // Activity를 통해, 타 fragment에 이벤트를 던지기 위한 (fragment간 직접통신 안됨. activity를 통해야함)
     // 연결자 인터페이스.
@@ -99,6 +100,7 @@ public class PlayList extends Fragment
         super.onResume();
     }
 
+
     // 플레이 리스트 클릭 이벤트 리스너
     private AdapterView.OnItemClickListener mListItemClickListener
                                         = new AdapterView.OnItemClickListener()
@@ -115,8 +117,8 @@ public class PlayList extends Fragment
             Drawable iconDrawable = item.getIcon() ;
 
             // 새 커스텀 퀴즈 리스트 만들기
-            if( Const.Text_New.equals(titleStr) )
-                ((MainActivity)getActivity()).changeViewFragment( Const.View.NEW_CUSTOM_QUIZ );  // activity에게 리스트추가 화면으로 전환요청.
+            if( Text_New.equals(titleStr) )
+                ((MainActivity)getActivity()).changeViewFragment( MainActivity.FRAGMENT.NEW_CUSTOM_QUIZ );  // activity에게 리스트추가 화면으로 전환요청.
             else // 옵션 선택 버튼 띄우기
                 showOptions();
         }
@@ -171,7 +173,7 @@ public class PlayList extends Fragment
 
             case R.id.playlist_show_detail_btn:
                 // 디테일 보기로 화면 전환
-                ((MainActivity)getActivity()).changeViewFragment( Const.View.QUIZ_DETAIL_LIST);
+                ((MainActivity)getActivity()).changeViewFragment( MainActivity.FRAGMENT.QUIZ_DETAIL_LIST);
                 // 옵션 창 닫기
                 hideOptions();
                 break;

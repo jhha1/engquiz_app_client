@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 
 import android.content.DialogInterface;
@@ -19,8 +19,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.controller.QuizManager;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.backend_logic.ScriptManager;
+import kr.jhha.engquiz.ui.MainActivity;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -45,7 +45,7 @@ public class AddList extends Fragment {
         // 스크립트 전체 제목리스트를 사용.
         int resourceID = R.layout.content_textstyle_listview_checked_multiple;
         //int resourceID = android.R.layout.simple_list_item_multiple_choice;
-        Object[] quizTitleAll = QuizManager.getInstance().getQuizTitleAll();
+        Object[] quizTitleAll = ScriptManager.getInstance().getScriptTitleAll();
         if(quizTitleAll == null) {
             Log.e("TAG", "quiz titles null");
             return;

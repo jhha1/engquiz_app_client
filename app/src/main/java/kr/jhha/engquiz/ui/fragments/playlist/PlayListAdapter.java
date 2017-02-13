@@ -1,8 +1,7 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

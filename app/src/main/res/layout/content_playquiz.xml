@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorGamePlayBackground"
-    tools:context="kr.jhha.engquiz.view.fragments.PlayQuizFragment">
+    tools:context="kr.jhha.engquiz.ui.fragments.PlayQuizFragment">
 
     <android.support.v4.widget.NestedScrollView
         xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -1,24 +1,21 @@
-package kr.jhha.engquiz.view.fragments;
+package kr.jhha.engquiz.ui.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.ui.MainActivity;
 
-import static kr.jhha.engquiz.view.fragments.SyncFragment.TabView.UPDATE;
-import static kr.jhha.engquiz.view.fragments.SyncFragment.TabView.UPLOAD;
+import static kr.jhha.engquiz.ui.fragments.SyncFragment.TabView.UPDATE;
+import static kr.jhha.engquiz.ui.fragments.SyncFragment.TabView.UPLOAD;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -96,7 +93,7 @@ public class SyncFragment extends Fragment
         public TabPagerAdapter(FragmentManager fm, int tabCount) {
             super(fm);
             tab1 = new UpdateFragment();
-            tab2 = new UploadScriptFragment();
+            tab2 = new AddScriptFragment();
             this.tabCount = tabCount;
         }
 

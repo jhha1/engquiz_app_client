@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="kr.jhha.engquiz.view.MainActivity"
+        tools:context="kr.jhha.engquiz.ui.MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </FrameLayout>
 

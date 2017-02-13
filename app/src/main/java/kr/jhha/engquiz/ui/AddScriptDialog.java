@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view;
+package kr.jhha.engquiz.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -20,9 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.controller.AddScript;
-import kr.jhha.engquiz.controller.FileManager;
-import kr.jhha.engquiz.model.Const;
+import kr.jhha.engquiz.backend_logic.FileManager;
+import kr.jhha.engquiz.backend_logic.ScriptManager;
 
 /**
  * Created by thyone on 2016-12-29.
@@ -30,7 +29,6 @@ import kr.jhha.engquiz.model.Const;
 
 public class AddScriptDialog extends Dialog
 {
-    private AddScript mController = new AddScript();
 
     private TextView mTitleView = null;
     private TextView mFileLocationView = null;
@@ -47,7 +45,7 @@ public class AddScriptDialog extends Dialog
 
     // 카카오톡 다운로드 폴더 내 파일 리스트 가져오기
     // 수강생들은 카톡단톡방에서 영어스크립트를 다운로드하므로.
-    private final String currentDirectoryName = Const.KaKaoDownloadFolder_AndroidPath;
+    private final String currentDirectoryName = FileManager.KaKaoDownloadFolder_AndroidPath;
 
     public AddScriptDialog (Context context) {
         super(context, android.R.style.Theme_Translucent_NoTitleBar);
@@ -66,7 +64,7 @@ public class AddScriptDialog extends Dialog
 
 
         mFileLocationView = (TextView) findViewById(R.id.add_script_file_location);
-        showCurrentPath( mController.getAbsoluteFilePath(currentDirectoryName) );
+        showCurrentPath( ScriptManager.getInstance().getAbsoluteFilePath(currentDirectoryName) );
 
         // 2. 파일 리스트뷰
         mItemListView = (ListView) findViewById(R.id.add_script_filebrower);
@@ -143,9 +141,7 @@ public class AddScriptDialog extends Dialog
     private void showDoubleCheckDialog(String filename, View v )
     {
         String msg = filename + " 스크립트를 추가하시겠습니까? " +
-                     "\\n반드시 Sonya의 pdf만 추가하셔야 합니다. " +
-                    "\\n서버에 없는 스크립트면, " +
-                    "앱을 사용하는 모든 수강생에게 공유됩니다.";
+                     "\\n반드시 Sonya 선생님의 pdf만 추가하셔야 합니다. ";
 
         AlertDialog.Builder ab = new AlertDialog.Builder( mContext );
         ab.setIcon(android.R.drawable.alert_dark_frame);
@@ -155,7 +151,7 @@ public class AddScriptDialog extends Dialog
             // 확인 버튼 클릭.
             public void onClick(DialogInterface dialog, int which) {
                 // 스크립트 추가
-                addScript();
+                addScript( );
             }
         });
         ab.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -170,8 +166,9 @@ public class AddScriptDialog extends Dialog
 
     // 스크립트 추가. 서버로 스크립트 전송
     private void addScript() {
+        String filename = mItems.get( mSelectedScriptPosition );
         String filepath = mFilepath.get( mSelectedScriptPosition );
-        mController.addScript( filepath );
+        //ScriptManager.getInstance().parseScript( filename, filepath );
     }
 
     // 다이알로그 닫기

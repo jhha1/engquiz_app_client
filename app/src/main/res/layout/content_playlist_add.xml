@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".view.fragments.playlist.AddList">
+    tools:context=".ui.fragments.playlist.AddList">
 
     <LinearLayout
         android:layout_width="match_parent"

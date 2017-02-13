@@ -1,18 +1,21 @@
-package kr.jhha.engquiz.model;
+package kr.jhha.engquiz.backend_logic;
 
 /**
  * Created by jhha on 2016-10-14.
  */
 
-public class QuizUnit {
+public class Sentence {
     public StringBuffer korean = new StringBuffer();
     public StringBuffer english = new StringBuffer();
 
-    public QuizUnit() {
+    public static final String KOREAN = "korean";
+    public static final String ENGLIST = "english";
+
+    public Sentence() {
         ;
     }
 
-    public QuizUnit(String korean, String english) {
+    public Sentence(String korean, String english) {
         this.korean.append(korean);
         this.english.append(english);
     }

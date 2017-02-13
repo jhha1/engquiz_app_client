@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.controller;
+package kr.jhha.engquiz.backend_logic;
 
 import android.util.Log;
 
@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.model.*;
-
 /**
  * Created by jhha on 2016-10-14.
  */
@@ -16,21 +14,23 @@ import kr.jhha.engquiz.model.*;
 public class QuizDataMaker
 {
 
-    public static Map<String, QuizList> parse(List<String> textfiles)
+    public static final String QuizUnitSeperator = "@@@";
+
+    public static Map<Integer, Script> parse(List<String> textfiles)
     {
-        if(textfiles == null) {
+        if(textfiles == null || textfiles.isEmpty()) {
             Log.e("QuizDataMaker.parse", "textFiles is null.");
             return Collections.emptyMap();
         }
 
-        Map<String, QuizList> parsedMap = new HashMap<String, QuizList>();
+        Map<Integer, Script> parsedMap = new HashMap<Integer, Script>();
         for(String text : textfiles) {
-            QuizList script = parse(text);
+            Script script = parse(text);
             if(null == script) {
                 System.out.println("[ERROR] parse failed. ");
                 continue;
             }
-            parsedMap.put(script.title, script);
+            parsedMap.put(script.index, script);
         }
         Log.d("QuizDataMaker.parse", "COUNT (textScript:"+ textfiles.size()
                         + ", parsedScript:"+parsedMap.size() +")");
@@ -38,15 +38,15 @@ public class QuizDataMaker
         return parsedMap;
     }
 
-    public static QuizList parse(String textFile)
+    public static Script parse(String textFile)
     {
         if(isNull(textFile)) {
             Log.e("QuizDataMaker", "textFile is null");
             return null;
         }
 
-        String rows[] = textFile.split(Const.QuizUnitSeperator);
-        if(rows.length <= 1) {
+        String rows[] = textFile.split(QuizUnitSeperator);
+        if(rows.length <= 3) {
             Log.e("QuizDataMaker", "Cound not split with. text["+textFile+"]");
             return null;
         }
@@ -55,9 +55,11 @@ public class QuizDataMaker
             Log.d("[test]",r);
         }
 
-        QuizList quizSet = new QuizList();
-        quizSet.title = rows[0];
-        for(int i=1; i<rows.length; ++i)
+        Script script = new Script();
+        script.index = Integer.parseInt( rows[0] );
+        script.revision = Integer.parseInt( rows[1] );
+        script.title = rows[2];
+        for(int i=3; i<rows.length; ++i)
         {
             String row = rows[i];
             if(row.isEmpty()) {
@@ -71,13 +73,13 @@ public class QuizDataMaker
                 continue;
             }
 
-            QuizUnit unit = new QuizUnit();
+            Sentence unit = new Sentence();
             unit.korean = new StringBuffer(dividedRow[0].trim());
             unit.english = new StringBuffer(dividedRow[1].trim());
-            quizSet.quizList.add(unit);
+            script.sentences.add(unit);
         }
-        Log.d("QuizDataMaker", "COUNT (quizSetLen:"+ quizSet.quizList.size() +")");
-        return quizSet;
+        Log.d("QuizDataMaker", "COUNT (quizSetLen:"+ script.sentences.size() +")");
+        return script;
     }
 
     private static Boolean isNull(String row) {

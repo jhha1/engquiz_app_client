@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments;
+package kr.jhha.engquiz.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,13 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.QuizUnit;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.backend_logic.Sentence;
+import kr.jhha.engquiz.ui.MainActivity;
 
-import static kr.jhha.engquiz.controller.QuizManager.quizManager;
+import static kr.jhha.engquiz.backend_logic.QuizPlayManager.quizManager;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -24,7 +23,7 @@ public class PlayQuizFragment extends Fragment
 {
     private final String mTITLE = "TODO: MyQuiz 이름";
 
-    private QuizUnit quiz;
+    private Sentence quiz;
 
     private TextView mQuestionView;
     private TextView mAnswerView;
@@ -88,20 +87,21 @@ public class PlayQuizFragment extends Fragment
     }
 
     private void doNextQuestion() {
+        mScrollView.scrollTo(0, 0);
+        mAnswerView.setVisibility(View.INVISIBLE);
+        mNextQuestionButton.setVisibility(View.INVISIBLE);
+
         quiz = getNewQuiz();
         if(quiz == null) {
-            mQuestionView.setText("퀴즈 데이터가 없습니다. 싱크를 눌러 서버로부터 퀴즈데이터를 받아주시기 바랍니다.");
-          //  Toast.makeText(this, "NewQuiz is null", Toast.LENGTH_SHORT).show();
+            mQuestionView.setText("퀴즈 데이터가 없습니다. 스크립트를 추가해, 나만의 퀴즈를 만들어 퀴즈게임을 즐길 수 있습니다");
+            mShowAnswerBtn.setVisibility(View.INVISIBLE);
             return;
         }
         mShowAnswerBtn.setVisibility(View.VISIBLE);
-        mAnswerView.setVisibility(View.INVISIBLE);
-        mNextQuestionButton.setVisibility(View.INVISIBLE);
         mQuestionView.setText(quiz.korean);
-        mScrollView.scrollTo(0, 0);
     }
 
-    private QuizUnit getNewQuiz() {
+    private Sentence getNewQuiz() {
         if(quizManager != null)
             return quizManager.getQuiz();
         return null;

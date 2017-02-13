@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.controller;
+package kr.jhha.engquiz.backend_logic;
 
 import android.util.Log;
 
@@ -8,44 +8,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import kr.jhha.engquiz.model.*;
-
 /**
  * Created by jhha on 2016-10-14.
  */
 
-public class QuizManager
+public class QuizPlayManager
 {
-    public static final QuizManager quizManager = new QuizManager();
+    public static final QuizPlayManager quizManager = new QuizPlayManager();
 
-    private Map<String, QuizList> allQuizs = new HashMap<String, QuizList>();
-    private List<QuizUnit> selectedQuizs = new ArrayList<QuizUnit>();
+    private Map<Integer, Script> scriptMap = new HashMap<Integer, Script>();
+    private List<Sentence> selectedQuizs = new ArrayList<Sentence>();
     private Random random = new Random();
 
-    private QuizManager() {
+    private QuizPlayManager() {
         init();
     }
 
-    public static QuizManager getInstance() {
+    public static QuizPlayManager getInstance() {
         return quizManager;
     }
 
     private void init()
     {
-        List<String> quizFiles = FileManager.getInstance().uploadParsedFiles();
-        // if ( 폰에 파싱된 파일이 없다면, 서버에서 전체받아옴)
-        this.allQuizs = QuizDataMaker.parse( quizFiles );
+        List<String> quizFiles = FileManager.getInstance().uploadParsedTextFiles();
+        if( quizFiles == null || quizFiles.isEmpty() ) {
+            return;
+        }
+
+        this.scriptMap = QuizDataMaker.parse( quizFiles );
         this.selectedQuizs = getLastPlayedQuizs();
     }
 
-    List<QuizUnit> getLastPlayedQuizs()
+    List<Sentence> getLastPlayedQuizs()
     {
-        List<QuizUnit> lastPlayedQuizs = new ArrayList<QuizUnit>();
+        List<Sentence> lastPlayedQuizs = new ArrayList<Sentence>();
 
-        // file read. last played idx. in my quiz.
-        // myquiz : myquizNum { script idx 들} , ... lastplay: myquiznum.
+        // file read. last played index. in my quiz.
+        // myquiz : myquizNum { script index 들} , ... lastplay: myquiznum.
 
-        // if( lastplay idx == 999 )
+        // if( lastplay index == 999 )
         // 전체 스크립트 리스트 가져옴.
         // show last played list
         lastPlayedQuizs = makeQuizList();
@@ -55,21 +56,21 @@ public class QuizManager
         return lastPlayedQuizs;
     }
 
-    public List<QuizUnit> makeQuizList() {
+    public List<Sentence> makeQuizList() {
         // 유저가 선택한 스크립트를 가지고 퀴즈 리스트를 만듬
         // 아직 미구현이므로, 전체 스크립트를 퀴즈 리스트로.
-        List<QuizUnit> lastPlayedQuizs = new ArrayList<QuizUnit>();
-        for(Map.Entry<String, QuizList> e : allQuizs.entrySet()) {
-            String title = e.getKey();
-            QuizList quizset = e.getValue();
-            for(QuizUnit quizunit : quizset.quizList) {
+        List<Sentence> lastPlayedQuizs = new ArrayList<Sentence>();
+        for(Map.Entry<Integer, Script> e : scriptMap.entrySet()) {
+            Integer index = e.getKey();
+            Script quizset = e.getValue();
+            for(Sentence quizunit : quizset.sentences) {
                 if(quizunit == null) {
-                    Log.e("[ERROR]","sentence is null. scriptTitle("+title+")");
+                    Log.e("[ERROR]","sentence is null. scriptIndex("+index+")");
                 }
                 lastPlayedQuizs.add(quizunit);
             }
         }
-        Log.d("makeQuizList", "Count(scriptMap:" + allQuizs.size()
+        Log.d("makeQuizList", "Count(scriptMap:" + scriptMap.size()
                         + ", selectedQuizs:"+ selectedQuizs.size() +")");
         System.out.println("[DEBUG] !!!!!!!!!!!!" + toStringScriptMap());
 
@@ -78,17 +79,17 @@ public class QuizManager
 
     private String toStringScriptMap() {
         StringBuffer buf = new StringBuffer();
-        buf.append("////////////////// allQuizs("+ allQuizs.size()+") /////////////////////\n");
-        for(Map.Entry<String, QuizList> e : allQuizs.entrySet()) {
-            String title = e.getKey();
-            QuizList script = e.getValue();
+        buf.append("////////////////// scriptMap("+ scriptMap.size()+") /////////////////////\n");
+        for(Map.Entry<Integer, Script> e : scriptMap.entrySet()) {
+            Integer index = e.getKey();
+            Script script = e.getValue();
             buf.append(script.toString() + "\n");
         }
         buf.append("////////////////////////////////////////////////////");
         return buf.toString();
     }
 
-    public QuizUnit getQuiz() {
+    public Sentence getQuiz() {
         if(selectedQuizs.isEmpty())
             return null;
 
@@ -97,7 +98,7 @@ public class QuizManager
     }
 
     public Object[] getQuizTitleAll() {
-        return this.allQuizs.keySet().toArray();
+        return this.scriptMap.keySet().toArray();
     }
 
     private int randomSelectOne() {

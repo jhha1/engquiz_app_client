@@ -8,7 +8,7 @@
     android:paddingLeft="50dp"
     android:paddingRight="50dp"
     android:paddingTop="100dp"
-    tools:context="kr.jhha.engquiz.view.IntroActivity">
+    tools:context="kr.jhha.engquiz.ui.IntroActivity">
 
     <Button
         android:id="@+id/intro_game_play_btn"

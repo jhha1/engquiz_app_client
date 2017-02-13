@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 
 import android.content.DialogInterface;
@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.view.MainActivity;
+import kr.jhha.engquiz.ui.MainActivity;
 
 
 /**

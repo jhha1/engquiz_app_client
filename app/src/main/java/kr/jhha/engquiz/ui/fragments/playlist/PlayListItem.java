@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.view.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.playlist;
 
 import android.graphics.drawable.Drawable;
 
