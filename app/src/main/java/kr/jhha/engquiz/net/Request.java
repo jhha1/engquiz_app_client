@@ -3,6 +3,7 @@ package kr.jhha.engquiz.net;
 import java.util.HashMap;
 import java.util.Map;
 
+import kr.jhha.engquiz.backend_logic.User;
 import kr.jhha.engquiz.backend_logic.Utils;
 
 /**
@@ -13,7 +14,13 @@ public class Request {
     private Map<EProtocol, Object> requestMap = new HashMap<EProtocol, Object>();
     private String requestString;
 
-    public Request(){}
+    public Request( Integer pid )
+    {
+        // set required values
+        set( EProtocol.PID, pid );
+        set( EProtocol.AccountID, User.getInstance().getAccountID() );
+        set( EProtocol.Nickname, User.getInstance().getNickname() );
+    }
 
     public void set( EProtocol key, Object vaule ) {
         if (key != null && vaule != null) {

@@ -7,40 +7,23 @@ import kr.jhha.engquiz.net.Response;
 
 // 스크립트 이름으로 서버에서 검색해,
 // 서버에 있으면 스크립트(파싱된) 다운로드
- public class GetScriptProtocol implements Protocol
+ public class GetScriptProtocol extends Protocol
 {
-    private Request request = new Request();
-    private Response response = new Response();
+    public final static Integer PID = 1002;
 
-    private Integer pid = 1002;
-
-    public GetScriptProtocol(String pdfFileName )
+    public GetScriptProtocol( String pdfFileName )
     {
+        super( PID );
         makeRequest( pdfFileName );
     }
 
-    @Override
-    public Request getRequest() {
-        return request;
-    }
-    @Override
-    public Response getResponse() {
-        return response;
-    }
-
-    public void makeRequest( String pdfFileName )
+    private void makeRequest( String pdfFileName )
     {
-        request.set( EProtocol.MacID, "dfdfdfd" );
-        request.set( EProtocol.PID, pid );
         request.set( EProtocol.ScriptTitle, pdfFileName);
-        request.serialize();
     }
 
-    @Override
-    public Object parseResponse( String responseString )
+    protected Response parseResponseMore()
     {
-        response.setResponseString( responseString );
-        response.unserialize();
         return response;
     }
 

@@ -36,15 +36,14 @@ public class Response {
         return this.responseString;
     }
 
-    public void setResponseString( String responseString ) {
+    public void unserialize( String responseString )
+    {
         if( responseString == null || responseString.isEmpty() ) {
             System.out.println("ERROR responseString is null or empty[" +responseString+"]");
             return;
         }
         this.responseString = responseString;
-    }
 
-    public void unserialize() {
         // extracting pure json string
         // JSON={..}  '='를 기점으로 'JSON'과 {}를 분리.
         int jsonBodyStartIndex = responseString.indexOf( "=" ) + 1;

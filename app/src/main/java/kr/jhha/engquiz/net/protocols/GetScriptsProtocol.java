@@ -15,41 +15,24 @@ import kr.jhha.engquiz.net.Response;
 
 // 스크립트 이름으로 서버에서 검색해,
 // 서버에 있으면 스크립트(파싱된) 다운로드
- public class GetScriptsProtocol implements Protocol
+ public class GetScriptsProtocol extends Protocol
 {
-    private Request request = new Request();
-    private Response response = new Response();
-
-    private Integer pid = 1003;
+    public final static Integer PID = 1003;
 
     public GetScriptsProtocol( List<Integer> scriptIndexes )
     {
+        super( PID );
         makeRequest( scriptIndexes );
-    }
-
-    @Override
-    public Request getRequest() {
-        return request;
-    }
-    @Override
-    public Response getResponse() {
-        return response;
     }
 
     public void makeRequest( List<Integer> scriptIndexes )
     {
-        request.set( EProtocol.MacID, "dfdfdfd" );
-        request.set( EProtocol.PID, pid );
         request.set( EProtocol.ScriptIndex, scriptIndexes);
-        request.serialize();
     }
 
     @Override
-    public Object parseResponse( String responseString )
+    protected Response parseResponseMore()
     {
-        response.setResponseString( responseString );
-        response.unserialize();
-
         Map<Integer, Script> parsedScript2 = new HashMap<Integer, Script>();
 
         Map<String, HashMap> parsedScript = (HashMap) response.get(EProtocol.ParsedSciprt);

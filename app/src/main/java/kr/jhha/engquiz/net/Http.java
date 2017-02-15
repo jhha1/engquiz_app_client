@@ -28,11 +28,9 @@ public class Http
     /* 개발시에는 에뮬레이터의 호스트 컴퓨터 주소를 사용해야 한다.
    * localhost, 127.0.0.1 등은 모바일 기기에서 실행되는 웹서버를 의미하므로 안됨
   */
-    public Response httpRequestPost( Protocol protocol )
+    public String httpRequestPost( String requestString )
     {
         try {
-            String requestString = protocol.getRequest().getRequestString();
-
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(url);
 
@@ -52,7 +50,7 @@ public class Http
             String responseString = EntityUtils.toString( responseEntity );
             System.out.println("[HTTP RESPONSE:URL{" + post.getURI() + "},DATA{" + responseString +"}");
 
-            return (Response) protocol.parseResponse( responseString );
+            return responseString;
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -11,7 +11,7 @@ public enum EProtocol {
 	
 	PID ("pid"),	// string
 	iPID ("iPID"),  // integer 
-	MacID("macId"),
+	AccountID("AccountID"),
 	
 	// required in response
 	CODE("code"),
@@ -19,6 +19,7 @@ public enum EProtocol {
 	
 	
 	// others
+	Nickname ("Nickname"),
 	ScriptTitle("title"),
 	ScriptIndex("index"),
 	ScriptRevision("revision"),
@@ -26,7 +27,12 @@ public enum EProtocol {
 	ParsedSciprt("parsedScript"),
 	HasParsedScript("HasParsedScript"),
 	SciprtPDF("scriptPDF"),
+	SciprtDOCX("scriptDocx"),
+	ScriptNames("ScriptNames"),
 	MatchedScripts("MatchedScripts"),
+	CheckSync_ResultCode("CheckSyncResultCode"),
+	CheckSync_NewScriptList("CheckSync_NewScriptList"),
+	CheckSync_NeedUpdateScriptList("CheckSync_NeedUpdateScriptList"),
 
 	
 	// for test

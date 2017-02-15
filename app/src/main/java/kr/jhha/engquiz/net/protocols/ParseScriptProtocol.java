@@ -93,45 +93,28 @@ public class ParseScriptPacket extends AsyncTask<Object, Integer, Object>
     }
 }
 */
- public class ParseScriptProtocol implements Protocol
+ public class ParseScriptProtocol extends Protocol
 {
-    private Request request = new Request();
-    private Response response = new Response();
-
-    private Integer pid = 1001;
+    public final static Integer PID = 1001;
 
     public ParseScriptProtocol( String pdfFilePath, String pdfFileName )
     {
+        super( PID );
         makeRequest( pdfFilePath, pdfFileName );
     }
 
-    @Override
-    public Request getRequest() {
-        return request;
-    }
-    @Override
-    public Response getResponse() {
-        return response;
-    }
-
-    public void makeRequest( String pdfFilePath, String pdfFileName )
+    private void makeRequest( String pdfFilePath, String pdfFileName )
     {
         byte[] pdfFile = ScriptManager.getInstance().loadPDF( pdfFilePath, pdfFileName );
-
-        request.set( EProtocol.MacID, "dfdfdfd" );
-        request.set( EProtocol.PID, pid );
         request.set( EProtocol.ScriptTitle, pdfFileName);
         request.set( EProtocol.SciprtPDF, pdfFile);
-        request.serialize();
         //byte[] test = new byte[10];for(int i=0;i<10;++i) test[i] = (byte)i;
         //protocol.setRequestParam( EProtocol.SciprtPDF, test);
     }
 
     @Override
-    public Response parseResponse( String responseString )
+    protected Response parseResponseMore()
     {
-        response.setResponseString( responseString );
-        response.unserialize();
         return response;
 
         /*

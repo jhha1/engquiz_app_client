@@ -1,11 +1,30 @@
 package kr.jhha.engquiz.net;
 
-public interface Protocol
+public abstract class Protocol
 {
-    Request getRequest();
-    Response getResponse();
+    protected Request request = null;
+    protected Response response = null;
 
-    Object parseResponse( String responseString );
+    public Protocol( Integer pid ) {
+        request = new Request( pid );
+        response = new Response();
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+    public Response getResponse() {
+        return response;
+    }
+
+    public Response callServer() {
+        request.serialize();
+        String responseString = new Http().httpRequestPost( request.getRequestString() );
+        response.unserialize( responseString );
+        return parseResponseMore();
+    }
+
+    abstract protected Response parseResponseMore();
 }
 
 /**

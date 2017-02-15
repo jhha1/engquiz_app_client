@@ -13,10 +13,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import kr.jhha.engquiz.net.EProtocol;
+import kr.jhha.engquiz.net.EResultCode;
 import kr.jhha.engquiz.net.Http;
 import kr.jhha.engquiz.net.Response;
+import kr.jhha.engquiz.net.protocols.CheckToNeedSyncProtocol;
 import kr.jhha.engquiz.net.protocols.GetScriptsProtocol;
 import kr.jhha.engquiz.net.protocols.MatchScriptProtocol;
+import kr.jhha.engquiz.net.protocols.SignInProtocol;
 
 /**
  * Created by thyone on 2017-02-10.
@@ -57,13 +60,177 @@ public class Initailizer
         Log.i("!!!!!!!!!!!!!!","Init Backend..");
         mContext = context;
 
+        initUser();
+
+        // 게임용 스크립트 구성
+        checkToNeedSync();
+        {
+            // if( need sync )
+            //      Map<Integer, Script> parsedScripts = doSync();
+            Map<Integer, Script> parsedScripts = new HashMap<>();
+            // 컨텐츠 로직 메모리에 셋팅
+            ScriptManager.getInstance().init(parsedScripts);
+        }
+        // else
+        {
+            // 내퀴즈의 마지막 플레이한 폴더 스크립트들을 게임데이터로 셋팅
+        }
+        return true;
+    }
+
+    private void initUser()
+    {
+        if( User.isSignInUser() )
+        {
+            User.getInstance().init();
+        }
+        else    // user db가 없거나, user db에 row 가 없거나.
+        {
+            // 회원가입 절차
+            // # 닉넴만들기 창으로 이동. ("아이디가 있습니다".. 버튼도추가. 클릭시 로긴창으로 이동.)
+            //   : 닉넴을 입력받아 서버로부터 새 user정보를 받아와 (accountid) usr 객체에 셋팅     <= 완전 첫 접속임
+            // # 아이디가 있어서, 아이디입력 로긴하면,                                             <= 앱 삭제후 재 설치
+            //  : 서버에서 아이디 확인 후, 유저정보(account id)를 usr객체에 셋팅
+            //     : 이런 경우, 앱 재설치므로, 스크립트 데이터가 앱에 없을것임.
+            //        앱 삭제시 sqlite데이터도 삭제된다면, 유저플레이정보를 서버에 저장해 재설치시 데이터복원을 해야함.
+            //
+            String nickname = "joy";
+            signIn( nickname );
+        }
+    }
+
+    private void signIn( String nickname ) {
+        Response response = new SignInProtocol( nickname ).callServer();
+        EResultCode code = (EResultCode) response.get(EProtocol.CODE);
+        if( code.equals( EResultCode.SUCCESS) ) {
+            Integer accountID = (Integer) response.get(EProtocol.AccountID);
+            User.getInstance().create( accountID, nickname, "macID" );
+        } else if ( code.equals( EResultCode.NICKNAME_DUPLICATED) ) {
+            Log.e("AppContent", "signIn() NICKNAME_DUPLICATED : "+nickname);
+        } else {
+            Log.e("AppContent", "signIn() UnkownERROR : "+ code.toString());
+        }
+    }
+
+    private void checkToNeedSync()
+    {
+        Map<String, String> cliScriptIndexsAndRevisions = new HashMap<>();
+
+        Response response = new CheckToNeedSyncProtocol( cliScriptIndexsAndRevisions ).callServer();
+
+        String resultCode = (String) response.get(EProtocol.CheckSync_ResultCode);
+        Map<Integer, String> newScriptSummary = (Map) response.get(EProtocol.CheckSync_NewScriptList);
+        List<Integer> needUpdateScriptIndexes = (List) response.get(EProtocol.CheckSync_NeedUpdateScriptList);
+
+        Log.i("AppContent", "#### checkToNeedSync() ###### " +
+                "resultCode:"+resultCode
+                 + "newScriptSummary:"+newScriptSummary.toString()
+                + "needUpdateScriptIndexes:"+needUpdateScriptIndexes.toString()  );
+    }
+
+    private List<String> readPDFFileTitles()
+    {
+        List<String> pdfFileNames = new LinkedList<String>();
+        FileManager manager = FileManager.getInstance();
+        String kakaoDownFolder = manager.getAndroidAbsolutePath(manager.KaKaoDownloadFolder_AndroidPath);
+        File[] scriptFiles = manager.getFileList( kakaoDownFolder );
+        Log.i("!!!!!!!!!!!!!!","read pdf from kakaoDownFolder [" + kakaoDownFolder +"], AllFileCount["+scriptFiles.length+"]");
+        for( File f : scriptFiles ){
+            String fileName = f.getName();
+            boolean bPDF = fileName.contains(".pdf");
+            if( bPDF ){
+                pdfFileNames.add( fileName );
+            }
+        }
+        Log.i("!!!!!!!!!!!!!!","read pdf from kakaoDownFolder [" + kakaoDownFolder +"], PDFFileCount["+pdfFileNames.size()+"]");
+        return pdfFileNames;
+    }
+
+    // 서버의 pdf 중, 클라에 있는 것 매치.
+    private Map<String, Integer> checkMatchScripts( List<String> pdfFileNames )
+    {
+        Response response =  new MatchScriptProtocol( pdfFileNames ).callServer();
+        Map<String, Integer> matchedScriptNames = (HashMap<String, Integer>) response.get(EProtocol.MatchedScripts);
+        return matchedScriptNames;
+    }
+
+    private Map<Integer, Script> downloadMatchScripts( Map<String, Integer> matchedScriptNames )
+    {
+        // 매치된 스크립트 다운로드 (5개 단위로 끊어 :1MB)
+        Map<Integer, Script> parsedScripts = new HashMap<Integer, Script>();
+        int requestCount = 0;          // 서버 다운 요청 개수
+        int maxRequestCount = 5;   // 서버에 요청 가능한 최대 파일 개수
+        int totalFileCounts = 0;  // 누적 파일 개수
+        List<Integer> scriptIndexes = new ArrayList<Integer>();
+        for( Map.Entry<String, Integer> e : matchedScriptNames.entrySet() )
+        {
+            if( (requestCount >= maxRequestCount)
+                    && (requestCount % maxRequestCount)  == 0 )
+            {
+                requestCount = 0;
+                Map<Integer, Script> downloadPieces = downloadMatchScriptsImpl( scriptIndexes );
+                if( downloadPieces == null ){
+                    Log.e("AppContent","downloadMatchScripts() download script map is null");
+                    continue;
+                }
+                parsedScripts.putAll( downloadPieces );
+            }
+            String scriptName = e.getKey();
+            Integer scriptIndex = e.getValue();
+            scriptIndexes.add(requestCount, scriptIndex);
+
+            Log.i("!!!!!!!!!!!!!!","downloadMatchScripts() requestCount [" + requestCount +"], " +
+                    "scriptIndex["+scriptIndexes.get(requestCount)+"], " +
+                    "totalFileCounts["+totalFileCounts+"], " +
+                    "matchedScriptNames.size() -1["+(matchedScriptNames.size() -1)+"], " +
+                    "matchedScriptNames.size() % 5["+(matchedScriptNames.size() % 5)+"]" +
+                    "(requestCount % maxRequestCount) ["+(requestCount % maxRequestCount) +"]");
+
+            // 파일 총 개수가 5배수가 아니면, 5로 나눈 나머지 파일은 별도로 받아줘야 함.
+            if( (totalFileCounts == matchedScriptNames.size() -1)
+                    &&  (matchedScriptNames.size() % 5) != 0  )
+            {
+                Log.i("!!!!!!!!!!!!!!","downloadMatchScripts() send remain!! requestCount [" + requestCount +"], scriptIndex["+scriptIndexes.get(requestCount)+"]");
+
+                Map<Integer, Script> downloadPieces = downloadMatchScriptsImpl( scriptIndexes );
+                if( downloadPieces == null ){
+                    Log.e("AppContent","downloadMatchScripts() download script map is null");
+                } else {
+                    parsedScripts.putAll(downloadPieces);
+                }
+                break;
+            }
+            ++requestCount;
+            ++totalFileCounts;
+        }
+        return parsedScripts;
+    }
+
+    private Map<Integer, Script> downloadMatchScriptsImpl( List<Integer> scriptIndexes )
+    {
+        Response response = new GetScriptsProtocol( scriptIndexes ).callServer();
+        return (HashMap<Integer, Script>) response.get(EProtocol.ParsedSciprt);
+    }
+
+    // 0: first, 1: none first
+    private boolean isUserFirstAccess( SharedPreferences preferences  )
+    {
+        int firstAccess = preferences.getInt("firstAccess", 0);
+        if( firstAccess == 0 )
+            return true;
+        else
+            return false;
+    }
+
+    private boolean legacy( Context context, SharedPreferences preferences )
+    {
+        Log.i("!!!!!!!!!!!!!!","Init Backend..");
+        mContext = context;
+
         SharedPreferences.Editor editor = preferences.edit();
 
         // 게임용 스크립트 구성
         Map<Integer, Script> parsedScripts = null;
-
-        //  앱이 처음 플레이 되는 케이스의 스크립트 구성
-        //      : 카톡폴더에 있는 스크립트 전체를 게임데이터로 자동 셋팅해줌
         if( isUserFirstAccess( preferences ) )
         {
             Log.i("!!!!!!!!!!!!!!","First Acess to this app ..");
@@ -112,7 +279,7 @@ public class Initailizer
                     Script script = e.getValue();
 
                     boolean bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
-                                                                            script.title, script.toTextFileFormat());
+                            script.title, script.toTextFileFormat());
 
                     // 저장 실패 된 스크립트로 데이터 init을 실패해 앱을 종료시키지 않는다.
                     // 정상적으로 저장된 것만 게임용으로 사용한다.
@@ -186,100 +353,5 @@ public class Initailizer
         // 컨텐츠 로직 메모리에 셋팅
         ScriptManager.getInstance().init( parsedScripts );
         return true;
-    }
-
-    private List<String> readPDFFileTitles()
-    {
-        List<String> pdfFileNames = new LinkedList<String>();
-        FileManager manager = FileManager.getInstance();
-        String kakaoDownFolder = manager.getAndroidAbsolutePath(manager.KaKaoDownloadFolder_AndroidPath);
-        File[] scriptFiles = manager.getFileList( kakaoDownFolder );
-        Log.i("!!!!!!!!!!!!!!","read pdf from kakaoDownFolder [" + kakaoDownFolder +"], AllFileCount["+scriptFiles.length+"]");
-        for( File f : scriptFiles ){
-            String fileName = f.getName();
-            boolean bPDF = fileName.contains(".pdf");
-            if( bPDF ){
-                pdfFileNames.add( fileName );
-            }
-        }
-        Log.i("!!!!!!!!!!!!!!","read pdf from kakaoDownFolder [" + kakaoDownFolder +"], PDFFileCount["+pdfFileNames.size()+"]");
-        return pdfFileNames;
-    }
-
-    // 서버의 pdf 중, 클라에 있는 것 매치.
-    private Map<String, Integer> checkMatchScripts( List<String> pdfFileNames )
-    {
-        MatchScriptProtocol protocol = new MatchScriptProtocol( pdfFileNames );
-        Response response = new Http().httpRequestPost( protocol );
-        Map<String, Integer> matchedScriptNames = (HashMap<String, Integer>) response.get(EProtocol.MatchedScripts);
-        return matchedScriptNames;
-    }
-
-    private Map<Integer, Script> downloadMatchScripts( Map<String, Integer> matchedScriptNames )
-    {
-        // 매치된 스크립트 다운로드 (5개 단위로 끊어 :1MB)
-        Map<Integer, Script> parsedScripts = new HashMap<Integer, Script>();
-        int requestCount = 0;          // 서버 다운 요청 개수
-        int maxRequestCount = 5;   // 서버에 요청 가능한 최대 파일 개수
-        int totalFileCounts = 0;  // 누적 파일 개수
-        List<Integer> scriptIndexes = new ArrayList<Integer>();
-        for( Map.Entry<String, Integer> e : matchedScriptNames.entrySet() )
-        {
-            if( (requestCount >= maxRequestCount)
-                    && (requestCount % maxRequestCount)  == 0 )
-            {
-                requestCount = 0;
-                Map<Integer, Script> downloadPieces = downloadMatchScriptsImpl( scriptIndexes );
-                if( downloadPieces == null ){
-                    Log.e("AppContent","downloadMatchScripts() download script map is null");
-                    continue;
-                }
-                parsedScripts.putAll( downloadPieces );
-            }
-            String scriptName = e.getKey();
-            Integer scriptIndex = e.getValue();
-            scriptIndexes.add(requestCount, scriptIndex);
-
-            Log.i("!!!!!!!!!!!!!!","downloadMatchScripts() requestCount [" + requestCount +"], " +
-                    "scriptIndex["+scriptIndexes.get(requestCount)+"], " +
-                    "totalFileCounts["+totalFileCounts+"], " +
-                    "matchedScriptNames.size() -1["+(matchedScriptNames.size() -1)+"], " +
-                    "matchedScriptNames.size() % 5["+(matchedScriptNames.size() % 5)+"]" +
-                    "(requestCount % maxRequestCount) ["+(requestCount % maxRequestCount) +"]");
-
-            // 파일 총 개수가 5배수가 아니면, 5로 나눈 나머지 파일은 별도로 받아줘야 함.
-            if( (totalFileCounts == matchedScriptNames.size() -1)
-                    &&  (matchedScriptNames.size() % 5) != 0  )
-            {
-                Log.i("!!!!!!!!!!!!!!","downloadMatchScripts() send remain!! requestCount [" + requestCount +"], scriptIndex["+scriptIndexes.get(requestCount)+"]");
-
-                Map<Integer, Script> downloadPieces = downloadMatchScriptsImpl( scriptIndexes );
-                if( downloadPieces == null ){
-                    Log.e("AppContent","downloadMatchScripts() download script map is null");
-                } else {
-                    parsedScripts.putAll(downloadPieces);
-                }
-                break;
-            }
-            ++requestCount;
-            ++totalFileCounts;
-        }
-        return parsedScripts;
-    }
-
-    private Map<Integer, Script> downloadMatchScriptsImpl( List<Integer> scriptIndexes )
-    {
-        GetScriptsProtocol protocol = new GetScriptsProtocol( scriptIndexes );
-        Response response = new Http().httpRequestPost( protocol );
-        return (HashMap<Integer, Script>) response.get(EProtocol.ParsedSciprt);
-    }
-
-    private boolean isUserFirstAccess(SharedPreferences preferences  )
-    {
-        int lastPlayQuizIndex = preferences.getInt("lastestPlayMyQuizIndex", -1);
-        if( lastPlayQuizIndex == -1 )
-            return true;
-        else
-            return false;
     }
 }
