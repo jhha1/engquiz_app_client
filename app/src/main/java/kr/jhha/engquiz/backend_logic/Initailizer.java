@@ -95,16 +95,17 @@ public class Initailizer
     private void initMyQuizList( Context context, Map<Integer, Script> parsedScripts  ) {
         if (QuizGroupAdapter.getInstance().getCount() == 0) {
             Drawable img = ContextCompat.getDrawable(context, R.drawable.ic_format_align_left_grey600_48dp);
-            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.");
-            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "Default", "개의 스크립트가 들어있습니다.");
-        }
-        // 임시적인 셋팅법.
-        // TODO 퀴즈그룹 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
-        for(Map.Entry<Integer,Script> e : parsedScripts.entrySet()) {
-            Integer idx = e.getKey();
-            Script script = e.getValue();
+            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.", null);
 
-            QuizGroupAdapter.getInstance().addScriptIntoDefaultQuizGroup( idx );
+            // 임시적인 셋팅법.
+            // TODO 퀴즈그룹 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
+            Integer[] parsedScriptIndexes = new Integer[ parsedScripts.size() ];
+            int i = 0;
+            for( Map.Entry<Integer, Script> e : parsedScripts.entrySet() ) {
+                Integer index = e.getKey();
+                parsedScriptIndexes[i++] =  index ;
+            }
+            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "Default", "개의 스크립트가 들어있습니다.", parsedScriptIndexes);
         }
     }
 

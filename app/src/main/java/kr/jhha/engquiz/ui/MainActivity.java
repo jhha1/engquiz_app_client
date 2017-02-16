@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,14 +21,13 @@ import android.widget.Toast;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.Initailizer;
 import kr.jhha.engquiz.ui.fragments.AddScriptFragment;
-import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
+import kr.jhha.engquiz.ui.fragments.QuizPlayFragment;
 import kr.jhha.engquiz.ui.fragments.SyncFragment;
 import kr.jhha.engquiz.ui.fragments.UpdateFragment;
-import kr.jhha.engquiz.ui.fragments.quizgroups.AddList;
-import kr.jhha.engquiz.ui.fragments.quizgroups.DelList;
+import kr.jhha.engquiz.ui.fragments.quizgroups.AddQuizGroup;
+import kr.jhha.engquiz.ui.fragments.quizgroups.DeleteQuizGroup;
 import kr.jhha.engquiz.ui.fragments.quizgroups.ShowQuizGroups;
-import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
-import kr.jhha.engquiz.ui.fragments.quizgroups.PlayListDetail;
+import kr.jhha.engquiz.ui.fragments.quizgroups.ShowQuizGroupDetail;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -100,11 +97,11 @@ public class MainActivity extends AppCompatActivity
 
     // 프래그먼트 초기화
     private void initFragments() {
-        mPlayQuizFragment = new PlayQuizFragment();
+        mPlayQuizFragment = new QuizPlayFragment();
         mPlayListFragment = new ShowQuizGroups();
-        mPlayListDetailFragment = new PlayListDetail();
-        mMakeCustomQuizFragment = new AddList();
-        mDelPlayListFragment = new DelList();
+        mPlayListDetailFragment = new ShowQuizGroupDetail();
+        mMakeCustomQuizFragment = new AddQuizGroup();
+        mDelPlayListFragment = new DeleteQuizGroup();
         mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
         mUpdateFragment = new UpdateFragment();

@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".ui.fragments.quizgroups.PlayListDetail">
+    tools:context=".ui.fragments.quizgroups.ShowQuizGroupDetail">
 
     <!-- explain how to use -->
     <TextView

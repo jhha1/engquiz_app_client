@@ -30,8 +30,8 @@ public class QuizGroupItem
     public void setDesc(String desc) {
         descStr = desc;
     }
-    public void addScriptIndex( Integer newScriptIndex ) {
-        scriptIndexes.add( newScriptIndex );
+    public void setScriptIndexes( List<Integer> indexes ) {
+        scriptIndexes = indexes;
     }
 
     public Drawable getIcon() {
@@ -43,10 +43,11 @@ public class QuizGroupItem
     public String getDesc() {
         return this.descStr ;
     }
-    public Integer getScript( Integer scriptIndex ) {
-        return scriptIndexes.get( scriptIndex );
-    }
     public final List<Integer> getScriptIndexes() {
         return scriptIndexes;
+    }
+
+    public void addScriptIndex( Integer newScriptIndex ) {
+        scriptIndexes.add( newScriptIndex );
     }
 }

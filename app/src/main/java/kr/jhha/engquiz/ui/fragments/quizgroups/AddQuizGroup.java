@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.ScriptManager;
 import kr.jhha.engquiz.ui.MainActivity;
@@ -26,11 +30,11 @@ import kr.jhha.engquiz.ui.MainActivity;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class AddList extends Fragment {
+public class AddQuizGroup extends Fragment {
 
-    private final String mTITLE = "Add Play List";
+    private final String mTITLE = "Add Quiz Group";
 
-    private ArrayAdapter mAdapter = null;
+    private ArrayAdapter<String> mAdapter = null;
     private ListView mItemListView = null;
     private EditText mPlayListSubject;
     private Button mButtonSetTitle;
@@ -45,12 +49,12 @@ public class AddList extends Fragment {
         // 스크립트 전체 제목리스트를 사용.
         int resourceID = R.layout.content_textstyle_listview_checked_multiple;
         //int resourceID = android.R.layout.simple_list_item_multiple_choice;
-        Object[] quizTitleAll = ScriptManager.getInstance().getScriptTitleAll();
+        String[] quizTitleAll = ScriptManager.getInstance().getScriptTitleAll();
         if(quizTitleAll == null) {
             Log.e("TAG", "quiz titles null");
             return;
         }
-        mAdapter = new ArrayAdapter(getActivity(), resourceID, quizTitleAll);
+        mAdapter = new ArrayAdapter<String>(getActivity(), resourceID, quizTitleAll);
 
         // 커스텀 플레이 리스트 추가확인 다이알로그 만들기
         initDialog();
@@ -176,16 +180,28 @@ public class AddList extends Fragment {
             return false;
         }
 
+        // 선택한 스크립트들의 index 가져오기
+        SparseBooleanArray checked = mItemListView.getCheckedItemPositions();
+        List<Integer> selectedItems = new ArrayList<>();
+        for( int i = 0; i < checked.size(); i++) {
+            int position = checked.keyAt(i);
+            if (checked.valueAt(i)) {
+                String scriptTitle = mAdapter.getItem(position);
+                Integer scriptIndex = ScriptManager.getInstance().getScriptIndexAsTitle( scriptTitle );
+                if( scriptIndex < 0 ) {
+                    continue;
+                }
+                selectedItems.add( scriptIndex );
+            }
+        }
+
         // 플레이 리스트뷰(ShowQuizGroups)에 새 플레이리스트를 추가
         //  -> 플레이 리스트 커스텀 아답터에 새 아이템 추가.
         int resourceID = R.drawable.ic_format_align_left_grey600_48dp;
         Drawable img = ContextCompat.getDrawable( getActivity(), resourceID );
         String playlistTitle = mPlayListSubject.getText().toString();
-        QuizGroupAdapter.getInstance().addNewQuizGroup( img, playlistTitle,  selectedCount + "개 리스트" );
-
-        // TODO
-        // 플레이리스트에 스크립트 넘버링
-        // 넘버로 실제 스크립트 데이터 가져오기
+        Integer[] scriptIndexes = selectedItems.toArray( new Integer[selectedItems.size()] );
+        QuizGroupAdapter.getInstance().addNewQuizGroup( img, playlistTitle,  "개 스크립트", scriptIndexes);
 
         Toast.makeText(getActivity(), "새 퀴즈가 추가되었습니다", Toast.LENGTH_SHORT).show();
         return true;

@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".ui.fragments.quizgroups.DelList">
+    tools:context=".ui.fragments.quizgroups.DeleteQuizGroup">
 
     <!-- explain how to use -->
     <TextView

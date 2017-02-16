@@ -24,9 +24,9 @@ import kr.jhha.engquiz.ui.MainActivity;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class DelList extends Fragment {
+public class DeleteQuizGroup extends Fragment {
 
-    private final String mTITLE = "Delete Play List";
+    private final String mTITLE = "Delete Quiz Group";
 
     private ArrayAdapter mAdapter = null;
     private ListView mItemListView = null;

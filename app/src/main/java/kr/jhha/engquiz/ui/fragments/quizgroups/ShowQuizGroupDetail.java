@@ -22,9 +22,9 @@ import kr.jhha.engquiz.ui.MainActivity;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class PlayListDetail extends Fragment {
+public class ShowQuizGroupDetail extends Fragment {
 
-    private final String mTITLE = "My Quiz Detail";
+    private final String mTITLE = "Quiz Group Detail";
 
     private ListView mItemListView = null;
     private String mSelectedItem;

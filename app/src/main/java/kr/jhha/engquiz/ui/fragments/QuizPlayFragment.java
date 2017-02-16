@@ -19,7 +19,7 @@ import static kr.jhha.engquiz.backend_logic.QuizPlayManager.quizManager;
  * Created by jhha on 2016-12-16.
  */
 
-public class PlayQuizFragment extends Fragment
+public class QuizPlayFragment extends Fragment
 {
     private final String mTITLE = "TODO: MyQuiz 이름";
 
@@ -35,7 +35,7 @@ public class PlayQuizFragment extends Fragment
     // TODO view 말고 model이나 컨트롤러로 이동
     private static int selectedQuizID = 0;
 
-    public PlayQuizFragment() {
+    public QuizPlayFragment() {
     }
 
     @Override

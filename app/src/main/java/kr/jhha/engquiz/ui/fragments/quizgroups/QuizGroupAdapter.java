@@ -46,7 +46,6 @@ public class QuizGroupAdapter extends BaseAdapter
     {
         final int pos = position;
         final Context context = parent.getContext();
-        int viewType = getItemViewType(position);
 
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
         QuizGroupItem quizGroupItem = listViewItemList.get(position);
@@ -65,9 +64,12 @@ public class QuizGroupAdapter extends BaseAdapter
         // 아이템 내 각 위젯에 데이터 반영
         iconImageView.setImageDrawable(quizGroupItem.getIcon());
         titleTextView.setText(quizGroupItem.getTitle());
-        Integer scriptCount = quizGroupItem.getScriptIndexes().size();
-        descTextView.setText(scriptCount + quizGroupItem.getDesc());
-
+        if( "New..".equals(quizGroupItem.getTitle()) ) {
+            descTextView.setText(quizGroupItem.getDesc());
+        } else {
+            Integer scriptCount = quizGroupItem.getScriptIndexes().size();
+            descTextView.setText(scriptCount + quizGroupItem.getDesc());
+        }
         return convertView;
     }
 
@@ -92,12 +94,17 @@ public class QuizGroupAdapter extends BaseAdapter
     }
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
-    public void addNewQuizGroup(Drawable icon, String title, String desc) {
+    public void addNewQuizGroup( Drawable icon, String title, String desc, Integer[] scriptIndexes ) {
         QuizGroupItem item = new QuizGroupItem();
 
         item.setIcon(icon);
         item.setTitle(title);
         item.setDesc(desc);
+        if( scriptIndexes != null ) {
+            for (Integer index : scriptIndexes) {
+                item.addScriptIndex(index);
+            }
+        }
 
         if(listViewItemList.isEmpty()) {
 

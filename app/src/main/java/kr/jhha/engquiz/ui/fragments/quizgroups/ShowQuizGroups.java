@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.ui.MainActivity;
-import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
+import kr.jhha.engquiz.ui.fragments.QuizPlayFragment;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -26,7 +26,7 @@ import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
 
 public class ShowQuizGroups extends Fragment
 {
-    private final String mTITLE = "Play List";
+    private final String mTITLE = "Quiz Groups";
 
     // 내 퀴즈 리스트
     private ListView mItemListView = null;
@@ -170,7 +170,7 @@ public class ShowQuizGroups extends Fragment
         switch(v.getId()){
             case R.id.playlist_set_for_play_btn:
                 // 플레이용 퀴즈로 설정
-                boolean bOK = PlayQuizFragment.setQuizList( mSelectedItemIndex );
+                boolean bOK = QuizPlayFragment.setQuizList( mSelectedItemIndex );
                 String msg = (bOK)? "게임플레이용 퀴즈가 변경되었습니다.":"게임플레이용 퀴즈 변경에 실패했습니다.";
                 Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
                 break;

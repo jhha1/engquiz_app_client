@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.jhha.engquiz.net.EProtocol;
-import kr.jhha.engquiz.net.Http;
-import kr.jhha.engquiz.net.Protocol;
 import kr.jhha.engquiz.net.Response;
 import kr.jhha.engquiz.net.protocols.GetScriptProtocol;
 import kr.jhha.engquiz.net.protocols.ParseScriptProtocol;
@@ -22,7 +20,7 @@ public class ScriptManager
     private static final ScriptManager instance = new ScriptManager();
 
     private Map<Integer, Script> scriptMap = new HashMap<>();
-    private Map<String, Integer> scriptMapByName = new HashMap<String, Integer>();
+    private Map<String, Integer> scriptIndexMapByName = new HashMap<String, Integer>();
 
     private ScriptManager() {}
 
@@ -42,7 +40,7 @@ public class ScriptManager
         // 1. scriptMap 에 셋팅
         this.scriptMap = parsedScripts;
 
-        // 2. scriptMapByName 에 셋팅.
+        // 2. scriptIndexMapByName 에 셋팅.
         for( Map.Entry<Integer, Script> e : this.scriptMap.entrySet() )
         {
             Integer scriptIndex =  Integer.parseInt(String.valueOf(e.getKey()));
@@ -57,12 +55,12 @@ public class ScriptManager
                 Log.e("AppContent", "Failed Init ScriptManager. invalid param. script["+((script!=null)?script.toString():null)+"]");
                 return;
             }
-            this.scriptMapByName.put( script.title, scriptIndex );
+            this.scriptIndexMapByName.put( script.title, scriptIndex );
         }
 
         // log
         Log.i("!!!!!!!!!!!!!!","ScriptManager INIT result. " +
-                "scriptMapByName ["+ scriptMapByName.toString() +"],"
+                "scriptIndexMapByName ["+ scriptIndexMapByName.toString() +"],"
                 +" parsedScripts ["+ scriptMap.toString() +"]");
     }
 
@@ -76,6 +74,13 @@ public class ScriptManager
         return new String();
     }
 
+    public Integer getScriptIndexAsTitle( String title ) {
+        if( scriptIndexMapByName.containsKey(title) ) {
+            return scriptIndexMapByName.get(title);
+        }
+        return -1;
+    }
+
     private Boolean addScript( Script newScript )
     {
         if( newScript == null) {
@@ -84,14 +89,14 @@ public class ScriptManager
         }
 
         if( scriptMap.containsKey(newScript.index)
-                || scriptMapByName.containsKey(newScript.title) ) {
+                || scriptIndexMapByName.containsKey(newScript.title) ) {
             Log.e("AppContent", "already exist script [" +newScript.title+ "]" +
                     "scriptMap in " + scriptMap.containsKey(newScript.index) +
-                    ", scriptMapByName in " + scriptMapByName.containsKey(newScript.title));
+                    ", scriptIndexMapByName in " + scriptIndexMapByName.containsKey(newScript.title));
             return false;
         }
         scriptMap.put( newScript.index, newScript );
-        scriptMapByName.put( newScript.title, newScript.index );
+        scriptIndexMapByName.put( newScript.title, newScript.index );
         return true;
     }
 
@@ -109,8 +114,8 @@ public class ScriptManager
 
         Script oldScript = scriptMap.get(newScript.index);
         scriptMap.put(newScript.index, newScript);
-        scriptMapByName.remove(oldScript.title);
-        scriptMapByName.put(newScript.title, newScript.index);
+        scriptIndexMapByName.remove(oldScript.title);
+        scriptIndexMapByName.put(newScript.title, newScript.index);
 
         // 오프라인 파일에 저장
         boolean bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
@@ -182,8 +187,8 @@ public class ScriptManager
         return newScript;
     }
 
-    public Object[] getScriptTitleAll(){
-        return this.scriptMapByName.keySet().toArray();
+    public String[] getScriptTitleAll(){
+        return this.scriptIndexMapByName.keySet().toArray( new String[scriptIndexMapByName.size()] );
     }
 
     private String toStringScriptMap() {
