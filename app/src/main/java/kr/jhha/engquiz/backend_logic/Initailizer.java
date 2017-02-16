@@ -2,6 +2,8 @@ package kr.jhha.engquiz.backend_logic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -10,16 +12,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.net.EProtocol;
 import kr.jhha.engquiz.net.EResultCode;
-import kr.jhha.engquiz.net.Http;
 import kr.jhha.engquiz.net.Response;
 import kr.jhha.engquiz.net.protocols.CheckToNeedSyncProtocol;
 import kr.jhha.engquiz.net.protocols.GetScriptsProtocol;
 import kr.jhha.engquiz.net.protocols.MatchScriptProtocol;
 import kr.jhha.engquiz.net.protocols.SignInProtocol;
+import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
 
 /**
  * Created by thyone on 2017-02-10.
@@ -60,6 +62,17 @@ public class Initailizer
         Log.i("!!!!!!!!!!!!!!","Init Backend..");
         mContext = context;
 
+        // 파일에 저장된 파싱된 파일읽어
+        List<String> files = FileManager.getInstance().uploadParsedTextFiles();
+        Map<Integer, Script> parsedScripts = QuizDataMaker.parse(files);
+        // 컨텐츠 로직 메모리에 셋팅
+        ScriptManager.getInstance().init(parsedScripts);
+
+        // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
+        // 일단은 parsedScripts를 인자로 넘기나, 구현후, ScriptManager에서 가져와서 셋티
+        initMyQuizList( context, parsedScripts );
+
+/*
         initUser();
 
         // 게임용 스크립트 구성
@@ -74,8 +87,25 @@ public class Initailizer
         // else
         {
             // 내퀴즈의 마지막 플레이한 폴더 스크립트들을 게임데이터로 셋팅
-        }
+        }*/
         return true;
+    }
+
+    // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
+    private void initMyQuizList( Context context, Map<Integer, Script> parsedScripts  ) {
+        if (QuizGroupAdapter.getInstance().getCount() == 0) {
+            Drawable img = ContextCompat.getDrawable(context, R.drawable.ic_format_align_left_grey600_48dp);
+            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.");
+            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "Default", "개의 스크립트가 들어있습니다.");
+        }
+        // 임시적인 셋팅법.
+        // TODO 퀴즈그룹 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
+        for(Map.Entry<Integer,Script> e : parsedScripts.entrySet()) {
+            Integer idx = e.getKey();
+            Script script = e.getValue();
+
+            QuizGroupAdapter.getInstance().addScriptIntoDefaultQuizGroup( idx );
+        }
     }
 
     private void initUser()
@@ -103,7 +133,7 @@ public class Initailizer
         Response response = new SignInProtocol( nickname ).callServer();
         EResultCode code = (EResultCode) response.get(EProtocol.CODE);
         if( code.equals( EResultCode.SUCCESS) ) {
-            Integer accountID = (Integer) response.get(EProtocol.AccountID);
+            Integer accountID = (Integer) response.get(EProtocol.UserID);
             User.getInstance().create( accountID, nickname, "macID" );
         } else if ( code.equals( EResultCode.NICKNAME_DUPLICATED) ) {
             Log.e("AppContent", "signIn() NICKNAME_DUPLICATED : "+nickname);

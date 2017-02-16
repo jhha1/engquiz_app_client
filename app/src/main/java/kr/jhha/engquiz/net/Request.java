@@ -18,8 +18,8 @@ public class Request {
     {
         // set required values
         set( EProtocol.PID, pid );
-        set( EProtocol.AccountID, User.getInstance().getAccountID() );
-        set( EProtocol.Nickname, User.getInstance().getNickname() );
+        set( EProtocol.UserID, User.getInstance().getAccountID() );
+        set( EProtocol.UserName, User.getInstance().getNickname() );
     }
 
     public void set( EProtocol key, Object vaule ) {

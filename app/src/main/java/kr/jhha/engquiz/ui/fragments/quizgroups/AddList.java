@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.ui.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.quizgroups;
 
 
 import android.content.DialogInterface;
@@ -176,12 +176,12 @@ public class AddList extends Fragment {
             return false;
         }
 
-        // 플레이 리스트뷰(PlayList)에 새 플레이리스트를 추가
+        // 플레이 리스트뷰(ShowQuizGroups)에 새 플레이리스트를 추가
         //  -> 플레이 리스트 커스텀 아답터에 새 아이템 추가.
         int resourceID = R.drawable.ic_format_align_left_grey600_48dp;
         Drawable img = ContextCompat.getDrawable( getActivity(), resourceID );
         String playlistTitle = mPlayListSubject.getText().toString();
-        PlayListAdapter.getInstance().addItem( img, playlistTitle,  selectedCount + "개 리스트" );
+        QuizGroupAdapter.getInstance().addNewQuizGroup( img, playlistTitle,  selectedCount + "개 리스트" );
 
         // TODO
         // 플레이리스트에 스크립트 넘버링
@@ -193,7 +193,7 @@ public class AddList extends Fragment {
 
     private void addPlayListAfterProcess()
     {
-        PlayListAdapter.getInstance().notifyDataSetChanged();
+        QuizGroupAdapter.getInstance().notifyDataSetChanged();
 
         // 입력한 제목과, 체크된 리스트 UI 초기화.
         // OnCreateView() 에서 초기화 시도했으나, 적용이 안되어,, 완료버튼이벤트에 삽입.

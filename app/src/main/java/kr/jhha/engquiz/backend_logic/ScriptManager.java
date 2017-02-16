@@ -66,6 +66,16 @@ public class ScriptManager
                 +" parsedScripts ["+ scriptMap.toString() +"]");
     }
 
+    public String getScriptTitleAsIndex( Integer index ) {
+        if( scriptMap.containsKey(index) ) {
+            Script script = scriptMap.get(index);
+            if( script != null ) {
+                return script.title;
+            }
+        }
+        return new String();
+    }
+
     private Boolean addScript( Script newScript )
     {
         if( newScript == null) {
@@ -85,15 +95,15 @@ public class ScriptManager
         return true;
     }
 
-    private Boolean replaceScript( Script newScript )
+    public Boolean replaceScript( Script newScript )
     {
-        if( newScript == null ) {
+        if (newScript == null) {
             Log.e("AppContent", "script is null");
             return false;
         }
 
         if( false == scriptMap.containsKey(newScript.index)) {
-            Log.e("AppContent", "None exist script [" +newScript.title+ "]" );
+            Log.e("AppContent", "Failed replace script into map. None exist script [" +newScript.title+ "]" );
             return false;
         }
 
@@ -102,6 +112,14 @@ public class ScriptManager
         scriptMapByName.remove(oldScript.title);
         scriptMapByName.put(newScript.title, newScript.index);
 
+        // 오프라인 파일에 저장
+        boolean bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
+                newScript.title, newScript.toTextFileFormat());
+        if( false == bOK ) {
+            Log.e("AppContent",
+                    "Failed overwrite script into file ["+ newScript.title +"]");
+            return false;
+        }
         return true;
     }
 
@@ -130,14 +148,12 @@ public class ScriptManager
     {
         // 서버로 파싱된 스크립트 요청
         // 서버에 있으면 받아옴
-        Protocol protocol = new GetScriptProtocol( pdfFilename );
-        Response response = new Http().httpRequestPost( protocol );
+        Response response = new GetScriptProtocol( pdfFilename ).callServer();
         Boolean hasParsedScript = (Boolean) response.get(EProtocol.HasParsedScript);
         if( false == hasParsedScript )
         {
             // 서버에 없으면, pdf 파일을 업로드 하여 파싱받아옴
-            protocol = new ParseScriptProtocol( pdfFilepath, pdfFilename );
-            response = new Http().httpRequestPost( protocol );
+            response = new ParseScriptProtocol( pdfFilepath, pdfFilename ).callServer();
         }
         Map scriptMap = (Map) response.get(EProtocol.ParsedSciprt);
         Script newScript = new Script( scriptMap );
@@ -164,32 +180,6 @@ public class ScriptManager
         }
 
         return newScript;
-    }
-
-    public Boolean replaceScript( String filepath, Script newScript )
-    {
-        if (newScript == null) {
-            Log.e("AppContent", "script is null");
-            return false;
-        }
-
-        boolean bOK = replaceScript( newScript );
-        if(bOK == false) {
-            Log.e("AppContent",
-                    "Failed replace script into map ["+ newScript.title +"]");
-            return false;
-        }
-
-        // 오프라인 파일에 저장
-        bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
-                newScript.title, newScript.toTextFileFormat());
-        if( false == bOK ) {
-            Log.e("AppContent",
-                    "Failed overwrite script into file ["+ newScript.title +"]");
-            return false;
-        }
-
-        return true;
     }
 
     public Object[] getScriptTitleAll(){

@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.ui.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.quizgroups;
 
 
 import android.content.DialogInterface;
@@ -26,7 +26,6 @@ public class PlayListDetail extends Fragment {
 
     private final String mTITLE = "My Quiz Detail";
 
-    private ArrayAdapter mAdapter = null;
     private ListView mItemListView = null;
     private String mSelectedItem;
     private int mSelectedItemIndex = -1;
@@ -37,12 +36,6 @@ public class PlayListDetail extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        // 아답터 생성: 기본 안드로이드 아답터 사용
-        //int resourceID = android.R.layout.simple_list_item_1;
-        int resourceID = R.layout.content_textstyle_listview;
-        String[] items = {"A", "B", "C", "D", "E", PlayList.Text_New};
-        mAdapter = new ArrayAdapter(getActivity(), resourceID, items);
-
         // 리스트 아이템 삭제확인 다이알로그 만들기
         initDialog();
         super.onCreate(savedInstanceState);
@@ -68,7 +61,7 @@ public class PlayListDetail extends Fragment {
         // 1. 플레이 리스트뷰
         mItemListView = (ListView) view.findViewById(R.id.playlist_detail_listview);
         // 플레이 리스트 아답터 연결
-        mItemListView.setAdapter(mAdapter);
+        mItemListView.setAdapter( QuizGroupDetailAdapter.getInstance() );
         // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
         mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
 
@@ -93,13 +86,13 @@ public class PlayListDetail extends Fragment {
             mSelectedItemIndex = position;
 
             // get item
-            PlayListItem item = (PlayListItem) parent.getItemAtPosition(position) ;
+            QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
             String titleStr = item.getTitle() ;
             String descStr = item.getDesc() ;
             Drawable iconDrawable = item.getIcon() ;
 
             // 내 커스텀 퀴즈에 스크립트 추가.
-            if( PlayList.Text_New.equals(titleStr) )
+            if( ShowQuizGroups.Text_New.equals(titleStr) )
                 ; // activity에게 화면전환요청.
             else
                 ; // nothing
@@ -153,12 +146,12 @@ public class PlayListDetail extends Fragment {
 
     private boolean isEmptyPlayList()
     {
-        int playListCount = PlayListAdapter.getInstance().getCount();
+        int playListCount = QuizGroupAdapter.getInstance().getCount();
         return (playListCount <= 0);
     }
 
     private void delQuizAfterProcess()
     {
-        mAdapter.notifyDataSetChanged();
+        QuizGroupDetailAdapter.getInstance().notifyDataSetChanged();
     }
 }

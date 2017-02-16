@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.ui;
+package kr.jhha.engquiz;
 
 import android.app.Dialog;
 import android.content.Context;

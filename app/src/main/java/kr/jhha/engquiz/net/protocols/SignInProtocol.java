@@ -16,7 +16,7 @@ public class SignInProtocol extends Protocol
 
    private void makeRequest( String nickname )
    {
-       request.set( EProtocol.Nickname, nickname );
+       request.set( EProtocol.UserName, nickname );
    }
 
    @Override

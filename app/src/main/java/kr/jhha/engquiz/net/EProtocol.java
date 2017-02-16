@@ -11,15 +11,14 @@ public enum EProtocol {
 	
 	PID ("pid"),	// string
 	iPID ("iPID"),  // integer 
-	AccountID("AccountID"),
+	UserID("UserID"),
+	UserName("UserName"),
 	
 	// required in response
 	CODE("code"),
 	MSG("msg"),
-	
-	
+
 	// others
-	Nickname ("Nickname"),
 	ScriptTitle("title"),
 	ScriptIndex("index"),
 	ScriptRevision("revision"),

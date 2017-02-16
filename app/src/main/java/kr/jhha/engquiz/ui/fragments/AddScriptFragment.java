@@ -26,6 +26,7 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.FileManager;
 import kr.jhha.engquiz.backend_logic.ScriptManager;
 import kr.jhha.engquiz.backend_logic.Script;
+import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -183,9 +184,15 @@ public class AddScriptFragment extends Fragment
 
         // 폴더 내 파일들을 뷰 리스트에 삽입
         for (File file : files) {
-            mFilepath.add(file.getPath());  // file full path = file path + file name
-            String filename = (file.isDirectory()) ? file.getName() + "/" : file.getName();
-            mItems.add(filename);
+            // 디렉토리와 pdf만 표시
+            boolean bPDFFile = file.getName().contains(".pdf");
+            boolean bHideFile = ( false == file.isDirectory() && false == bPDFFile );
+            if( bHideFile )
+                continue;
+
+            mFilepath.add(file.getPath());  // file path = file dir + file name
+            String fileName = (file.isDirectory()) ? file.getName() + "/" : file.getName();
+            mItems.add(fileName);
         }
 
         // 디렉토리 위치변경에 의한 UI 리프레시
@@ -257,6 +264,8 @@ public class AddScriptFragment extends Fragment
          3. Object: onPostExecute 파라메터.
         */
         private AsyncTask<Object, Integer, Object> task = null;
+        private boolean mIsParseOK = false;
+        private Integer mParsedScriptIndex = 0;
 
         public AddScriptTask( String filepath, String filename )
         {
@@ -305,18 +314,45 @@ public class AddScriptFragment extends Fragment
                 {
                     mDialogLoadingSpinner.dismiss(); // 로딩스피너 다이알로그 닫기
 
-                    // 개발자와 유저에 따라 이후 액션이 바뀜
-                    String macID = "jhha"; // TODO macID
+                    // 에러 처리
                     String dialogMsg = "";
-                    if (macID.equals("jhha"))
+                    boolean bAdmin = true;
+                    if( result == null || result instanceof Exception ) {
+                        // 개발자에겐 스크립트 파싱 결과 텍스트를 보여줌.
+                        if( bAdmin ) {
+                            dialogMsg = (result == null)? null : ((Exception) result).getMessage();
+                        } // 유저에겐 안내메세지
+                        else {
+                            dialogMsg = "오류가 발생했습니다. " +
+                                    "\nReport 버튼을 클릭하시면 개발자에게 에러내용이 보고됩니다." +
+                                    "\n개발자가 확인 및 수정한 내역은 알람메뉴에서 보실 수 있습니다.";
+                            mDialogResult.setNegativeButton("Report", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface d, int which) {
+
+                                    d.dismiss(); // 다이알로그 닫기
+                                }
+                            });
+                        }
+                        mDialogResult.setMessage( dialogMsg );
+                        mDialogResult.show();
+                        return;
+                    }
+
+                    // Default Quiz Group에 넣어주기
+                    final QuizGroupAdapter adapter = QuizGroupAdapter.getInstance();
+                    if( result instanceof Script ) {
+                        mParsedScriptIndex = ((Script) result).index;
+                        adapter.addScriptIntoDefaultQuizGroup( mParsedScriptIndex );
+                        mIsParseOK = true;
+                    }
+
+                    // 결과 다이알로그
+                    if ( bAdmin )
                     {
                         // 개발자에겐 스크립트 파싱 결과 텍스트를 보여줌.
                         if( result instanceof Script )
-                            dialogMsg = ((Script)result).toString();
-                        else if( result instanceof Exception )
-                            dialogMsg = ((Exception) result).getMessage();
-                        else
-                            dialogMsg = "UnknownError";
+                            dialogMsg = ((Script) result).toString();
+
                         mDialogResult.setNegativeButton("Modify", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface d, int which) {
                                 // 파싱결과가 이상하면 수정
@@ -326,7 +362,7 @@ public class AddScriptFragment extends Fragment
                                 mDialogModifyResult.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface d, int which) {
                                         // 수정결과를 메모리맵에 반영.
-                                        boolean bOK = ScriptManager.getInstance().replaceScript( "", (Script)result );
+                                        boolean bOK = ScriptManager.getInstance().replaceScript( (Script)result );
                                         if( bOK == false ) {
                                             Toast.makeText(getActivity(), "수정결과 적용에러", Toast.LENGTH_SHORT).show();
                                         }
@@ -344,17 +380,6 @@ public class AddScriptFragment extends Fragment
                         if( result instanceof Script )
                             dialogMsg = "스크립트가 추가되었습니다. " +
                                     "\n튜토리얼에서 추가된 스크립트를 게임에 적용하는 법을 확인 할 수 있습니다.";
-                        else {
-                            dialogMsg = "오류가 발생했습니다. " +
-                                    "\nReport 버튼을 클릭하시면 개발자에게 에러내용이 보고됩니다." +
-                                    "\n개발자가 확인 및 수정한 내역은 알람메뉴에서 보실 수 있습니다.";
-                            mDialogResult.setNegativeButton("Report", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface d, int which) {
-
-                                        d.dismiss(); // 다이알로그 닫기
-                                }
-                            });
-                        }
                     }
                     mDialogResult.setMessage( dialogMsg );
                     mDialogResult.show();

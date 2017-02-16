@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.ui.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.quizgroups;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,7 +24,7 @@ import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
  * Created by jhha on 2016-12-16.
  */
 
-public class PlayList extends Fragment
+public class ShowQuizGroups extends Fragment
 {
     private final String mTITLE = "Play List";
 
@@ -45,7 +45,7 @@ public class PlayList extends Fragment
     private OnPlayListButtonClickListener mOnPlayListBtnClickListener;
     private AlertDialog.Builder mDeleteItemDialog = null;
 
-    public PlayList() {}
+    public ShowQuizGroups() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -78,13 +78,13 @@ public class PlayList extends Fragment
         // 2. 플레이 리스트뷰
         ListView itemListView = (ListView) view.findViewById(R.id.playlistview);
         // 아답터 연결
-        itemListView.setAdapter( PlayListAdapter.getInstance() );
+        itemListView.setAdapter( QuizGroupAdapter.getInstance() );
         // 클릭 이벤트 핸들러 정의: 내 퀴즈 디테일 보기
         itemListView.setOnItemClickListener(mListItemClickListener);
         // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
         itemListView.setOnItemLongClickListener(mListItemLongClickListener);
         // 데이터 변경에 대한 ui 리프레시 요청
-        PlayListAdapter.getInstance().notifyDataSetChanged();
+        QuizGroupAdapter.getInstance().notifyDataSetChanged();
 
         // 3. 아이템 선택시 나오는 옵션 창이 열려있으면 닫기
         hideOptions();
@@ -111,10 +111,14 @@ public class PlayList extends Fragment
             mSelectedItemIndex = position;
 
             // get item
-            PlayListItem item = (PlayListItem) parent.getItemAtPosition(position) ;
-            String titleStr = item.getTitle() ;
-            String descStr = item.getDesc() ;
-            Drawable iconDrawable = item.getIcon() ;
+            QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
+            String titleStr = item.getTitle();
+            String descStr = item.getDesc();
+            Drawable iconDrawable = item.getIcon();
+
+            // quiz group detail에서 보여줘야할.. 퀴즈그룹정보 전달.
+            QuizGroupDetailAdapter.getInstance().setCurrentQuizGroup( item );
+            Log.d("%%%%%%%%%%%%%%%", "ShowQuizGroups.item clicked. item titleStr:" + titleStr);
 
             // 새 커스텀 퀴즈 리스트 만들기
             if( Text_New.equals(titleStr) )
@@ -132,7 +136,7 @@ public class PlayList extends Fragment
         public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
         {
             mSelectedItemIndex = position;
-            PlayListItem item = (PlayListItem) parent.getItemAtPosition(position) ;
+            QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
             // 아이템 삭제 확인 다이알로그 띄우기
             String msg = item.getTitle() + " 을 삭제하시겠습니까?";
             mDeleteItemDialog.setMessage( msg );
@@ -197,7 +201,7 @@ public class PlayList extends Fragment
             return false;
         }
 
-        boolean bDeleted = PlayListAdapter.getInstance().deleteItem( mSelectedItemIndex );
+        boolean bDeleted = QuizGroupAdapter.getInstance().deleteQuizGroup( getActivity(), mSelectedItemIndex );
         if( false == bDeleted ) {
             Log.e("Tag", "Failed Deleting customPlaylist. Idx:" + mSelectedItemIndex);
             return false;
@@ -209,14 +213,14 @@ public class PlayList extends Fragment
 
     private boolean isEmptyPlayList()
     {
-        int playListCount = PlayListAdapter.getInstance().getCount();
+        int playListCount = QuizGroupAdapter.getInstance().getCount();
         return (playListCount <= 0);
     }
 
     private void addPlayListAfterProcess()
     {
         // mAdapter.notifyDataSetChanged();
-        PlayListAdapter.getInstance().notifyDataSetChanged(); // playlist
+        QuizGroupAdapter.getInstance().notifyDataSetChanged(); // playlist
     }
 
     // Activity와 통신을 위해, ShowList를 activity에 연결.

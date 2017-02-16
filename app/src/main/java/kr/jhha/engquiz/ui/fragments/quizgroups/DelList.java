@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.ui.fragments.playlist;
+package kr.jhha.engquiz.ui.fragments.quizgroups;
 
 
 import android.content.DialogInterface;
@@ -40,7 +40,7 @@ public class DelList extends Fragment {
         // 아답터 생성: 기본 안드로이드 아답터 사용
         // Custom PlayList에서 받아온 제목리스트를 사용.
         int resourceID = android.R.layout.simple_list_item_multiple_choice;
-        Object[] customQuizTitleAll = PlayListAdapter.getInstance().getPlayListTitles();
+        Object[] customQuizTitleAll = QuizGroupAdapter.getInstance().getPlayListTitles();
         if(customQuizTitleAll == null) {
             Log.e("TAG", "quiz titles null");
             return;
@@ -138,7 +138,7 @@ public class DelList extends Fragment {
         }
 
         SparseBooleanArray checkedItems = mItemListView.getCheckedItemPositions();
-        int playListCount = PlayListAdapter.getInstance().getCount();
+        int playListCount = QuizGroupAdapter.getInstance().getCount();
         int startIndex = playListCount - 1;
         for (int i=startIndex; i >= 0; --i)
         {
@@ -146,7 +146,7 @@ public class DelList extends Fragment {
             if( false == bSelected )
                 continue;
 
-            boolean bDeleted = PlayListAdapter.getInstance().deleteItem(i);
+            boolean bDeleted = QuizGroupAdapter.getInstance().deleteQuizGroup( getActivity(), i );
             if( false == bDeleted ) {
                  Log.e("Tag", "Failed Deleting customPlaylist. Idx:" + i);
                 return false;
@@ -165,14 +165,14 @@ public class DelList extends Fragment {
 
     private boolean isEmptyPlayList()
     {
-        int playListCount = PlayListAdapter.getInstance().getCount();
+        int playListCount = QuizGroupAdapter.getInstance().getCount();
         return (playListCount <= 0);
     }
 
     private void addPlayListAfterProcess()
     {
         // mAdapter.notifyDataSetChanged();
-        PlayListAdapter.getInstance().notifyDataSetChanged(); // playlist
+        QuizGroupAdapter.getInstance().notifyDataSetChanged(); // playlist
 
         // 체크된 리스트 UI 초기화.
         refreshUI();

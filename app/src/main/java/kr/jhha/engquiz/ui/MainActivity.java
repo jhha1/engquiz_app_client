@@ -1,7 +1,6 @@
 package kr.jhha.engquiz.ui;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,35 +16,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.backend_logic.FileManager;
 import kr.jhha.engquiz.backend_logic.Initailizer;
 import kr.jhha.engquiz.ui.fragments.AddScriptFragment;
 import kr.jhha.engquiz.ui.fragments.PlayQuizFragment;
 import kr.jhha.engquiz.ui.fragments.SyncFragment;
 import kr.jhha.engquiz.ui.fragments.UpdateFragment;
-import kr.jhha.engquiz.ui.fragments.playlist.AddList;
-import kr.jhha.engquiz.ui.fragments.playlist.DelList;
-import kr.jhha.engquiz.ui.fragments.playlist.PlayList;
-import kr.jhha.engquiz.ui.fragments.playlist.PlayListAdapter;
-import kr.jhha.engquiz.ui.fragments.playlist.PlayListDetail;
+import kr.jhha.engquiz.ui.fragments.quizgroups.AddList;
+import kr.jhha.engquiz.ui.fragments.quizgroups.DelList;
+import kr.jhha.engquiz.ui.fragments.quizgroups.ShowQuizGroups;
+import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
+import kr.jhha.engquiz.ui.fragments.quizgroups.PlayListDetail;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
-        , PlayList.OnPlayListButtonClickListener {
+        , ShowQuizGroups.OnPlayListButtonClickListener {
 
     private Toolbar mToolbar;
     private DrawerLayout mNavDrawer;
@@ -80,14 +69,10 @@ public class MainActivity extends AppCompatActivity
         initFragments();
         initFirstView(); // 첫 화면. initFragments() 다음에 와야함!!
 
-        // 파일에 있는 커스텀리스트를 읽어와 list에 저장.
-        // Adapter에서는 getActivity()가 안되서,, 여기서 초기화.
-        initMyQuizList();
-
         //SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
         //Initailizer.getInstance().initBackend(preferences);
 
-        new InitailizeAsync( this ).execute();
+       new InitailizeAsync( this ).execute();
     }
 
     // 툴바 초기화
@@ -116,7 +101,7 @@ public class MainActivity extends AppCompatActivity
     // 프래그먼트 초기화
     private void initFragments() {
         mPlayQuizFragment = new PlayQuizFragment();
-        mPlayListFragment = new PlayList();
+        mPlayListFragment = new ShowQuizGroups();
         mPlayListDetailFragment = new PlayListDetail();
         mMakeCustomQuizFragment = new AddList();
         mDelPlayListFragment = new DelList();
@@ -132,16 +117,6 @@ public class MainActivity extends AppCompatActivity
         transaction.add(R.id.container, mPlayQuizFragment);
         transaction.commit();
     }
-
-    // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
-    private void initMyQuizList() {
-        if (PlayListAdapter.getInstance().getCount() == 0) {
-            Drawable img = ContextCompat.getDrawable(this, R.drawable.ic_format_align_left_grey600_48dp);
-            PlayListAdapter.getInstance().addItem(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.");
-            PlayListAdapter.getInstance().addItem(img, "Default Quiz", "스크립트 전체가 들어있습니다.");
-        }
-    }
-
 
     @Override
     public void onBackPressed() {
