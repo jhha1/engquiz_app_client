@@ -23,7 +23,6 @@ public abstract class Protocol
         response.unserialize( responseString );
         return parseResponseMore();
     }
-
     abstract protected Response parseResponseMore();
 }
 

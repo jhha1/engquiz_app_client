@@ -1,5 +1,9 @@
 package kr.jhha.engquiz.net;
 
+import android.util.Log;
+
+import kr.jhha.engquiz.backend_logic.Utils;
+
 public enum EResultCode {
 	
 	SUCCESS ( 0000 ),
@@ -9,7 +13,7 @@ public enum EResultCode {
 	INVALID_ARGUMENT ( 1001 ),
 	
 	// account  
-	INVALID_ACCOUNTID ( 1010 ),
+	INVALID_USERID ( 1010 ),
 	ACCOUNT_LOGIN ( 1011 ),
 	ACCOUNT_LOGOUT( 1012 ),
 	ACCOUNT_BLOCK ( 1013 ),
@@ -46,5 +50,19 @@ public enum EResultCode {
 	public String stringCode()
 	{
 		return code.toString();
+	}
+
+	public static EResultCode findBy(String value ) {
+		if(Utils.isNullString(value)) {
+			throw new IllegalArgumentException("Null arg. value:"+value);
+		}
+
+		Integer intVaule = Integer.parseInt( value );
+		EResultCode[] codes = EResultCode.values();
+		for( EResultCode e: codes ) {
+			if( e.intCode().equals(intVaule) )
+				return e;
+		}
+		throw new IllegalArgumentException("No Existed EResultCode. value:"+value);
 	}
 }

@@ -4,11 +4,11 @@ import kr.jhha.engquiz.net.EProtocol;
 import kr.jhha.engquiz.net.Protocol;
 import kr.jhha.engquiz.net.Response;
 
-public class SignInProtocol extends Protocol
+public class CheckExistUserProtocol extends Protocol
 {
-   public final static Integer PID = 1002;
+   public final static Integer PID = 1001;
 
-   public SignInProtocol( String nickname, String macID )
+   public CheckExistUserProtocol( String nickname, String macID )
    {
        super( PID );
        makeRequest( nickname, macID );

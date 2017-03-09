@@ -89,7 +89,6 @@ public class ShowQuizGroupDetail extends Fragment {
             QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
             String titleStr = item.getTitle() ;
             String descStr = item.getDesc() ;
-            Drawable iconDrawable = item.getIcon() ;
 
             // 내 커스텀 퀴즈에 스크립트 추가.
             if( ShowQuizGroups.Text_New.equals(titleStr) )

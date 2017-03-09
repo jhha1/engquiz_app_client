@@ -33,6 +33,16 @@ public enum EProtocol {
 	CheckSync_NewScriptList("CheckSync_NewScriptList"),
 	CheckSync_NeedUpdateScriptList("CheckSync_NeedUpdateScriptList"),
 
+	MacID ("MacID"),
+	UserNickName("UserNickName"),
+	IsExistedUser("IsExistedUser"),
+	QuizGroupId("QuizGroupId"),
+	QuizGroupState("QuizGroupState"),
+	QuizGroupTitle("QuizGroupTitle"),
+	QuizGroupUIOrder("QuizGroupUIOrder"),
+	QuizGroupInfo("QuizGroupInfo"),
+	ScriptIds("ScriptIds"),
+
 	
 	// for test
 	TEST("test"),

@@ -19,6 +19,7 @@ public class QuizPlayManager
     private Map<Integer, Script> scriptMap = new HashMap<Integer, Script>();
     private List<Sentence> selectedQuizs = new ArrayList<Sentence>();
     private Random random = new Random();
+    private Integer playingQuizGroupId = 0;
 
     private QuizPlayManager() {
         init();
@@ -37,6 +38,18 @@ public class QuizPlayManager
 
         this.scriptMap = QuizDataMaker.parse( quizFiles );
         this.selectedQuizs = getLastPlayedQuizs();
+    }
+
+    public void changePlayingQuizGroup( QuizGroup quizGroup ) {
+        if( quizGroup == null ){
+            Log.e("CONTENT", "quiz group is null");
+            return;
+        }
+
+        for(Integer scriptId : quizGroup.scriptIndexes) {
+            // TODO 어떻게 읽어옴?
+            FileManager.getInstance()
+        }
     }
 
     List<Sentence> getLastPlayedQuizs()

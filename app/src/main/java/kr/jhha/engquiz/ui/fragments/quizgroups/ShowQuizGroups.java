@@ -75,7 +75,7 @@ public class ShowQuizGroups extends Fragment
         view.findViewById(R.id.playlist_show_detail_btn).setOnClickListener(mClickListener);
         view.findViewById(R.id.playlist_set_for_play_btn).setOnClickListener(mClickListener);
 
-        // 2. 플레이 리스트뷰
+        // 2. 퀴즈그룹 리스트뷰
         ListView itemListView = (ListView) view.findViewById(R.id.playlistview);
         // 아답터 연결
         itemListView.setAdapter( QuizGroupAdapter.getInstance() );
@@ -83,6 +83,8 @@ public class ShowQuizGroups extends Fragment
         itemListView.setOnItemClickListener(mListItemClickListener);
         // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
         itemListView.setOnItemLongClickListener(mListItemLongClickListener);
+        // 퀴즈그룹 리스트 ui 소팅
+        QuizGroupAdapter.getInstance().sort();
         // 데이터 변경에 대한 ui 리프레시 요청
         QuizGroupAdapter.getInstance().notifyDataSetChanged();
 
@@ -114,7 +116,6 @@ public class ShowQuizGroups extends Fragment
             QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
             String titleStr = item.getTitle();
             String descStr = item.getDesc();
-            Drawable iconDrawable = item.getIcon();
 
             // quiz group detail에서 보여줘야할.. 퀴즈그룹정보 전달.
             QuizGroupDetailAdapter.getInstance().setCurrentQuizGroup( item );

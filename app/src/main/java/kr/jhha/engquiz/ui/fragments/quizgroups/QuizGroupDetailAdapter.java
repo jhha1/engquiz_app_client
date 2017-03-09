@@ -96,7 +96,6 @@ public class QuizGroupDetailAdapter extends BaseAdapter
                 String scriptTitle = ScriptManager.getInstance().getScriptTitleAsIndex( index );
                 QuizGroupDetailItem detail = new QuizGroupDetailItem();
                 detail.setTitle( scriptTitle );
-                detail.setIcon( quizGroup.getIcon() );
                 detailList.add( detail );
             }
 

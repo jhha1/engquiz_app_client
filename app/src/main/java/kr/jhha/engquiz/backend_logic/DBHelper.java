@@ -7,14 +7,23 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupItem;
+
 /**
  * Created by thyone on 2017-02-14.
  */
 
 public class DBHelper extends SQLiteOpenHelper
 {
-    public static final String DB_NAME = "engquiz.db";
+    public static final String DB_NAME = "/mnt/sdcard/" + "engquiz.db";
     public static final int DB_VERSION = 1;
+
+    private static final String TB_QUIZGROUPS = "quizgroups";
 
     // DBHelper 생성자로 관리할 DB 이름과 버전 정보를 받음
     public DBHelper( Context context ) {
@@ -26,8 +35,13 @@ public class DBHelper extends SQLiteOpenHelper
     // 테이블 생성하는 코드를 작성한다
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "create table myquiz (_id integer primary key autoincrement," +
-                "order_index integer not null, title text not null, file_indexs integer not null);";
+        String sql = "CREATE TABLE IF NOT EXISTS " + TB_QUIZGROUPS
+                + " (_id integer primary key autoincrement," +
+                    "tag integer not null, " +
+                    "title text not null, " +
+                    "desc text, " +
+                    "script_indexes text not null, " +
+                    "created_dt DEFAULT CURRENT_TIMESTAMP not null);";
         db.execSQL(sql);
     }
 
@@ -45,14 +59,26 @@ public class DBHelper extends SQLiteOpenHelper
         onCreate(db);
     }
 
-    public boolean insertNewMyQuiz(int orderIndex, String title, String fileIndexes) {
+    private String getDateTime( long currentTimeMillis ) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return dateFormat.format( currentTimeMillis );
+    }
+
+    public boolean insertNewQuizGroup( QuizGroupItem item )
+    {
+        Log.i("#####################", "insertNewQuizGroup called DB");
         SQLiteDatabase db = getReadableDatabase();
         ContentValues values  = new ContentValues();
-        values.put("order_index", orderIndex);
-        values.put("title", title);
-        values.put("file_indexs", fileIndexes);
+
+        values.put("tag", item.getTag());
+        values.put("title", item.getTitle());
+        values.put("desc", item.getDesc());
+        values.put("script_indexes", Utils.list2json( item.getScriptIndexes() ));
+        values.put("created_dt", getDateTime(item.getCreatedDateTime()));
         Log.i("#####################", "Insert DB" + values.toString());
-        db.insert("myquiz", null, values);
+
+        db.insert(TB_QUIZGROUPS, null, values);
         db.close(); // Now close the DB Object
         return true;
     }
@@ -71,24 +97,43 @@ public class DBHelper extends SQLiteOpenHelper
         db.close();
     }
 
-    public String selectMyQuiz() {
+    public List<QuizGroupItem> selectQuizGroups()
+    {
+        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
+        String query = "SELECT _id, tag, title, desc, script_indexes, strftime('%s', created_dt) " +
+                        "FROM " + TB_QUIZGROUPS;
+
+        // select 결과
+        List<QuizGroupItem> selectedList = new ArrayList<>();
+
         // 읽기가 가능하게 DB 열기
         SQLiteDatabase db = getReadableDatabase();
-        String result = "";
+        Cursor cursor = db.rawQuery( query, null );
+        while (cursor.moveToNext())
+        {
+            Integer tag = cursor.getInt(1);
+            String title = cursor.getString(2);
+            String desc = cursor.getString(3);
+            String scriptIndexes = cursor.getString(4);
+            long created_dt = cursor.getLong(5);
 
-        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
-        Cursor cursor = db.rawQuery("SELECT * FROM myquiz", null);
-        while (cursor.moveToNext()) {
-            result += cursor.getInt(0)
-                    + " order_index: "
-                    + cursor.getInt(1)
-                    + " title: "
-                    + cursor.getString(2)
-                    + " file indexes: "
-                    + cursor.getString(3)
-                    + "\n";
+            String result = " _id: " + cursor.getInt(0)
+                    + " tag: " + tag
+                    + " title: " + title
+                    + " desc: " + desc
+                    + " script_indexes: " + scriptIndexes
+                    + " created_dt: " + created_dt;
+            Log.d("$$$$$$$$$$$$$$$$$$$$", " SELECT result : " + result);
+
+            QuizGroupItem item = new QuizGroupItem();
+            item.setTag( tag );
+            item.setTitle( title );
+            item.setDesc( desc );
+            item.setScriptIndexes( (List<Integer>) Utils.json2Object(scriptIndexes) );
+            item.setCreatedDateTime( created_dt );
+            selectedList.add( item );
         }
 
-        return result;
+        return selectedList;
     }
 }

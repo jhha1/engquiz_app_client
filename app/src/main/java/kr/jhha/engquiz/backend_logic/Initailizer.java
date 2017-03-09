@@ -2,8 +2,6 @@ package kr.jhha.engquiz.backend_logic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -13,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.net.EProtocol;
 import kr.jhha.engquiz.net.EResultCode;
 import kr.jhha.engquiz.net.Response;
@@ -22,6 +19,7 @@ import kr.jhha.engquiz.net.protocols.GetScriptsProtocol;
 import kr.jhha.engquiz.net.protocols.MatchScriptProtocol;
 import kr.jhha.engquiz.net.protocols.SignInProtocol;
 import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
+import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupItem;
 
 /**
  * Created by thyone on 2017-02-10.
@@ -62,6 +60,10 @@ public class Initailizer
         Log.i("!!!!!!!!!!!!!!","Init Backend..");
         mContext = context;
 
+        initUser();
+
+        /*
+
         // 파일에 저장된 파싱된 파일읽어
         List<String> files = FileManager.getInstance().uploadParsedTextFiles();
         Map<Integer, Script> parsedScripts = QuizDataMaker.parse(files);
@@ -70,8 +72,8 @@ public class Initailizer
 
         // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
         // 일단은 parsedScripts를 인자로 넘기나, 구현후, ScriptManager에서 가져와서 셋티
-        initMyQuizList( context, parsedScripts );
-
+        initQuizGroups( context, parsedScripts );
+*/
 /*
         initUser();
 
@@ -92,56 +94,42 @@ public class Initailizer
     }
 
     // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
-    private void initMyQuizList( Context context, Map<Integer, Script> parsedScripts  ) {
-        if (QuizGroupAdapter.getInstance().getCount() == 0) {
-            Drawable img = ContextCompat.getDrawable(context, R.drawable.ic_format_align_left_grey600_48dp);
-            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "New..", "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다.", null);
+    private void initQuizGroups(Context context, Map<Integer, Script> parsedScripts  ) {
+        List <QuizGroupItem> groups = new DBHelper(context).selectQuizGroups();
+        if( groups.size() <= 0 )
+        {
+            QuizGroupItem item = new QuizGroupItem();
+            item.setTitle( "New.." );
+            item.setDesc( "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다." );
+            QuizGroupAdapter.getInstance().addNewQuizGroup(item);
 
             // 임시적인 셋팅법.
             // TODO 퀴즈그룹 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
-            Integer[] parsedScriptIndexes = new Integer[ parsedScripts.size() ];
+            List<Integer> parsedScriptIndexes = new ArrayList<>();
             int i = 0;
             for( Map.Entry<Integer, Script> e : parsedScripts.entrySet() ) {
                 Integer index = e.getKey();
-                parsedScriptIndexes[i++] =  index ;
+                parsedScriptIndexes.add(index) ;
             }
-            QuizGroupAdapter.getInstance().addNewQuizGroup(img, "Default", "개의 스크립트가 들어있습니다.", parsedScriptIndexes);
+            item = new QuizGroupItem();
+            item.setTitle( "Default" );
+            item.setDesc( "개의 스크립트가 들어있습니다." );
+            item.setScriptIndexes(parsedScriptIndexes);
+            QuizGroupAdapter.getInstance().addNewQuizGroup(item);
+            return;
+        }
+
+        for( QuizGroupItem item : groups ) {
+            QuizGroupAdapter.getInstance().addNewQuizGroup( item );
         }
     }
 
     private void initUser()
     {
-        if( User.isSignInUser() )
-        {
-            User.getInstance().init();
-        }
-        else    // user db가 없거나, user db에 row 가 없거나.
-        {
-            // 회원가입 절차
-            // # 닉넴만들기 창으로 이동. ("아이디가 있습니다".. 버튼도추가. 클릭시 로긴창으로 이동.)
-            //   : 닉넴을 입력받아 서버로부터 새 user정보를 받아와 (accountid) usr 객체에 셋팅     <= 완전 첫 접속임
-            // # 아이디가 있어서, 아이디입력 로긴하면,                                             <= 앱 삭제후 재 설치
-            //  : 서버에서 아이디 확인 후, 유저정보(account id)를 usr객체에 셋팅
-            //     : 이런 경우, 앱 재설치므로, 스크립트 데이터가 앱에 없을것임.
-            //        앱 삭제시 sqlite데이터도 삭제된다면, 유저플레이정보를 서버에 저장해 재설치시 데이터복원을 해야함.
-            //
-            String nickname = "joy";
-            signIn( nickname );
-        }
+        UserManager.getInstance().init();
     }
 
-    private void signIn( String nickname ) {
-        Response response = new SignInProtocol( nickname ).callServer();
-        EResultCode code = (EResultCode) response.get(EProtocol.CODE);
-        if( code.equals( EResultCode.SUCCESS) ) {
-            Integer accountID = (Integer) response.get(EProtocol.UserID);
-            User.getInstance().create( accountID, nickname, "macID" );
-        } else if ( code.equals( EResultCode.NICKNAME_DUPLICATED) ) {
-            Log.e("AppContent", "signIn() NICKNAME_DUPLICATED : "+nickname);
-        } else {
-            Log.e("AppContent", "signIn() UnkownERROR : "+ code.toString());
-        }
-    }
+
 
     private void checkToNeedSync()
     {
@@ -335,14 +323,15 @@ public class Initailizer
 
                 // 내퀴즈 디폴트 폴더를 만들고, 다운 받은 파일 전체를 삽입
                 Log.i("#####################", "Start DB");
-                int orderIndex = 0;
-                String title = "default";
-                List fileIndexes = new ArrayList<Integer>(parsedScripts.keySet());
-                String fileIndexesJson = Utils.list2json( fileIndexes );
+                List<Integer> fileIndexes = new ArrayList<Integer>(parsedScripts.keySet());
                 DBHelper db = new DBHelper( mContext );
-                db.insertNewMyQuiz( orderIndex, title, fileIndexesJson );
-                String selectedRows = db.selectMyQuiz();
-                Log.i("#####################", selectedRows);
+                QuizGroupItem item = new QuizGroupItem();
+                item.setTag( QuizGroupItem.TAG.OTHERS );
+                item.setTitle( "default" );
+                item.setScriptIndexes( fileIndexes );
+                db.insertNewQuizGroup( item );
+                List<QuizGroupItem> selectedRows = db.selectQuizGroups();
+                Log.i("#####################", selectedRows.toString());
 
 
                 String lastplayFolderIndex = "lastplay=0";

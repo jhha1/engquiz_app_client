@@ -50,7 +50,7 @@ public class Utils {
         }
     }
 
-    public static String list2json( List<Object> list )
+    public static String list2json( List list )
     {
         if( list == null || list.isEmpty() )
             throw new IllegalArgumentException("list is null or empty:("+ list +")");
@@ -58,6 +58,21 @@ public class Utils {
         try
         {
             return jsonMapper.writeValueAsString(list);
+        }
+        catch ( Exception e )
+        {
+            throw new IllegalStateException("JsonAPI ERR", e);
+        }
+    }
+
+    public static Object json2Object( String jsonString )
+    {
+        if( jsonString == null || jsonString.isEmpty() || jsonString.equals("{}") )
+            throw new IllegalArgumentException("invalid Json("+ jsonString + ")");
+
+        try
+        {
+            return jsonMapper.readValue(jsonString, new TypeReference<HashMap<String, Object>>() {});
         }
         catch ( Exception e )
         {

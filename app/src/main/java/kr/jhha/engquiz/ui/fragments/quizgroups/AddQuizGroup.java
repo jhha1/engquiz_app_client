@@ -197,11 +197,8 @@ public class AddQuizGroup extends Fragment {
 
         // 플레이 리스트뷰(ShowQuizGroups)에 새 플레이리스트를 추가
         //  -> 플레이 리스트 커스텀 아답터에 새 아이템 추가.
-        int resourceID = R.drawable.ic_format_align_left_grey600_48dp;
-        Drawable img = ContextCompat.getDrawable( getActivity(), resourceID );
         String playlistTitle = mPlayListSubject.getText().toString();
-        Integer[] scriptIndexes = selectedItems.toArray( new Integer[selectedItems.size()] );
-        QuizGroupAdapter.getInstance().addNewQuizGroup( img, playlistTitle,  "개 스크립트", scriptIndexes);
+        QuizGroupAdapter.getInstance().addNewQuizGroup( playlistTitle,  "개 스크립트", selectedItems);
 
         Toast.makeText(getActivity(), "새 퀴즈가 추가되었습니다", Toast.LENGTH_SHORT).show();
         return true;
