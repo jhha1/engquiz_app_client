@@ -21,6 +21,7 @@ public class ScriptManager
 
     private Map<Integer, Script> scriptMap = new HashMap<>();
     private Map<String, Integer> scriptIndexMapByName = new HashMap<String, Integer>();
+    private Map<Integer, String> scriptTitlesById = new HashMap<>();
 
     private ScriptManager() {}
 
@@ -62,6 +63,10 @@ public class ScriptManager
         Log.i("!!!!!!!!!!!!!!","ScriptManager INIT result. " +
                 "scriptIndexMapByName ["+ scriptIndexMapByName.toString() +"],"
                 +" parsedScripts ["+ scriptMap.toString() +"]");
+    }
+
+    public Script getScript( Integer scriptId ) {
+
     }
 
     public String getScriptTitleAsIndex( Integer index ) {

@@ -48,7 +48,7 @@ public class QuizPlayManager
 
         for(Integer scriptId : quizGroup.scriptIndexes) {
             // TODO 어떻게 읽어옴?
-            FileManager.getInstance()
+            ScriptManager.getInstance().getScript( scriptId );
         }
     }
 
