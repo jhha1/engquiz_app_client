@@ -36,7 +36,7 @@ public class QuizPlayManager
             return;
         }
 
-        this.scriptMap = QuizDataMaker.parse( quizFiles );
+        this.scriptMap = Parsor.parse( quizFiles );
         this.selectedQuizs = getLastPlayedQuizs();
     }
 
@@ -46,9 +46,17 @@ public class QuizPlayManager
             return;
         }
 
+        this.selectedQuizs.clear();
         for(Integer scriptId : quizGroup.scriptIndexes) {
             // TODO 어떻게 읽어옴?
-            ScriptManager.getInstance().getScript( scriptId );
+            Script script = ScriptManager.getInstance().getScript( scriptId );
+            if( script == null ) {
+                Log.e("######", "Script is null. id("+scriptId+")");
+                continue;
+            }
+            for( Sentence sentence : script.sentences ) {
+                this.selectedQuizs.add( sentence );
+            }
         }
     }
 

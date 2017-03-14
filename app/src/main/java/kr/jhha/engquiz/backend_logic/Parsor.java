@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by jhha on 2016-10-14.
  */
 
-public class QuizDataMaker
+public class Parsor
 {
 
     public static final String QuizUnitSeperator = "@@@";
@@ -19,7 +19,7 @@ public class QuizDataMaker
     public static Map<Integer, Script> parse(List<String> textfiles)
     {
         if(textfiles == null || textfiles.isEmpty()) {
-            Log.e("QuizDataMaker.parse", "textFiles is null.");
+            Log.e("Parsor.parse", "textFiles is null.");
             return Collections.emptyMap();
         }
 
@@ -32,7 +32,7 @@ public class QuizDataMaker
             }
             parsedMap.put(script.index, script);
         }
-        Log.d("QuizDataMaker.parse", "COUNT (textScript:"+ textfiles.size()
+        Log.d("Parsor.parse", "COUNT (textScript:"+ textfiles.size()
                         + ", parsedScript:"+parsedMap.size() +")");
 
         return parsedMap;
@@ -41,13 +41,13 @@ public class QuizDataMaker
     public static Script parse(String textFile)
     {
         if(isNull(textFile)) {
-            Log.e("QuizDataMaker", "textFile is null");
+            Log.e("Parsor", "textFile is null");
             return null;
         }
 
         String rows[] = textFile.split(QuizUnitSeperator);
         if(rows.length <= 3) {
-            Log.e("QuizDataMaker", "Cound not split with. text["+textFile+"]");
+            Log.e("Parsor", "Cound not split with. text["+textFile+"]");
             return null;
         }
 
@@ -63,13 +63,13 @@ public class QuizDataMaker
         {
             String row = rows[i];
             if(row.isEmpty()) {
-                Log.w("QuizDataMaker", "row is empty");
+                Log.w("Parsor", "row is empty");
                 continue;
             }
 
             String[] dividedRow = row.split("\t");
             if(dividedRow.length != 2) {
-                Log.w("QuizDataMaker", "split 'TAP' row count is :" + dividedRow.length);
+                Log.w("Parsor", "split 'TAP' row count is :" + dividedRow.length);
                 continue;
             }
 
@@ -78,8 +78,21 @@ public class QuizDataMaker
             unit.english = new StringBuffer(dividedRow[1].trim());
             script.sentences.add(unit);
         }
-        Log.d("QuizDataMaker", "COUNT (quizSetLen:"+ script.sentences.size() +")");
+        Log.d("Parsor", "COUNT (quizSetLen:"+ script.sentences.size() +")");
         return script;
+    }
+
+    /*
+          ID@@@Title
+          ex) 16@@@Unit 5 ....
+     */
+    public static String[] splitParsedScriptTitleAndId( String before ) {
+        String[] divideStr = before.split( Parsor.QuizUnitSeperator );
+        if( divideStr == null || divideStr.length != 2 ) {
+            Log.e("###########", "Failed scplit with ParsedSciprt's Title and Id (" + before + ")");
+            return null;
+        }
+        return divideStr;
     }
 
     private static Boolean isNull(String row) {

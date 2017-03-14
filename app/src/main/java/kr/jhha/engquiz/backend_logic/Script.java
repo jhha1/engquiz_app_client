@@ -52,7 +52,7 @@ public class Script
             return;
         }
 
-        String rows[] = textScript.split(QuizDataMaker.QuizUnitSeperator);
+        String rows[] = textScript.split(Parsor.QuizUnitSeperator);
         if(rows.length <= 2) {
             System.out.println("ERROR invalied param. invalid param format: "+textScript);
             return;
@@ -135,12 +135,12 @@ public class Script
     public String toTextFileFormat() {
         StringBuffer text = new StringBuffer();
 
-        text.append(index + QuizDataMaker.QuizUnitSeperator);
-        text.append(revision + QuizDataMaker.QuizUnitSeperator);
-        text.append(title + QuizDataMaker.QuizUnitSeperator);
+        text.append(index + Parsor.QuizUnitSeperator);
+        text.append(revision + Parsor.QuizUnitSeperator);
+        text.append(title + Parsor.QuizUnitSeperator);
         for(Sentence unit : sentences)
         {
-            text.append(unit.korean + "\t" + unit.english + QuizDataMaker.QuizUnitSeperator);
+            text.append(unit.korean + "\t" + unit.english + Parsor.QuizUnitSeperator);
         }
         return text.toString();
     }

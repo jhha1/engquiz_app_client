@@ -37,7 +37,7 @@ public class FileManager
     public List<String> uploadParsedTextFiles()
     {
         String path = getAndroidAbsolutePath( ParsedFile_AndroidPath );
-        File files[] = getFileList( ParsedFile_AndroidPath  );
+        File files[] = listFiles( ParsedFile_AndroidPath  );
         if( files == null ) {
             Log.e("Tag", "uploadParsedTextFiles is failed. Directory is null. path: " + path);
             return null;
@@ -91,7 +91,7 @@ public class FileManager
             return false;
 
         String absoluteRootPath = root.getAbsolutePath();
-        if( isEmptyString(absoluteRootPath) )
+        if( Utils.isNullString(absoluteRootPath) )
             return false;
 
         return dirPath.contains(absoluteRootPath);
@@ -99,7 +99,7 @@ public class FileManager
 
     public String getAndroidAbsolutePath(String path)
     {
-        if( isEmptyString( path ) ) {
+        if( Utils.isNullString( path ) ) {
             Log.e("Tag", "File Path is null. path:["+ path +"]");
             return null;
         }
@@ -118,34 +118,39 @@ public class FileManager
         return absolutePath;
     }
 
-    private boolean isEmptyString( String str ) {
-        return ( str == null || str.isEmpty() );
+    public List listFileNames( String dirPath ) {
+        List<String> fileNames = new LinkedList<>();
+        File[] files = listFiles( dirPath );
+        for( File file : files ) {
+            fileNames.add( file.getName() );
+        }
+        return fileNames;
     }
 
-    public File[] getFileList( String path )
+    public File[] listFiles( String dirPath )
     {
-        if( isEmptyString( path ) ) {
-            Log.e("Tag", "File Path is null. path:["+ path +"]");
+        if( Utils.isNullString( dirPath ) ) {
+            Log.e("Tag", "File Path is null. path:["+ dirPath +"]");
             return null;
         }
 
-        path = getAndroidAbsolutePath( path );
-        File directory = new File( path );
+        dirPath = getAndroidAbsolutePath( dirPath );
+        File directory = new File( dirPath );
         if( directory == null ) {
-            Log.e("Tag", "Directory is null. path: " + path);
+            Log.e("Tag", "Directory is null. path: " + dirPath);
             return null;
         }
 
         File filelist[] = directory.listFiles();
         if( filelist == null ) {
-            Log.e("Tag", "directory is null. path: " + path);
+            Log.e("Tag", "directory is null. path: " + dirPath);
             return null;
         }
         // 디렉토리안에 파일이 없을때,
         // directory.listFiles() 에서 ".txt"라는 파일이 하나 있다고 리턴함. <- 버그인듯.
         // 하여, 빈 디렉토리인지는 아래와 같이 체크.
         if((filelist.length == 1 && ".txt".equals(filelist[0].getName())) ) {
-            Log.e("Tag", "directory is empty. path: " + path);
+            Log.e("Tag", "directory is empty. path: " + dirPath);
             return null;
         }
         return filelist;
@@ -153,7 +158,7 @@ public class FileManager
 
     public String getParentDirectoryName( String childDirPath )
     {
-        if( isEmptyString( childDirPath ) )
+        if( Utils.isNullString( childDirPath ) )
             return new String();
 
         File file = new File(childDirPath);
@@ -188,7 +193,7 @@ public class FileManager
     }
 
     public Long getFileByteSize( String filepath, String filename ) {
-        if( isEmptyString( filepath ) || isEmptyString( filename ) ) {
+        if( Utils.isNullString( filepath ) || Utils.isNullString( filename ) ) {
             Log.e("Tag", "path or name is null. path["+ filepath +"], name["+filename+"]");
             return 0L;
         }
@@ -203,7 +208,7 @@ public class FileManager
 
     public String readFile(String path, String name)
     {
-        if( isEmptyString( path ) || isEmptyString( name ) ) {
+        if( Utils.isNullString( path ) || Utils.isNullString( name ) ) {
             Log.e("Tag", "path or name is null. path["+ path +"], name["+name+"]");
             return new String();
         }
@@ -234,7 +239,7 @@ public class FileManager
 
     public byte[] readBinary( String filepath, String filename )
     {
-        if (isEmptyString(filepath) || isEmptyString(filename)) {
+        if (Utils.isNullString(filepath) || Utils.isNullString(filename)) {
             Log.e("Tag", "path or name is null. path[" + filepath + "], name[" + filename + "]");
             return null;
         }

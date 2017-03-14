@@ -65,11 +65,6 @@ public class MainActivity extends AppCompatActivity
         initCloseAppHandler();
         initFragments();
         initFirstView(); // 첫 화면. initFragments() 다음에 와야함!!
-
-        //SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
-        //Initailizer.getInstance().initBackend(preferences);
-
-       new InitailizeAsync( this ).execute();
     }
 
     // 툴바 초기화
@@ -210,27 +205,6 @@ public class MainActivity extends AppCompatActivity
 
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
-    }
-
-
-    class InitailizeAsync extends AsyncTask<String, Void, String>
-    {
-        private Context mContext = null;
-
-        public InitailizeAsync( Context context ) {
-            mContext = context;
-        }
-
-        @Override
-        protected String doInBackground(String... unused) {
-            SharedPreferences preferences = getSharedPreferences("myapp_properties", MODE_PRIVATE);
-            Initailizer.getInstance().initBackend(mContext, preferences);
-            return null;
-        }
-
-        protected void onPostExecute(final String... unused) {
-            ;
-        }
     }
 }
 

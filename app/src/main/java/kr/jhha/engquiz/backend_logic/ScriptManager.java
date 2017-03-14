@@ -3,6 +3,7 @@ package kr.jhha.engquiz.backend_logic;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import kr.jhha.engquiz.net.EProtocol;
@@ -10,20 +11,23 @@ import kr.jhha.engquiz.net.Response;
 import kr.jhha.engquiz.net.protocols.GetScriptProtocol;
 import kr.jhha.engquiz.net.protocols.ParseScriptProtocol;
 
+import static kr.jhha.engquiz.backend_logic.FileManager.ParsedFile_AndroidPath;
+
 
 /**
  * Created by jhha on 2016-10-14.
  */
 
-public class ScriptManager
-{
+public class ScriptManager {
     private static final ScriptManager instance = new ScriptManager();
 
     private Map<Integer, Script> scriptMap = new HashMap<>();
     private Map<String, Integer> scriptIndexMapByName = new HashMap<String, Integer>();
-    private Map<Integer, String> scriptTitlesById = new HashMap<>();
 
-    private ScriptManager() {}
+    private Map<Integer, String> allScriptTitleById = new HashMap<>();
+
+    private ScriptManager() {
+    }
 
     public static ScriptManager getInstance() {
         return instance;
@@ -31,9 +35,8 @@ public class ScriptManager
 
     // 파싱된 스크립트를 메모리 맵에 셋팅만 한다.
     // 스크립트 파싱은 Initializer 에서
-    public void init( Map<Integer, Script> parsedScripts )
-    {
-        if( parsedScripts == null ) {
+    public void init(Map<Integer, Script> parsedScripts) {
+        if (parsedScripts == null) {
             Log.e("AppContent", "Failed Init ScriptManager. invalid param. parsedScriptMap is null");
             return;
         }
@@ -42,31 +45,68 @@ public class ScriptManager
         this.scriptMap = parsedScripts;
 
         // 2. scriptIndexMapByName 에 셋팅.
-        for( Map.Entry<Integer, Script> e : this.scriptMap.entrySet() )
-        {
-            Integer scriptIndex =  Integer.parseInt(String.valueOf(e.getKey()));
+        for (Map.Entry<Integer, Script> e : this.scriptMap.entrySet()) {
+            Integer scriptIndex = Integer.parseInt(String.valueOf(e.getKey()));
             Integer key = e.getKey();
             Script script = e.getValue();
 
-            if( scriptIndex < 0 ) {
-                Log.e("AppContent", "Failed Init ScriptManager. invalid param. scriptIndex["+scriptIndex+"]");
+            if (scriptIndex < 0) {
+                Log.e("AppContent", "Failed Init ScriptManager. invalid param. scriptIndex[" + scriptIndex + "]");
                 return;
             }
-            if( script == null || Utils.isNullString( script.title ) ) {
-                Log.e("AppContent", "Failed Init ScriptManager. invalid param. script["+((script!=null)?script.toString():null)+"]");
+            if (script == null || Utils.isNullString(script.title)) {
+                Log.e("AppContent", "Failed Init ScriptManager. invalid param. script[" + ((script != null) ? script.toString() : null) + "]");
                 return;
             }
-            this.scriptIndexMapByName.put( script.title, scriptIndex );
+            this.scriptIndexMapByName.put(script.title, scriptIndex);
         }
 
         // log
-        Log.i("!!!!!!!!!!!!!!","ScriptManager INIT result. " +
-                "scriptIndexMapByName ["+ scriptIndexMapByName.toString() +"],"
-                +" parsedScripts ["+ scriptMap.toString() +"]");
+        Log.i("!!!!!!!!!!!!!!", "ScriptManager INIT result. " +
+                "scriptIndexMapByName [" + scriptIndexMapByName.toString() + "],"
+                + " parsedScripts [" + scriptMap.toString() + "]");
     }
 
-    public Script getScript( Integer scriptId ) {
+    public void init2()
+    {
+        // fill allScriptTitleById
+        List<String> fileNames = FileManager.getInstance().listFileNames( getParsedScriptLocation() );
+        for( String filename : fileNames ) {
+            String[] splitTitle = Parsor.splitParsedScriptTitleAndId( filename );
+            if( splitTitle == null ) {
+                Log.e("########", "Failed split script title. " +
+                        "but, CONTINUE Upload script titles without this.  " +
+                        "title before split("+filename+")");
+                continue;
+            }
+            Integer scriptId = Integer.parseInt( splitTitle[0] );
+            String scriptTitle = splitTitle[1];
+            this.allScriptTitleById.put(scriptId, scriptTitle);
+        }
+    }
 
+    public Script getScript( Integer scriptId )
+    {
+        if (this.scriptMap.containsKey(scriptId)) {
+            return this.scriptMap.get(scriptId);
+        }
+
+        boolean hasScript = this.allScriptTitleById.containsKey(scriptId);
+        if (false == hasScript) {
+            Log.e("############", "invalid scriptID[" + scriptId + "]");
+            return null;
+        }
+        String scriptTitle = this.allScriptTitleById.get(scriptId);
+        String scriptText = FileManager.getInstance().readFile( getParsedScriptLocation(), scriptTitle );
+        Script script  = Parsor.parse(scriptText);
+
+        this.scriptMap.put( scriptId, script );
+        Log.i("!!!!!!!!!!!!!!", "parsedScripts. scriptTitle:" + scriptTitle + ",map: " + script.toString());
+        return script;
+    }
+
+    public String getParsedScriptLocation() {
+        return FileManager.getInstance().getAndroidAbsolutePath(ParsedFile_AndroidPath);
     }
 
     public String getScriptTitleAsIndex( Integer index ) {
@@ -123,7 +163,7 @@ public class ScriptManager
         scriptIndexMapByName.put(newScript.title, newScript.index);
 
         // 오프라인 파일에 저장
-        boolean bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
+        boolean bOK = FileManager.getInstance().overwrite( ParsedFile_AndroidPath,
                 newScript.title, newScript.toTextFileFormat());
         if( false == bOK ) {
             Log.e("AppContent",
@@ -181,7 +221,7 @@ public class ScriptManager
         }
 
         // 오프라인 파일에 저장
-        bOK = FileManager.getInstance().overwrite( FileManager.ParsedFile_AndroidPath,
+        bOK = FileManager.getInstance().overwrite( ParsedFile_AndroidPath,
                 newScript.title, newScript.toTextFileFormat());
         if( false == bOK ) {
             Log.e("AppContent",

@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.FileManager;
 import kr.jhha.engquiz.backend_logic.ScriptManager;
 
@@ -181,7 +180,7 @@ public class AddScriptDialog extends Dialog
     }
 
     private void showCurrentDirectory(String dirName ) {
-        File files[] = FileManager.getInstance().getFileList(dirName);
+        File files[] = FileManager.getInstance().listFiles(dirName);
         if (files == null) {
             Log.e("Tag", "Directory is null. mFilepath:" + dirName);
             return;

@@ -178,9 +178,11 @@ public class UserManager {
 
         QuizGroup quizgroupForPlaying = (QuizGroup) response.get(EProtocol.QuizGroupInfo);
         // 해당 스크립트 로드해 스크립트 맵에 init.
+        QuizPlayManager.getInstance().changePlayingQuizGroup( quizgroupForPlaying );
 
         List syncNeededSentenceIds = (List) response.get(EProtocol.ScriptIds);
         // 싱크 알람 띄우기
+        Log.i("##################", "SYNC ALARM !!!!!~!! " + syncNeededSentenceIds.toString());
 
     }
 }

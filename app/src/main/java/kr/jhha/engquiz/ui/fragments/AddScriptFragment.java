@@ -166,7 +166,7 @@ public class AddScriptFragment extends Fragment
 
     // 리스트 뷰에 현재 디렉토리 하이락키 그리기
     private void showCurrentFilesInDirectory(String dirName ) {
-        File files[] = FileManager.getInstance().getFileList(dirName);
+        File files[] = FileManager.getInstance().listFiles(dirName);
         if (files == null) {
             Log.e("Tag", "Directory is null. mFilepath:" + dirName);
             return;
