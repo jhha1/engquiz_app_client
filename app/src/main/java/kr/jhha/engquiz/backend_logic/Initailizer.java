@@ -4,18 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.net.EProtocol;
-import kr.jhha.engquiz.net.Response;
-import kr.jhha.engquiz.net.protocols.CheckToNeedSyncProtocol;
-import kr.jhha.engquiz.net.protocols.GetScriptsProtocol;
-import kr.jhha.engquiz.net.protocols.MatchScriptProtocol;
 import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupAdapter;
 import kr.jhha.engquiz.ui.fragments.quizgroups.QuizGroupItem;
 
@@ -58,18 +50,10 @@ public class Initailizer
         Log.i("!!!!!!!!!!!!!!","Init Backend..");
         mContext = context;
 
-        // fill script all title/id list
-        ScriptManager.getInstance().init2();
-        // signin / login -> set gaming script. sync data
-        initUser();
         return true;
     }
 
 
-    private void initUser()
-    {
-        UserManager.getInstance().init();
-    }
 
     // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
     private void initQuizGroups(Context context, Map<Integer, Script> parsedScripts  ) {

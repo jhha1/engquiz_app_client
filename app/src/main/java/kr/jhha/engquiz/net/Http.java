@@ -21,8 +21,8 @@ import java.util.List;
 public class Http
 {
     final private static String ContentType = "text/html; charset=utf-8";
-    //final private static String url = "http://192.168.0.6:8080/engquiz_server";
-    final private static String url = "http://172.30.51.58:8080/engquiz_server";
+    final private static String url = "http://192.168.0.6:8080/engquiz_server";
+    //final private static String url = "http://172.30.51.58:8080/engquiz_server";
 
     public Http(){}
 

@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.backend_logic;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -119,7 +120,7 @@ public class ScriptManager {
         return new String();
     }
 
-    public Integer getScriptIndexAsTitle( String title ) {
+    public Integer getScriptIndexAsTitle(@NonNull String title ) {
         if( scriptIndexMapByName.containsKey(title) ) {
             return scriptIndexMapByName.get(title);
         }

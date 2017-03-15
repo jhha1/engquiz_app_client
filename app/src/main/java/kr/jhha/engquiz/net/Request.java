@@ -3,7 +3,6 @@ package kr.jhha.engquiz.net;
 import java.util.HashMap;
 import java.util.Map;
 
-import kr.jhha.engquiz.backend_logic.UserManager;
 import kr.jhha.engquiz.backend_logic.Utils;
 
 /**

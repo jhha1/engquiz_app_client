@@ -14,12 +14,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import kr.jhha.engquiz.Intro.IntroActivity;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.Initailizer;
+import kr.jhha.engquiz.backend_logic.ScriptManager;
 import kr.jhha.engquiz.ui.fragments.AddScriptFragment;
 import kr.jhha.engquiz.ui.fragments.QuizPlayFragment;
 import kr.jhha.engquiz.ui.fragments.SyncFragment;
@@ -28,6 +31,9 @@ import kr.jhha.engquiz.ui.fragments.quizgroups.AddQuizGroup;
 import kr.jhha.engquiz.ui.fragments.quizgroups.DeleteQuizGroup;
 import kr.jhha.engquiz.ui.fragments.quizgroups.ShowQuizGroups;
 import kr.jhha.engquiz.ui.fragments.quizgroups.ShowQuizGroupDetail;
+import kr.jhha.engquiz.user.LoginFragment;
+import kr.jhha.engquiz.user.SignInFragment;
+import kr.jhha.engquiz.user.UserModel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -50,7 +56,11 @@ public class MainActivity extends AppCompatActivity
     private Fragment mMakeCustomQuizFragment;
     private Fragment mDelPlayListFragment;
 
-    public static enum FRAGMENT {NONE, PLAYQUIZ, NEW_CUSTOM_QUIZ, QUIZ_DETAIL_LIST, SYNC, UPLOAD, UPDATE}
+    private Fragment mSignInFragment;
+    private Fragment mLoginFragment;
+
+    public static enum FRAGMENT {NONE, PLAYQUIZ, NEW_CUSTOM_QUIZ,
+        QUIZ_DETAIL_LIST, SYNC, UPLOAD, UPDATE, SIGNIN, LOGIN}
 
     ;
 
@@ -65,6 +75,30 @@ public class MainActivity extends AppCompatActivity
         initCloseAppHandler();
         initFragments();
         initFirstView(); // 첫 화면. initFragments() 다음에 와야함!!
+
+        initailizeData();
+    }
+
+    public void initailizeData() {
+        initScriptSummaryUserHas();
+        initUser();
+    }
+    private void initScriptSummaryUserHas() {
+        // fill script all title/id list
+        ScriptManager.getInstance().init2();
+    }
+    private void initUser() {
+        Log.d("$$$$$$$$$$$$$$$$$","initUser() called");
+        final UserModel userModel = UserModel.getInstance();
+        if( userModel.isExistUser() ) {
+            // login
+            Log.d("$$$$$$$$$$$$$$$$$","try login. user("+ userModel.toString()+")");
+            userModel.logIn( userModel.getUser() );
+        }   else {
+            // signIn fragment show
+            Log.d("$$$$$$$$$$$$$$$$$","try changeView Signin.");
+            changeViewFragment(FRAGMENT.SIGNIN);
+        }
     }
 
     // 툴바 초기화
@@ -100,6 +134,9 @@ public class MainActivity extends AppCompatActivity
         mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
         mUpdateFragment = new UpdateFragment();
+
+        mSignInFragment = new SignInFragment();
+        mLoginFragment = new LoginFragment();
     }
 
     // 첫 화면 셋팅
@@ -189,6 +226,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void changeViewFragment(FRAGMENT fragment) {
+        Log.d("$$$$$$$$$$$$$$$$$","changeViewFragment called. fragment("+fragment+")");
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (FRAGMENT.PLAYQUIZ == fragment) {
             transaction.replace(R.id.container, mPlayQuizFragment);
@@ -198,6 +237,12 @@ public class MainActivity extends AppCompatActivity
         } else if (FRAGMENT.QUIZ_DETAIL_LIST == fragment) {
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mPlayListDetailFragment);
+        } else if (FRAGMENT.SIGNIN == fragment) {
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.container, mSignInFragment);
+        } else if (FRAGMENT.LOGIN == fragment) {
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.container, mLoginFragment);
         }
 
         transaction.commit();

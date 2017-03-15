@@ -2,13 +2,14 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/intro_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingLeft="50dp"
     android:paddingRight="50dp"
     android:paddingTop="100dp"
-    tools:context="kr.jhha.engquiz.ui.IntroActivity">
+    tools:context="kr.jhha.engquiz.Intro.IntroActivity">
 
     <Button
         android:id="@+id/intro_game_play_btn"
