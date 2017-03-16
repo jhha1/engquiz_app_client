@@ -112,7 +112,7 @@ public class ShowQuizGroups extends Fragment
 
             mSelectedItemIndex = position;
 
-            // get item
+            // toInt item
             QuizGroupItem item = (QuizGroupItem) parent.getItemAtPosition(position) ;
             String titleStr = item.getTitle();
             String descStr = item.getDesc();

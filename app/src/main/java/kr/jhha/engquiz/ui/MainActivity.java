@@ -19,10 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.List;
+
 import kr.jhha.engquiz.Intro.IntroActivity;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.backend_logic.Initailizer;
+import kr.jhha.engquiz.backend_logic.QuizGroup;
 import kr.jhha.engquiz.backend_logic.ScriptManager;
+import kr.jhha.engquiz.net.EResultCode;
 import kr.jhha.engquiz.ui.fragments.AddScriptFragment;
 import kr.jhha.engquiz.ui.fragments.QuizPlayFragment;
 import kr.jhha.engquiz.ui.fragments.SyncFragment;
@@ -76,25 +80,14 @@ public class MainActivity extends AppCompatActivity
         initFragments();
         initFirstView(); // 첫 화면. initFragments() 다음에 와야함!!
 
-        initailizeData();
-    }
-
-    public void initailizeData() {
-        initScriptSummaryUserHas();
         initUser();
     }
-    private void initScriptSummaryUserHas() {
-        // fill script all title/id list
-        ScriptManager.getInstance().init2();
-    }
+
     private void initUser() {
         Log.d("$$$$$$$$$$$$$$$$$","initUser() called");
         final UserModel userModel = UserModel.getInstance();
-        if( userModel.isExistUser() ) {
-            // login
-            Log.d("$$$$$$$$$$$$$$$$$","try login. user("+ userModel.toString()+")");
-            userModel.logIn( userModel.getUser() );
-        }   else {
+        Integer result = userModel.initUser();
+        if( result == 1 ) {
             // signIn fragment show
             Log.d("$$$$$$$$$$$$$$$$$","try changeView Signin.");
             changeViewFragment(FRAGMENT.SIGNIN);

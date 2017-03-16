@@ -89,11 +89,11 @@ public class Utils {
         for( Map.Entry<EProtocol, Object> e : map.entrySet() )
         {
             if( e.getKey() == null )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Protocol Field:" + e.getKey());
+                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
 
             String stringKey = ((EProtocol) e.getKey()).value();
             if( stringKey == null )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Protocol Field:" + e.getKey() + "," + stringKey);
+                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey() + "," + stringKey);
 
             String upperStringKey = stringKey.trim().toUpperCase();
             stringKeyResponseMap.put( upperStringKey, e.getValue() );
@@ -110,10 +110,10 @@ public class Utils {
         for( Map.Entry<String, Object> e : map.entrySet() )
         {
             if( e.getKey() == null )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Protocol Field:" + e.getKey());
+                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
             EProtocol enumKey = EProtocol.toEnum( e.getKey() );
             if( EProtocol.NULL == enumKey )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Protocol Field:" + e.getKey());
+                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
 
             dst.put( enumKey, e.getValue() );
         }

@@ -2,8 +2,7 @@ package kr.jhha.engquiz.net.protocols;
 
 import kr.jhha.engquiz.backend_logic.ScriptManager;
 import kr.jhha.engquiz.net.EProtocol;
-import kr.jhha.engquiz.net.Protocol;
-import kr.jhha.engquiz.net.Request;
+import kr.jhha.engquiz.net.Network;
 import kr.jhha.engquiz.net.Response;
 
 /**
@@ -46,11 +45,11 @@ public class ParseScriptPacket extends AsyncTask<Object, Integer, Object>
         String pdfFilepath = (String)params[0];
         String pdfFilename = (String)params[1];
 
-        Protocol protocol = new ParseScriptProtocol( pdfFilepath, pdfFilename );
+        Network protocol = new ParseScriptProtocol( pdfFilepath, pdfFilename );
         String requestString = protocol.getRequest().getRequestString();
 
         publishProgress(1);        // 서버 처리중
-        String responseString = new Http().httpRequestPost( requestString );
+        String responseString = new Http().requestPost( requestString );
 
         publishProgress(2);        // 결과 처리중
         return protocol.parseResponse( responseString );
@@ -93,7 +92,7 @@ public class ParseScriptPacket extends AsyncTask<Object, Integer, Object>
     }
 }
 */
- public class ParseScriptProtocol extends Protocol
+ public class ParseScriptProtocol extends Network
 {
     public final static Integer PID = 1001;
 
@@ -120,7 +119,7 @@ public class ParseScriptPacket extends AsyncTask<Object, Integer, Object>
         /*
         // parsing script list.  List<HashMap> -> List<Sentence>
         //  : 서버에서 Sentence Object를 json string으로 변환시에, HashMap포맷으로 변환된다.
-        List<HashMap> sentencesMap = (List<HashMap>) response.get(EProtocol.ParsedSciprt);
+        List<HashMap> sentencesMap = (List<HashMap>) response.toInt(EProtocol.ParsedSciprt);
         List<Sentence> parsedSentences = new LinkedList<Sentence>();
         if( sentencesMap != null ) {
             for( HashMap sentenceMap : sentencesMap )
@@ -128,18 +127,18 @@ public class ParseScriptPacket extends AsyncTask<Object, Integer, Object>
                 String ko = null;
                 String en = null;
                 if( sentenceMap.containsKey(Sentence.KOREAN) )
-                    ko = (String) sentenceMap.get(Sentence.KOREAN);
+                    ko = (String) sentenceMap.toInt(Sentence.KOREAN);
                 if( sentenceMap.containsKey(Sentence.ENGLIST) )
-                    en = (String) sentenceMap.get(Sentence.ENGLIST);
+                    en = (String) sentenceMap.toInt(Sentence.ENGLIST);
 
                 Sentence s = new Sentence( ko, en );
                 parsedSentences.add( s );
             }
         }
 
-        Integer scriptIndex = (Integer) response.get(EProtocol.ScriptIndex);
-        Integer scriptRevision = (Integer) response.get(EProtocol.ScriptRevision);
-        String scriptTitle = (String) response.get(EProtocol.ScriptTitle);
+        Integer scriptIndex = (Integer) response.toInt(EProtocol.ScriptIndex);
+        Integer scriptRevision = (Integer) response.toInt(EProtocol.ScriptRevision);
+        String scriptTitle = (String) response.toInt(EProtocol.ScriptTitle);
         return new Script( scriptTitle, scriptIndex, scriptRevision, parsedSentences );*/
     }
 

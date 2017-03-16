@@ -141,7 +141,7 @@ public class AddScriptFragment extends Fragment
         @Override
         public void onItemClick(AdapterView parent, View v, int position, long id) {
 
-            // get TextView's Text.
+            // toInt TextView's Text.
             String strText = (String) parent.getItemAtPosition(position) ;
 
             String fileFullPath = mFilepath.get(position);

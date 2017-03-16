@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum EProtocol {
-	
+
 	// required 
 	JSON ("JSON"),
 	
@@ -64,7 +64,7 @@ public enum EProtocol {
 		    lookup.put( upperKey, e );
 		}
 	}
-	
+
 	private String value;
 	
 	private EProtocol( String value ) 
@@ -85,4 +85,6 @@ public enum EProtocol {
 		String upperKey = key.trim().toUpperCase();
 		return (lookup.containsKey(upperKey)? lookup.get(upperKey) : NULL );
 	}
+
 }
+

@@ -3,12 +3,10 @@ package kr.jhha.engquiz.net.protocols;
 import java.util.Map;
 
 import kr.jhha.engquiz.net.EProtocol;
-import kr.jhha.engquiz.net.Http;
-import kr.jhha.engquiz.net.Protocol;
-import kr.jhha.engquiz.net.Request;
+import kr.jhha.engquiz.net.Network;
 import kr.jhha.engquiz.net.Response;
 
- public class CheckToNeedSyncProtocol extends Protocol
+ public class CheckToNeedSyncProtocol extends Network
 {
     public final static Integer PID = 1005;
 

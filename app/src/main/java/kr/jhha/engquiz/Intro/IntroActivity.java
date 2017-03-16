@@ -23,14 +23,9 @@ import kr.jhha.engquiz.user.SignInFragment;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class IntroActivity extends AppCompatActivity implements IntroContract.View
+public class IntroActivity extends AppCompatActivity
 {
     private final int mIntroAnimationSec = 1000;
-    private IntroContract.UserActionsListener mActionListener;
-
-    public static enum FRAGMENT {NONE, SIGNIN, LOGIN};
-    private Fragment mSignInFragment;
-    private Fragment mLoginFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +36,7 @@ public class IntroActivity extends AppCompatActivity implements IntroContract.Vi
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-       // initFragments();
-       // mActionListener = new IntroPresenter( this );
-
-
-        // 2초 후 인트로 액티비티 제거
+        // 1초 후 인트로 액티비티 제거
         Handler handler = new Handler();
         handler.postDelayed( runnable, mIntroAnimationSec );
     }
@@ -60,29 +51,4 @@ public class IntroActivity extends AppCompatActivity implements IntroContract.Vi
             finish();
         }
     };
-
-    private void initFragments() {
-        mSignInFragment = new SignInFragment();
-        mLoginFragment = new LoginFragment();
-    }
-
-    @Override
-    public void setProgressIndicator(boolean active) {
-
-    }
-
-    @Override
-    public void changeViewFragment(FRAGMENT fragment) {
-        Log.d("$$$$$$$$$$$$$$$$$","changeViewFragment called. fragment("+fragment+")");
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (FRAGMENT.SIGNIN == fragment) {
-            transaction.addToBackStack(null);
-            transaction.add(R.id.intro_container, mSignInFragment);
-        } else if (FRAGMENT.LOGIN == fragment) {
-            transaction.addToBackStack(null);
-            transaction.add(R.id.intro_container, mLoginFragment);
-        }
-        transaction.commit();
-    }
 }

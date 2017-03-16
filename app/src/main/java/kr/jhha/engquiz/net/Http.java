@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.net;
 
-import android.os.AsyncTask;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,22 +12,16 @@ import org.apache.http.util.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by thyone on 2017-01-05.
- */
-
 public class Http
 {
+    /* 개발시에는 에뮬레이터의 호스트 컴퓨터 주소를 사용해야 한다.
+    * localhost, 127.0.0.1 등은 모바일 기기에서 실행되는 웹서버를 의미하므로 안됨
+    */
     final private static String ContentType = "text/html; charset=utf-8";
     final private static String url = "http://192.168.0.6:8080/engquiz_server";
     //final private static String url = "http://172.30.51.58:8080/engquiz_server";
 
-    public Http(){}
-
-    /* 개발시에는 에뮬레이터의 호스트 컴퓨터 주소를 사용해야 한다.
-   * localhost, 127.0.0.1 등은 모바일 기기에서 실행되는 웹서버를 의미하므로 안됨
-  */
-    public String httpRequestPost( String requestString )
+    public static String requestPost(String requestString )
     {
         try {
             HttpClient client = new DefaultHttpClient();
