@@ -1,0 +1,232 @@
+package kr.jhha.engquiz.quizgroup;
+
+
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.data.local.QuizGroupModel;
+import kr.jhha.engquiz.data.local.ScriptRepository;
+import kr.jhha.engquiz.MainActivity;
+
+/**
+ * Created by Junyoung on 2016-06-23.
+ */
+
+public class AddQuizGroupFragment extends Fragment implements  AddQuizGroupContract.View {
+
+    private AddQuizGroupContract.UserActionsListener mActionListener;
+    private QuizGroupAdapter mQuizGroupsAdapter;
+
+    private final String mTITLE = "Add Quiz Group";
+
+    private ArrayAdapter<String> mParsedScriptsAdapter = null;
+    private ListView mItemListView = null;
+    private EditText mPlayListSubject;
+    private Button mButtonSetTitle;
+
+    // 확인버튼 클릭시, 커스텀 퀴즈 리스트 추가 재확인 다이알로그
+    private AlertDialog.Builder mDialog = null;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        mActionListener = new AddQuizGroupPresenter( this, QuizGroupModel.getInstance() );
+        mQuizGroupsAdapter = new QuizGroupAdapter( QuizGroupModel.getInstance() );
+
+        // 아답터 생성: 기본 안드로이드 아답터 사용
+        // 스크립트 전체 제목리스트를 사용.
+        int resourceID = R.layout.content_textstyle_listview_checked_multiple;
+        //int resourceID = android.R.layout.simple_list_item_multiple_choice;
+        String[] quizTitleAll = ScriptRepository.getInstance().getScriptTitleAll();
+        if(quizTitleAll == null) {
+            Log.e("TAG", "quiz titles null");
+            return;
+        }
+        mParsedScriptsAdapter = new ArrayAdapter<String>(getActivity(), resourceID, quizTitleAll);
+
+        // 커스텀 플레이 리스트 추가확인 다이알로그 만들기
+        initDialog();
+        super.onCreate(savedInstanceState);
+    }
+
+    private void initDialog()
+    {
+        mDialog = new AlertDialog.Builder( getActivity() );
+        mDialog.setIcon(android.R.drawable.alert_dark_frame);
+        mDialog.setTitle("새 퀴즈를 추가하시겠습니까?");
+        mDialog.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
+        // 확인 버튼 클릭 이벤트.
+        mDialog.setPositiveButton("OK", mDialogListner_ClickBtnOk);
+        // 취소 버튼 클릭 이벤트.
+        mDialog.setNegativeButton("Cancel", mDialogListner_ClickBtnCancel);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.content_playlist_add, container, false);
+
+        // 1. 플레이리스트 제목 입력창
+        mPlayListSubject = (EditText) view.findViewById (R.id.add_playlist_subject);
+        // 포커스를 제목입력창으로 이동
+        mPlayListSubject.requestFocus();
+
+        // 2. 플레이리스트 제목입력/추가완료 버튼: 클릭 이벤트 핸들러 정의
+        mButtonSetTitle = (Button) view.findViewById(R.id.add_playlist_set_title_btn);
+        mButtonSetTitle.setOnClickListener(mClickListener);
+        view.findViewById(R.id.add_playlist_complate_btn).setOnClickListener(mClickListener);
+
+        // 3. 플레이 리스트뷰
+        mItemListView = (ListView) view.findViewById(R.id.add_playlist_listview);
+        // 플레이 리스트 아답터 연결
+        mItemListView.setAdapter(mParsedScriptsAdapter);
+        view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        // 툴바에 현 프래그먼트 제목 출력
+        ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
+        super.onResume();
+    }
+
+    // 제목입력완료, 새 퀴즈 만들기 버튼
+    Button.OnClickListener mClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            switch(v.getId())
+            {
+                case R.id.add_playlist_set_title_btn:
+                    Boolean bOK = checkTitle();
+                    if( bOK == false )
+                        return;
+
+                    //키보드 숨기기:
+                    // checkTitle()에 넣으면, 완료버튼 누르면 키보드 나옴
+                    // -> 완료버튼에서 checkTitle()쓰기때문에 다시 키보드 토글.
+                    hideKeyboard();
+
+                    break;
+
+                case R.id.add_playlist_complate_btn:
+                    // 체크 다이알로그 띄우기
+                    mDialog.show();
+                    break;
+            }
+        }
+    };
+
+    // 다이알로그 버튼 클릭 이벤트 OK
+    DialogInterface.OnClickListener mDialogListner_ClickBtnOk = new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface d, int which) {
+            // 새 리스트 추가
+            addPlayList();
+        }
+    };
+
+    // 다이알로그 버튼 클릭 이벤트 CANCEL
+    DialogInterface.OnClickListener mDialogListner_ClickBtnCancel = new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface d, int which) {
+            // 다이알로그 닫기
+            d.dismiss();
+        }
+    };
+
+    private void hideKeyboard()
+    {
+        InputMethodManager immhide = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        immhide.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    private  Boolean checkTitle()
+    {
+        String playlistTitle = mPlayListSubject.getText().toString();
+        if(playlistTitle.isEmpty()) {
+            mPlayListSubject.requestFocus(); // 커서를 제목입력칸으로 이동
+            Toast.makeText(getActivity(), "제목을 입력해주세요", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+    private Boolean addPlayList()
+    {
+        Boolean bOK = checkTitle();
+        if( bOK == false )
+            return false;
+
+        // 선택한 스크립트 개수 체크
+        int selectedCount = mItemListView.getCheckedItemCount();
+        if( 0 >= selectedCount ) {
+            Toast.makeText(getActivity(), "선택된 퀴즈가 없습니다", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // 선택한 스크립트들의 index 가져오기
+        SparseBooleanArray checked = mItemListView.getCheckedItemPositions();
+        List<Integer> selectedItems = new ArrayList<>();
+        for( int i = 0; i < checked.size(); i++) {
+            int position = checked.keyAt(i);
+            if (checked.valueAt(i)) {
+                String scriptTitle = mParsedScriptsAdapter.getItem(position);
+                Integer scriptIndex = ScriptRepository.getInstance().getScriptIndexAsTitle( scriptTitle );
+                if( scriptIndex < 0 ) {
+                    continue;
+                }
+                selectedItems.add( scriptIndex );
+            }
+        }
+
+        // 플레이 리스트뷰(ShowQuizGroupsFragment)에 새 플레이리스트를 추가
+        //  -> 플레이 리스트 커스텀 아답터에 새 아이템 추가.
+        String playlistTitle = mPlayListSubject.getText().toString();
+        mActionListener.addQuizGroup( playlistTitle, selectedItems );
+
+        return true;
+    }
+
+    @Override
+    public void onAddQuizGroupSuccess() {
+        Toast.makeText(getActivity(), "새 퀴즈가 추가되었습니다", Toast.LENGTH_SHORT).show();
+
+        mQuizGroupsAdapter.notifyDataSetChanged();
+
+        // UI 초기화.
+        // OnCreateView() 에서 초기화 시도했으나, 적용이 안되어,, 완료버튼이벤트에 삽입.
+        // 입력한 제목 초기화.
+        mPlayListSubject.setText(null);
+        // 모든 선택 상태 초기화.
+        mItemListView.clearChoices() ;
+
+        // Fragment 전환.
+        // 프래그먼트로 이루어진 View들의 스택에서, 최상위인 현재 view를 삭제하면, 바로 전단계 view가 보임.
+        // 이게 작동하려면, 화면 전환시, transaction.addToBackStack() 해줘야 함.
+        getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onAddQuizGroupFail() {
+
+    }
+}

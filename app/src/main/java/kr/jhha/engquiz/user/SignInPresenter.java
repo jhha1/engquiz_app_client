@@ -2,10 +2,8 @@ package kr.jhha.engquiz.user;
 
 import android.util.Log;
 
-import java.util.List;
-
-import kr.jhha.engquiz.backend_logic.QuizGroup;
-import kr.jhha.engquiz.net.EResultCode;
+import kr.jhha.engquiz.data.local.UserModel;
+import kr.jhha.engquiz.data.remote.EResultCode;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -14,22 +12,26 @@ import kr.jhha.engquiz.net.EResultCode;
 public class SignInPresenter implements SignInContract.UserActionsListener {
 
     private final SignInContract.View mView;
-    private final UserModel mUser = UserModel.getInstance();
+    private final UserModel mUser;
 
-    public SignInPresenter(SignInContract.View view ) {
+    public SignInPresenter( SignInContract.View view, UserModel userModel ) {
+        mUser = userModel;
         mView = view;
     }
 
     public void signIn( final String userNickname ) {
+        Log.i("AppContent", "SignInPresenter signIn() called  userNickname: " + userNickname);
         mUser.signIn( userNickname, onSignInCallback(userNickname) );
     }
 
     private UserModel.SignInCallback onSignInCallback( final String userNickname ) {
         return new UserModel.SignInCallback(){
             @Override
-            public void onSignInSuccess(Integer userId) {
-                Log.i("AppContent", "onSignInSuccess()  userId: " + userId);
-                directLogin( userId );
+            public void onSignInSuccess(Integer userID, String nickname, String userKey) {
+                Log.i("AppContent", "onSignInSuccess() userId:"+userID +", userKey:"+userKey);
+
+                mUser.saveUserInfo( userID, nickname, userKey ); // 유저정보 파일에 저장
+                mView.onSignInSuccess( userID );
             }
 
             @Override
@@ -43,28 +45,6 @@ public class SignInPresenter implements SignInContract.UserActionsListener {
                         Log.e("AppContent", "signIn() UnkownERROR : " + userNickname);
                         break;
                 }
-            }
-        };
-    }
-
-    private void directLogin( Integer userId ) {
-        // 회원가입 성공. 바로 로긴.
-        mUser.logIn( userId, onLogInCallback(userId) );
-    }
-
-    private UserModel.LogInCallback onLogInCallback( final Integer userId ) {
-        return new UserModel.LogInCallback(){
-
-            @Override
-            public void onLogInSuccess(QuizGroup quizgroupForPlaying, List syncNeededSentenceIds) {
-                Log.i("AppContent", "onLogInSuccess()  userId: " + userId);
-                mUser.initUserData( quizgroupForPlaying, syncNeededSentenceIds );
-            }
-
-            @Override
-            public void onLogInFail(EResultCode resultCode) {
-                Log.e("AppContent", "onLogInFail() UnkownERROR. userId: " + userId);
-                // TODO 실패 메세지
             }
         };
     }

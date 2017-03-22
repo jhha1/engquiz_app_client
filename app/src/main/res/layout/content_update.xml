@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.jhha.engquiz.ui.fragments.SyncFragment">
+    tools:context="kr.jhha.engquiz.sync.SyncFragment">
 
     <TextView
         android:id="@+id/update_text_description1"

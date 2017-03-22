@@ -7,9 +7,14 @@ package kr.jhha.engquiz.user;
 public class LoginContract {
 
     interface View {
+        void onChangeViewToSignIn();
+        void onLoginSuccess();
+        void onLoginFail();
     }
 
     interface UserActionsListener {
-        void logIn( String userNickname );
+        void initUser();
+        void login(Integer userId );
+        void login(String userNickname );
     }
 }

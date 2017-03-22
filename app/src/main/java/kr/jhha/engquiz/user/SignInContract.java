@@ -6,6 +6,7 @@ package kr.jhha.engquiz.user;
 
 public class SignInContract {
     interface View {
+        void onSignInSuccess(Integer userId );
     }
 
     interface UserActionsListener {

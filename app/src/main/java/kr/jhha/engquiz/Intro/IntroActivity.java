@@ -1,23 +1,13 @@
 package kr.jhha.engquiz.Intro;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.backend_logic.Initailizer;
-import kr.jhha.engquiz.ui.MainActivity;
-import kr.jhha.engquiz.user.LoginContract;
-import kr.jhha.engquiz.user.LoginFragment;
-import kr.jhha.engquiz.user.SignInFragment;
+import kr.jhha.engquiz.MainActivity;
 
 /**
  * Created by Junyoung on 2016-06-23.

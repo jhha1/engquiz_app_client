@@ -19,8 +19,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.jhha.engquiz.backend_logic.FileManager;
-import kr.jhha.engquiz.backend_logic.ScriptManager;
+import kr.jhha.engquiz.util.FileHelper;
+import kr.jhha.engquiz.data.local.ScriptRepository;
 
 /**
  * Created by thyone on 2016-12-29.
@@ -44,7 +44,7 @@ public class AddScriptDialog extends Dialog
 
     // 카카오톡 다운로드 폴더 내 파일 리스트 가져오기
     // 수강생들은 카톡단톡방에서 영어스크립트를 다운로드하므로.
-    private final String currentDirectoryName = FileManager.KaKaoDownloadFolder_AndroidPath;
+    private final String currentDirectoryName = FileHelper.KaKaoDownloadFolder_AndroidPath;
 
     public AddScriptDialog (Context context) {
         super(context, android.R.style.Theme_Translucent_NoTitleBar);
@@ -63,7 +63,7 @@ public class AddScriptDialog extends Dialog
 
 
         mFileLocationView = (TextView) findViewById(R.id.add_script_file_location);
-        showCurrentPath( ScriptManager.getInstance().getAbsoluteFilePath(currentDirectoryName) );
+        showCurrentPath( ScriptRepository.getInstance().getAbsoluteFilePath(currentDirectoryName) );
 
         // 2. 파일 리스트뷰
         mItemListView = (ListView) findViewById(R.id.add_script_filebrower);
@@ -74,7 +74,7 @@ public class AddScriptDialog extends Dialog
 
         // 클릭 이벤트 셋팅
         mOKButton = (Button) findViewById(R.id.add_script_btn_ok);
-       // mCancelButton = (Button) findViewById(R.id.add_script_btn_cancel);
+       // mCancelButton = (Button) findViewById(R.quizGroupId.add_script_btn_cancel);
         if (mClickListener != null && mClickListener != null) {
             mOKButton.setOnClickListener(mClickListener);
             mCancelButton.setOnClickListener(mClickListener);
@@ -129,7 +129,7 @@ public class AddScriptDialog extends Dialog
                     showDoubleCheckDialog( filename, v );
                     //showDialog(DIALOG_YES_NO_LONG_MESSAGE);
                     break;
-               // case R.id.add_script_btn_cancel:
+               // case R.quizGroupId.add_script_btn_cancel:
                     //dismiss();
                 //    break;
             }
@@ -167,7 +167,7 @@ public class AddScriptDialog extends Dialog
     private void addScript() {
         String filename = mItems.get( mSelectedScriptPosition );
         String filepath = mFilepath.get( mSelectedScriptPosition );
-        //ScriptManager.getInstance().parseScript( filename, filepath );
+        //ScriptRepository.getInstance().parseScript( filename, filepath );
     }
 
     // 다이알로그 닫기
@@ -180,7 +180,7 @@ public class AddScriptDialog extends Dialog
     }
 
     private void showCurrentDirectory(String dirName ) {
-        File files[] = FileManager.getInstance().listFiles(dirName);
+        File files[] = FileHelper.getInstance().listFiles(dirName);
         if (files == null) {
             Log.e("Tag", "Directory is null. mFilepath:" + dirName);
             return;
@@ -190,9 +190,9 @@ public class AddScriptDialog extends Dialog
         mFilepath = new ArrayList<String>(); // 파일이름에 해당하는 실제 파일로케이션
 
         // 현재 디렉토리가 루트가 아니면, 현재폴더 상위 디렉토리를 뷰 리스트에 삽입
-        if (false == FileManager.getInstance().isRootDirectory(dirName)) {
+        if (false == FileHelper.getInstance().isRootDirectory(dirName)) {
             mItems.add("../"); // 상위 디렉토리로 이동 텍스트
-            String parentDir = FileManager.getInstance().getParentDirectoryName(dirName);
+            String parentDir = FileHelper.getInstance().getParentDirectoryName(dirName);
             mFilepath.add(parentDir); // 상위 디렉토리 경로 삽입
         }
 

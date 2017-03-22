@@ -10,8 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import kr.jhha.engquiz.Intro.IntroActivity;
 import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.MainActivity;
+import kr.jhha.engquiz.data.local.UserModel;
 
 /**
  * Created by thyone on 2017-03-16.
@@ -27,13 +28,17 @@ public class SignInFragment extends Fragment implements SignInContract.View
     private Button mSignInConfirmBtn = null;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mActionListener = new SignInPresenter( this, UserModel.getInstance() );
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.d("$$$$$$$$$$$$$$$$$","SignInFragment called");
 
         View view = inflater.inflate(R.layout.content_signin, container, false);
-
-        mActionListener = new SignInPresenter( this );
 
         mSignInLayout = (LinearLayout) view.findViewById(R.id.signin_layout);
         mSignInNickname = (EditText) view.findViewById(R.id.signin_nickname);
@@ -51,14 +56,29 @@ public class SignInFragment extends Fragment implements SignInContract.View
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.login_i_have_id_btn:
-                    ((IntroActivity)getActivity()).changeViewFragment( IntroActivity.FRAGMENT.LOGIN );
+                    changeViewToLogIn();
                     break;
                 case R.id.signin_btn:
                     String nickname = mSignInNickname.getText().toString();
-                    mActionListener.signIn( nickname );
+                    signIn( nickname );
                     break;
             }
         }
     };
 
+    private void signIn( String nickname ){
+        mActionListener.signIn( nickname );
+    }
+
+    @Override
+    public void onSignInSuccess(Integer userId) {
+        // redirect to login logic
+        final Fragment fragment = ((MainActivity)getActivity()).getFragment( MainActivity.EFRAGMENT.LOGIN );
+        ((LoginFragment) fragment).logIn( userId );
+    }
+
+    // change view to login
+    private void changeViewToLogIn() {
+        ((MainActivity)getActivity()).changeViewFragment( MainActivity.EFRAGMENT.LOGIN );
+    }
 }
