@@ -17,6 +17,7 @@ public class EProtocol2 {
         AddUserQuizGroup(1006),
         DelUserQuizGroup(1007),
         GetUserQuizGroupSummaryList(1008),
+        AddUserQuizGroupDetail(1009),
 
         NONE(9999);
 

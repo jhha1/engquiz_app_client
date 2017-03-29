@@ -8,6 +8,7 @@ import java.util.Map;
 import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.data.local.QuizGroupDetail;
 import kr.jhha.engquiz.data.local.QuizGroupModel;
+import kr.jhha.engquiz.data.local.QuizPlayModel;
 import kr.jhha.engquiz.data.local.UserModel;
 import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.quizgroup.detail.QuizGroupDetailAdapter;
@@ -46,10 +47,10 @@ public class ShowQuizGroupPresenter implements ShowQuizGroupsContract.UserAction
     public void getQuizGroupSummaryList() {
         Log.i("AppContent", "ShowQuizGroupPresenter getQuizGroupSummaryList() called");
         Integer userId = UserModel.getInstance().getUserID();
-        mModel.getQuizGroupSummaryList( userId, onGetQuizGroupSummaryList(userId) );
+        mModel.getQuizGroupSummaryList( userId, onGetQuizGroupSummaryList() );
     }
 
-    private QuizGroupModel.GetQuizGroupCallback onGetQuizGroupSummaryList(final Integer userId ) {
+    private QuizGroupModel.GetQuizGroupCallback onGetQuizGroupSummaryList() {
         return new QuizGroupModel.GetQuizGroupCallback(){
 
             @Override
@@ -95,5 +96,14 @@ public class ShowQuizGroupPresenter implements ShowQuizGroupsContract.UserAction
                 mView.onDelQuizGroupFail(msg);
             }
         };
+    }
+
+    @Override
+    public void changePlayingQuizGroup(QuizGroupSummary mListviewSelectedItem) {
+        QuizGroupDetail quizGroupDetail = new QuizGroupDetail();
+        quizGroupDetail.setSummary( mListviewSelectedItem );
+        // TODO set script list
+        QuizPlayModel.getInstance().changePlayingQuizGroup( quizGroupDetail );
+        mView.onShowChangePlayingQuizGroupSuccess();
     }
 }

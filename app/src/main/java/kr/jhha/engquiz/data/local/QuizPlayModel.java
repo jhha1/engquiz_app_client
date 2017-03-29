@@ -51,10 +51,10 @@ public class QuizPlayModel
     {
         List<Sentence> lastPlayedQuizs = new ArrayList<Sentence>();
 
-        // file read. last played index. in my quiz.
-        // myquiz : myquizNum { script index 들} , ... lastplay: myquiznum.
+        // file read. last played scriptId. in my quiz.
+        // myquiz : myquizNum { script scriptId 들} , ... lastplay: myquiznum.
 
-        // if( lastplay index == 999 )
+        // if( lastplay scriptId == 999 )
         // 전체 스크립트 리스트 가져옴.
         // show last played list
         lastPlayedQuizs = makeQuizList();

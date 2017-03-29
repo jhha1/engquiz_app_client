@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.data.local.Sentence;
 import kr.jhha.engquiz.data.remote.AsyncNet;
 import kr.jhha.engquiz.data.remote.EProtocol;
 import kr.jhha.engquiz.data.remote.EProtocol2;
@@ -29,8 +28,7 @@ public class SyncModel {
         Integer scriptId = 0;
         Integer senteceId = 0;
     }
-    private List<SyncNeededSentenceSummary> mSyncNeededSentecesSummary = new LinkedList<>();
-    private List<Sentence> mSyncNeededSentences = new LinkedList<>();
+    private List<SyncNeededSentenceSummary> mSyncNeededSenteceSummaries = new LinkedList<>();
 
     private static SyncModel instance = new SyncModel();
     private SyncModel() {}
@@ -67,11 +65,11 @@ public class SyncModel {
     }
 
     public Integer getSyncNeededCount() {
-        if( mSyncNeededSentecesSummary == null
-                || mSyncNeededSentecesSummary.isEmpty() )
+        if( mSyncNeededSenteceSummaries == null
+                || mSyncNeededSenteceSummaries.isEmpty() )
             return 0;
 
-        return mSyncNeededSentecesSummary.size();
+        return mSyncNeededSenteceSummaries.size();
     }
 
     public Integer saveSyncNeededSentencesSummary( List sentences )
@@ -88,7 +86,7 @@ public class SyncModel {
                 continue;
             }
 
-            this.mSyncNeededSentecesSummary.add( summary );
+            this.mSyncNeededSenteceSummaries.add( summary );
         }
         return getSyncNeededCount();
     }

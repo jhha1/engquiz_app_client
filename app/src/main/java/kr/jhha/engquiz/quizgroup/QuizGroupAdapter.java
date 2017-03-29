@@ -86,6 +86,8 @@ public class QuizGroupAdapter extends BaseAdapter
     // 지정한 위치(position)에 있는 데이터 리턴 : 필수 구현
     @Override
     public Object getItem(int position) {
+        // model의 summary list 배열 순서대로 UI listveiw에 뿌려지게 된다.
+        // so, listview의 position은 arraylist의 index다.
         return mModel.getQuizGroupSummary(position) ;
     }
 

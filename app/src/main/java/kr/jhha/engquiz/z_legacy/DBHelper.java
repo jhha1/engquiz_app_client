@@ -84,10 +84,10 @@ public class DBHelper extends SQLiteOpenHelper
         return true;
     }
 
-    public void update(String title, int index) {
+    public void update(String title, int scriptId) {
         SQLiteDatabase db = getWritableDatabase();
         // 입력한 항목과 일치하는 행의 가격 정보 수정
-        db.execSQL("UPDATE myquiz SET title=" + title + " WHERE _id='" + index + "';");
+        db.execSQL("UPDATE myquiz SET title=" + title + " WHERE _id='" + scriptId + "';");
         db.close();
     }
 

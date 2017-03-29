@@ -16,14 +16,14 @@ import kr.jhha.engquiz.util.Parsor;
 
 public class Script
 {
-    public Integer index = 0;
+    public Integer scriptId = 0;
     public Integer revision = 0;
     public String title = "";
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
     /*
     private enum EValueName {
-        INDEX ("index"), REVISION ("revision"),
+        INDEX ("scriptId"), REVISION ("revision"),
         TITLE ("title"), SENTENCES ("sentences");
 
         private String value;
@@ -32,7 +32,7 @@ public class Script
         }
     };
 */
-    public static final String INDEX = "index";
+    public static final String INDEX = "scriptId";
     public static final String REVISION = "revision";
     public static final String TITLE = "title";
     public static final String SENTENCES = "sentences";
@@ -42,7 +42,7 @@ public class Script
                   Integer revision, List<Sentence> sentences )
     {
         this.title = filename;
-        this.index = index;
+        this.scriptId = index;
         this.revision = revision;
         this.sentences = sentences;
     }
@@ -81,7 +81,7 @@ public class Script
         }
 
         this.title = title;
-        this.index = index;
+        this.scriptId = index;
         this.revision = revision;
         this.sentences = sentences;
     }
@@ -95,7 +95,7 @@ public class Script
             List<HashMap> sentencesMap = (List<HashMap>) scriptMap.get(SENTENCES);
 
             if( index < 0 )
-                throw new Exception("invalid index:"+index);
+                throw new Exception("invalid scriptId:"+index);
             if( revision < 0 )
                 throw new Exception("invalid revision:"+revision);
             if( title == null || title.isEmpty() )
@@ -121,7 +121,7 @@ public class Script
             if( parsedSentences == null || parsedSentences.size() == 0 )
                 throw new Exception("invalid parsedSentences:"+parsedSentences);
 
-            this.index = index;
+            this.scriptId = index;
             this.revision = revision;
             this.title = title;
             this.sentences = parsedSentences;
@@ -137,7 +137,7 @@ public class Script
     public String toTextFileFormat() {
         StringBuffer text = new StringBuffer();
 
-        text.append(index + Parsor.MainSeperator);
+        text.append(scriptId + Parsor.MainSeperator);
         text.append(revision + Parsor.MainSeperator);
         text.append(title + Parsor.MainSeperator);
         for(Sentence unit : sentences)
@@ -150,7 +150,7 @@ public class Script
     // just for logging
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("{[index: "+ index +"], " +
+        buf.append("{[scriptId: "+ scriptId +"], " +
                     "[revision: "+ revision +"], " +
                     "[title: "+ title +"], " +
                     "[sentence count("+ sentences.size() +").. ");

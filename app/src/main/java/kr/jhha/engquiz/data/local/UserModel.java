@@ -181,29 +181,10 @@ public class UserModel {
                 if (response.isSuccess()) {
 
                     Map quizgroupMap = (HashMap) response.get(EProtocol.QuizGroupInfo);
-                    if( QuizGroupDetail.isNull(quizgroupMap) ){
-                        // 첫 로긴시에는 quizGroup이 없다
-                    } else {
-                        QuizGroupDetail quizgroupForPlaying = new QuizGroupDetail();
-                        quizgroupForPlaying.deserialize(quizgroupMap);
-
-                        // 해당 스크립트 로드해 스크립트 맵에 init.
-                        QuizPlayModel.getInstance().changePlayingQuizGroup( quizgroupForPlaying );
-                    }
                     List syncNeededSentenceIds = (List) response.get(EProtocol.ScriptIds);
-                    // 싱크 알람 띄우기
-                    SyncModel.getInstance().saveSyncNeededSentencesSummary( syncNeededSentenceIds );
-                    Log.i("##################", "SYNC ALARM !!!!!~!! " + syncNeededSentenceIds.toString());
-
-                    Log.i("AppContent", "onLoginSuccess()  " +
-                            "quizgroupForPlaying: " + quizgroupMap.toString() +
-                            ", syncNeededSentenceIds: " + syncNeededSentenceIds.toString()
-                    );
-
-                    // fill script all title/quizGroupId list
-                    ScriptRepository.getInstance().init2();
-
+                    initGameData( quizgroupMap, syncNeededSentenceIds );
                     callback.onLogInSuccess( syncNeededSentenceIds );
+
                 } else {
                     // TODO 실패 메세지. 존재하지 않는 이름. 이름을 다시 확인
                     Log.e("AppContent", "initUser() UnkownERROR : "+ response.getResultCodeString());
@@ -211,6 +192,32 @@ public class UserModel {
                 }
             }
         };
+    }
+
+    private void initGameData( Map quizgroupMap, List syncNeededSentenceIds )
+    {
+        // 1. playing quiz
+        if( QuizGroupDetail.isNull(quizgroupMap) ){
+            // 첫 로긴시에는 quizGroup이 없다
+        } else {
+            QuizGroupDetail quizgroupForPlaying = new QuizGroupDetail();
+            quizgroupForPlaying.deserialize(quizgroupMap);
+
+            // 해당 스크립트 로드해 스크립트 맵에 initailize.
+            QuizPlayModel.getInstance().changePlayingQuizGroup( quizgroupForPlaying );
+        }
+
+        // 2. 싱크 알람 띄우기
+        SyncModel.getInstance().saveSyncNeededSentencesSummary( syncNeededSentenceIds );
+        Log.i("##################", "SYNC ALARM !!!!!~!! " + syncNeededSentenceIds.toString());
+
+        Log.i("AppContent", "onLoginSuccess()  " +
+                "quizgroupForPlaying: " + quizgroupMap.toString() +
+                ", syncNeededSentenceIds: " + syncNeededSentenceIds.toString()
+        );
+
+        // 3. 퀴즈그룹리스트를 서버로부터 받아온다.
+        QuizGroupModel.getInstance().initQuizGroupList( getUserID() );
     }
 
     private Integer readMacID() {

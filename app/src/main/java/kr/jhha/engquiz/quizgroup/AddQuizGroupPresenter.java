@@ -32,7 +32,7 @@ public class AddQuizGroupPresenter implements AddQuizGroupContract.UserActionsLi
         return new QuizGroupModel.AddQuizGroupCallback(){
 
             @Override
-            public void onSuccess(List<QuizGroupSummary> quizGroupSummaryList) {
+            public void onSuccess() {
                 mView.onAddQuizGroupSuccess();
             }
 

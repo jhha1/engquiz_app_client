@@ -183,14 +183,14 @@ public class AddQuizGroupFragment extends Fragment implements  AddQuizGroupContr
             return false;
         }
 
-        // 선택한 스크립트들의 index 가져오기
+        // 선택한 스크립트들의 scriptId 가져오기
         SparseBooleanArray checked = mItemListView.getCheckedItemPositions();
         List<Integer> selectedItems = new ArrayList<>();
         for( int i = 0; i < checked.size(); i++) {
             int position = checked.keyAt(i);
             if (checked.valueAt(i)) {
                 String scriptTitle = mParsedScriptsAdapter.getItem(position);
-                Integer scriptIndex = ScriptRepository.getInstance().getScriptIndexAsTitle( scriptTitle );
+                Integer scriptIndex = ScriptRepository.getInstance().getScriptIdAsTitle( scriptTitle );
                 if( scriptIndex < 0 ) {
                     continue;
                 }

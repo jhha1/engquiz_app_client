@@ -21,7 +21,6 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.data.local.QuizGroupDetail;
 import kr.jhha.engquiz.data.local.ScriptRepository;
 import kr.jhha.engquiz.util.StringHelper;
-import kr.jhha.engquiz.quizgroup.QuizGroupSummary;
 
 public class QuizGroupDetailAdapter extends BaseAdapter
 {
@@ -41,7 +40,9 @@ public class QuizGroupDetailAdapter extends BaseAdapter
     // Adapter에 사용되는 데이터의 개수를 리턴. : 필수 구현
     @Override
     public int getCount() {
-        return mCurrentQuizGroup.getScriptIds().size();
+        if( mCurrentQuizGroup != null && mCurrentQuizGroup.getScriptIds() != null)
+            return mCurrentQuizGroup.getScriptIds().size();
+        return 0;
     }
 
     /*
@@ -95,7 +96,7 @@ public class QuizGroupDetailAdapter extends BaseAdapter
             Log.d("%%%%%%%%%%%%%%%", "detailadapter. setCurrentQuizGroup. " +
                     "quizGroup.getScriptIds().size():" + quizGroup.getScriptIds().size());
             for( Integer index : quizGroup.getScriptIds() ) {
-                String scriptTitle = ScriptRepository.getInstance().getScriptTitleAsIndex( index );
+                String scriptTitle = ScriptRepository.getInstance().getScriptTitleAsId( index );
                 QuizGroupDetailItem detail = new QuizGroupDetailItem();
                 detail.setTitle( scriptTitle );
                 detailList.add( detail );

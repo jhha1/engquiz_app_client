@@ -1,8 +1,10 @@
 package kr.jhha.engquiz.quizgroup;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -15,14 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.List;
-
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.MainActivity;
-import kr.jhha.engquiz.data.local.QuizGroupDetail;
 import kr.jhha.engquiz.data.local.QuizGroupModel;
 import kr.jhha.engquiz.quizplay.QuizPlayFragment;
-import kr.jhha.engquiz.quizgroup.detail.QuizGroupDetailAdapter;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -44,6 +42,8 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
 
     public static final String Text_New = "New..";
 
+    private DoubleClickHandler mDoubleClickHandler;
+
     // Activity를 통해, 타 fragment에 이벤트를 던지기 위한 (fragment간 직접통신 안됨. activity를 통해야함)
     // 연결자 인터페이스.
     public interface OnPlayListButtonClickListener {
@@ -51,6 +51,7 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
     }
     private OnPlayListButtonClickListener mOnPlayListBtnClickListener;
     private AlertDialog.Builder mDeleteItemDialog = null;
+    private AlertDialog.Builder mDialogChangePlayingQuizGroup = null;
 
     public ShowQuizGroupsFragment() {}
 
@@ -62,6 +63,8 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
         mAdapter = new QuizGroupAdapter( QuizGroupModel.getInstance() );
         mActionListener = new ShowQuizGroupPresenter( this, QuizGroupModel.getInstance() );
         mActionListener.getQuizGroupSummaryList();
+
+        mDoubleClickHandler = new DoubleClickHandler();
     }
 
     private void initDialog()
@@ -69,7 +72,19 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
         mDeleteItemDialog = new AlertDialog.Builder( getActivity() );
         mDeleteItemDialog.setTitle("내 퀴즈 삭제");
         mDeleteItemDialog.setPositiveButton( "OK", mDeleteItemDialogListner_ClickBtnOk);
-        mDeleteItemDialog.setNegativeButton( "CanCel", mDeleteItemDialogListner_ClickBtnCancel);
+        mDeleteItemDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int which) {
+                d.dismiss();
+            }
+        });
+
+        mDialogChangePlayingQuizGroup = new AlertDialog.Builder( getActivity() );
+        mDialogChangePlayingQuizGroup.setTitle("플레이 그룹 변경");
+        mDialogChangePlayingQuizGroup.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int which) {
+                d.dismiss();
+            }
+        });
     }
 
     @Override
@@ -111,7 +126,6 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
         super.onResume();
     }
 
-
     // 플레이 리스트 클릭 이벤트 리스너
     private AdapterView.OnItemClickListener mListItemClickListener
                                         = new AdapterView.OnItemClickListener()
@@ -121,7 +135,7 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
 
             mSelectedItemIndex = position;
             QuizGroupSummary item = (QuizGroupSummary) parent.getItemAtPosition(position) ;
-            mActionListener.quizGroupItemClicked( item );
+            mDoubleClickHandler.onClicked( position, item ); // 클릭과 더블클릭을 구분해 그에따른 동작.
         }
     };
 
@@ -149,15 +163,6 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
             mActionListener.delQuizGroup( mSelectedItemIndex );
         }
     };
-
-    // 퀴즈 삭제 다이알로그 버튼 클릭 이벤트 CANCEL
-    DialogInterface.OnClickListener mDeleteItemDialogListner_ClickBtnCancel = new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface d, int which) {
-            // 다이알로그 닫기
-            d.dismiss();
-        }
-    };
-
 
     // 리스트 아이템 옵션 버튼 클릭 리스너
     private Button.OnClickListener mClickListener = new View.OnClickListener() {
@@ -224,8 +229,65 @@ public class ShowQuizGroupsFragment extends Fragment implements  ShowQuizGroupsC
     }
 
     @Override
-    public void onShowOptions() {
-        mItemOptionLayout.setVisibility(View.VISIBLE);
+    public void onShowChangePlayingQuizGroupSuccess() {
+        mAdapter.notifyDataSetChanged();
+        Toast.makeText(getActivity(), "퀴즈 그룹 변경에 성공했습니다", Toast.LENGTH_SHORT).show();
+    }
+
+    class DoubleClickHandler {
+        private long clickedTime = 0;
+        private long resetTime = 500; // 리셋 타임 설정 - 0.5초
+        private QuizGroupSummary mListviewSelectedItem = null;
+        Handler mHandler = new Handler();
+
+        public DoubleClickHandler() {}
+
+        public void onClicked( int position, QuizGroupSummary item ) {
+            boolean bFirstClicked = System.currentTimeMillis() > clickedTime + resetTime;
+            if ( bFirstClicked ) {
+                clickedTime = System.currentTimeMillis();
+                mListviewSelectedItem = item;
+                // Timer 설정. 0.6초동안 재 클릭이 없으면 one click 이벤트 실행.
+                mHandler.postDelayed( runnable, resetTime +100 );
+                return;
+            }
+
+            boolean bSameItem = (mListviewSelectedItem!=null)
+                    && (mListviewSelectedItem.getQuizGroupId() == item.getQuizGroupId());
+            boolean bDoubleClicked = ! bFirstClicked && bSameItem;
+            if ( bDoubleClicked ) {
+                // one click 이벤트 콜백 삭제.
+                mHandler.removeCallbacks(runnable);
+
+                // double click 이벤트 실행.
+                doDoubleClickEvent();
+            }
+        }
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                doOneClickEvent();
+            }
+        };
+
+        private void doOneClickEvent(){
+            // show quiz group detail
+            mActionListener.quizGroupItemClicked( mListviewSelectedItem );
+        }
+
+        private void doDoubleClickEvent(){
+            // show delete quiz group dialog
+            String msg = mListviewSelectedItem.getTitle() + " 을 게임용으로 선택하시겠습니까?";
+            mDialogChangePlayingQuizGroup.setMessage( msg );
+            // 플레이용 퀴즈 변경 OK 클릭 이벤트
+            mDialogChangePlayingQuizGroup.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int which) {
+                    mActionListener.changePlayingQuizGroup( mListviewSelectedItem );
+                }
+            });
+            mDialogChangePlayingQuizGroup.show();
+        }
     }
 }
 

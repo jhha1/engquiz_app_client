@@ -71,8 +71,8 @@ public class Initailizer
             List<Integer> parsedScriptIndexes = new ArrayList<>();
             int i = 0;
             for( Map.Entry<Integer, Script> e : parsedScripts.entrySet() ) {
-                Integer index = e.getKey();
-                parsedScriptIndexes.add(index) ;
+                Integer scriptId = e.getKey();
+                parsedScriptIndexes.add(scriptId) ;
             }
             item = new QuizGroupSummary();
             item.setTitle( "Default" );

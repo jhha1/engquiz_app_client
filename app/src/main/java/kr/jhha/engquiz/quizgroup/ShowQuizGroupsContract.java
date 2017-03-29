@@ -18,7 +18,7 @@ public class ShowQuizGroupsContract {
         void onDelQuizGroupSuccess();
         void onDelQuizGroupFail( String msg );
         void onChangeViewFragmet(MainActivity.EFRAGMENT fragment );
-        void onShowOptions();
+        void onShowChangePlayingQuizGroupSuccess();
     }
 
     interface UserActionsListener {
@@ -26,5 +26,6 @@ public class ShowQuizGroupsContract {
         void getQuizGroupSummaryList();
 
         void delQuizGroup( Integer position );
+        void changePlayingQuizGroup( QuizGroupSummary mListviewSelectedItem );
     }
 }

@@ -35,7 +35,7 @@ public class Parsor
                 System.out.println("[ERROR] parse failed. ");
                 continue;
             }
-            parsedMap.put(script.index, script);
+            parsedMap.put(script.scriptId, script);
         }
         Log.d("Parsor.parse", "COUNT (textScript:"+ textfiles.size()
                         + ", parsedScript:"+parsedMap.size() +")");
@@ -61,7 +61,7 @@ public class Parsor
         }
 
         Script script = new Script();
-        script.index = Integer.parseInt( rows[0] );
+        script.scriptId = Integer.parseInt( rows[0] );
         script.revision = Integer.parseInt( rows[1] );
         script.title = rows[2];
         for(int i=3; i<rows.length; ++i)
