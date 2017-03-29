@@ -60,7 +60,7 @@ public class User {
         return this.nickname;
     }
 
-    public Integer checkUserID( String userIdString ) {
+    public static Integer checkUserID( String userIdString ) {
         if( StringHelper.isNullString(userIdString) ){
             throw new IllegalArgumentException("");
         }
@@ -69,14 +69,14 @@ public class User {
         return checkUserID( userId );
     }
 
-    public Integer checkUserID( Integer userId ) {
+    public static Integer checkUserID( Integer userId ) {
         if( userId < 1 ){
             throw new IllegalArgumentException("invalid userId:"+userId);
         }
         return userId;
     }
 
-    public String checkNickname( String nickname ) {
+    public static String checkNickname( String nickname ) {
         if( StringHelper.isNullString(nickname)){
             throw new IllegalArgumentException("nickname is null");
         }
@@ -89,14 +89,14 @@ public class User {
         return nickname;
     }
 
-    public String checkUserKey( String userkey ) {
+    public static String checkUserKey( String userkey ) {
         if( StringHelper.isNullString(userkey)){
             throw new IllegalArgumentException("userkey is null");
         }
         return userkey;
     }
 
-    public String checkMacID( String macId ) {
+    public static String checkMacID( String macId ) {
         if( StringHelper.isNullString(macId)){
             throw new IllegalArgumentException("macId is null");
         }

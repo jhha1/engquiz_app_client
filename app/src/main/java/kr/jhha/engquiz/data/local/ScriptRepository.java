@@ -90,6 +90,9 @@ public class ScriptRepository {
 
     public String[] getScriptTitleAll(){
         final Map<String, Integer> titleMap = mAllScriptIdsAndTitles_ReMap;
+        if( titleMap == null || titleMap.isEmpty() ){
+            return null;
+        }
         String[] arr = new String[titleMap.size()];
         return titleMap.keySet().toArray(arr);
     }

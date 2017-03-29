@@ -1,6 +1,5 @@
 package kr.jhha.engquiz;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,38 +12,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
-import kr.jhha.engquiz.quizgroup.AddQuizGroupFragment;
-import kr.jhha.engquiz.quizgroup.ShowQuizGroupsFragment;
+import kr.jhha.engquiz.quizfolder.AddQuizFolderFragment;
+import kr.jhha.engquiz.quizfolder.ShowQuizFoldersFragment;
 import kr.jhha.engquiz.addscript.AddScriptFragment;
 import kr.jhha.engquiz.quizplay.QuizPlayFragment;
 import kr.jhha.engquiz.sync.SyncFragment;
-import kr.jhha.engquiz.quizgroup.detail.ShowQuizGroupDetail;
+import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetail;
 import kr.jhha.engquiz.user.LoginFragment;
 import kr.jhha.engquiz.user.SignInFragment;
+import kr.jhha.engquiz.util.click.BackPressedCloseHandler;
+import kr.jhha.engquiz.util.click.ClickDetector;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener
-        , ShowQuizGroupsFragment.OnPlayListButtonClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar mToolbar;
     private DrawerLayout mNavDrawer;
 
     // 앱 종료 핸들러 (백 버튼 2번 누르면 종료)
-    private BackPressCloseHandler mBackPressCloseHandler;
+    private ClickDetector mBackPressedCloseHandler;
 
     private QuizPlayFragment mPlayQuizFragment;
 
     private SyncFragment mSyncFragment;
     private Fragment mAddScriptFragment;
-    private Fragment mUpdateFragment;
 
     private Fragment mPlayListFragment;
     private Fragment mPlayListDetailFragment;
     private Fragment mMakeCustomQuizFragment;
-    private Fragment mDelPlayListFragment;
 
     private SignInFragment mSignInFragment;
     private LoginFragment mLoginFragment;
@@ -85,18 +81,17 @@ public class MainActivity extends AppCompatActivity
 
     // 앱 종료 핸들러
     private void initCloseAppHandler() {
-        mBackPressCloseHandler = new BackPressCloseHandler(this);
+        mBackPressedCloseHandler = new BackPressedCloseHandler( this );
     }
 
     // 프래그먼트 초기화
     private void initFragments() {
         mPlayQuizFragment = new QuizPlayFragment();
-        mPlayListFragment = new ShowQuizGroupsFragment();
-        mPlayListDetailFragment = new ShowQuizGroupDetail();
-        mMakeCustomQuizFragment = new AddQuizGroupFragment();
+        mPlayListFragment = new ShowQuizFoldersFragment();
+        mPlayListDetailFragment = new ShowQuizFolderDetail();
+        mMakeCustomQuizFragment = new AddQuizFolderFragment();
         mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
-
         mSignInFragment = new SignInFragment();
         mLoginFragment = new LoginFragment();
     }
@@ -109,13 +104,17 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
     }
 
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
-        mBackPressCloseHandler.onBackPressed();
+        mBackPressedCloseHandler.onClick(0);
         super.onBackPressed();
     }
 
@@ -132,10 +131,10 @@ public class MainActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int quizGroupId = item.getItemId();
+        int quizFolderId = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (quizGroupId == R.quizGroupId.action_settings) {
+        if (quizFolderId == R.quizFolderId.action_settings) {
             return true;
         }
 
@@ -167,24 +166,25 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onPlayListBtnClicked(View v) {
-        try {
-            changeViewFragment(v);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public Fragment getFragment( MainActivity.EFRAGMENT eFragment ){
+        Fragment fragment = null;
+        switch ( eFragment ){
+            case PLAYQUIZ:
+                fragment = mPlayQuizFragment; break;
+            case QUIZQROUP_NEW:
+                fragment = mMakeCustomQuizFragment; break;
+            case QUIZGROUP_DETAIL_SHOW:
+                fragment = mPlayListDetailFragment; break;
+            case SYNC:
+                fragment = mSyncFragment; break;
+            case ADD_SCRIPT:
+                fragment = mAddScriptFragment; break;
+            case SIGNIN:
+                fragment = mSignInFragment; break;
+            case LOGIN:
+                fragment = mLoginFragment; break;
         }
-    }
-
-    private void changeViewFragment(View v) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        switch (v.getId()) {
-            case R.id.playlist_set_for_play_btn:
-                transaction.replace(R.id.container, mPlayQuizFragment);
-                break;
-        }
-        transaction.commit();
+        return fragment;
     }
 
     public void changeViewFragment(EFRAGMENT fragment) {
@@ -206,73 +206,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         transaction.commit();
-    }
-
-    public void callViewFragment( EFRAGMENT fragment, Object arg ) {
-        switch ( fragment ){
-
-        }
-    }
-
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
-
-     public Fragment getFragment( MainActivity.EFRAGMENT eFragment ){
-        Fragment fragment = null;
-        switch ( eFragment ){
-            case PLAYQUIZ:
-                fragment = mPlayQuizFragment; break;
-            case QUIZQROUP_NEW:
-                fragment = mMakeCustomQuizFragment; break;
-            case QUIZGROUP_DETAIL_SHOW:
-                fragment = mPlayListDetailFragment; break;
-            case SYNC:
-                fragment = mSyncFragment; break;
-            case ADD_SCRIPT:
-                fragment = mAddScriptFragment; break;
-            case SIGNIN:
-                fragment = mSignInFragment; break;
-            case LOGIN:
-                fragment = mLoginFragment; break;
-        }
-        return fragment;
-    }
-}
-
-class BackPressCloseHandler {
-
-    private long backKeyPressedTime = 0;
-    private Toast toast;
-
-    private Activity activity;
-
-    public BackPressCloseHandler(Activity context) {
-        this.activity = context;
-    }
-
-    public void onBackPressed() {
-        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-            backKeyPressedTime = System.currentTimeMillis();
-            showGuide();
-            return;
-        }
-        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
-            SystemExit();
-        }
-    }
-    public void SystemExit() {
-        activity.moveTaskToBack(true);
-        activity.finish();
-        toast.cancel();
-        android.os.Process.killProcess(android.os.Process.myPid() );
-        System.exit(0);
-    }
-    public void showGuide() {
-        toast = Toast.makeText(activity,
-                "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT);
-        toast.show();
     }
 }
 

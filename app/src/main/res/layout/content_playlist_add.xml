@@ -9,57 +9,57 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".quizgroup.AddQuizGroupFragment">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="70">
-        <!--
-        input title of playlist
-          # hint: edittext창 내부에 기본셋팅글.
-          # maxLines:최대 몇 줄까지 입력가능.
-          # maxLength: 최대 입력가능 글자수
-         -->
-        <EditText
-            android:id="@+id/add_playlist_subject"
+    tools:context=".quizfolder.AddQuizFolderFragment">
+    <!--
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="제목을 입력해주세요"
-            android:textColorHint="@color/colorTextDark"
-            android:maxLines="1"
-            android:maxLength="30"
-            android:textColor="@color/colorTextWhite"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:imeOptions="actionNext"
-            android:layout_weight="1"/>
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="70">
 
-        <!-- set title button  -->
-        <Button
-            android:id="@+id/add_playlist_set_title_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OK"
-            android:layout_weight="4"/>
-    </LinearLayout>
+            input title of quizfolder
+              # hint: edittext창 내부에 기본셋팅글.
+              # maxLines:최대 몇 줄까지 입력가능.
+              # maxLength: 최대 입력가능 글자수
 
+            <EditText
+                android:id="@+id/add_quizfolder_subject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="제목을 입력해주세요"
+                android:textColorHint="@color/colorTextDark"
+                android:maxLines="1"
+                android:maxLength="30"
+                android:textColor="@color/colorTextWhite"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:imeOptions="actionNext"
+                android:layout_weight="1"/>
+
+
+            <Button
+                android:id="@+id/add_quizfolder_set_title_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OK"
+                android:layout_weight="4"/>
+        </LinearLayout>
+        -->
     <!-- explain how to use -->
     <TextView
-        android:id="@+id/add_playlist_howtouse"
+        android:id="@+id/add_quizfolder_howtouse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
         android:textColor="@color/colorTextDark"
         android:text="새 퀴즈에 담고 싶은 스크립트들을 체크해주세요." />
 
-    <!-- all playlist : chackable listview
+    <!-- all quizfolder : chackable listview
          # 리스트뷰 라인 색: row간 간격 벌리고 그 틈에 색을 입힘.
             android:dividerHeight - row간격. android:divider - 간격 틈 색
          # 리스트뷰 텍스트 색: content_textstyle_listview_checked_multiple.xml
     -->
     <ListView
-        android:id="@+id/add_playlist_listview"
+        android:id="@+id/add_quizfolder_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
@@ -70,7 +70,7 @@
 
     <!-- complate button  -->
     <Button
-        android:id="@+id/add_playlist_complate_btn"
+        android:id="@+id/add_quizfolder_complate_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"

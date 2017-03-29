@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.quizgroup.detail;
+package kr.jhha.engquiz.quizfolder.detail;
 
 
 import android.content.DialogInterface;
@@ -13,9 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.quizgroup.QuizGroupAdapter;
-import kr.jhha.engquiz.quizgroup.QuizGroupSummary;
-import kr.jhha.engquiz.quizgroup.ShowQuizGroupsFragment;
+import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.MainActivity;
 
 
@@ -23,7 +21,7 @@ import kr.jhha.engquiz.MainActivity;
  * Created by Junyoung on 2016-06-23.
  */
 
-public class ShowQuizGroupDetail extends Fragment {
+public class ShowQuizFolderDetail extends Fragment {
 
     private final String mTITLE = "Quiz Group Detail";
 
@@ -57,12 +55,12 @@ public class ShowQuizGroupDetail extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View  view = inflater.inflate(R.layout.content_playlist_detail, container, false);
+        View  view = inflater.inflate(R.layout.content_quizfolder_detail, container, false);
 
         // 1. 플레이 리스트뷰
-        mItemListView = (ListView) view.findViewById(R.id.playlist_detail_listview);
+        mItemListView = (ListView) view.findViewById(R.id.quizfolder_detail_listview);
         // 플레이 리스트 아답터 연결
-        mItemListView.setAdapter( QuizGroupDetailAdapter.getInstance() );
+        mItemListView.setAdapter( kr.jhha.engquiz.quizfolder.detail.QuizFolderDetailAdapter.getInstance() );
         // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
         mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
 
@@ -87,11 +85,11 @@ public class ShowQuizGroupDetail extends Fragment {
             mSelectedItemIndex = position;
 
             // toInt item
-            QuizGroupSummary item = (QuizGroupSummary) parent.getItemAtPosition(position) ;
+            QuizFolder item = (QuizFolder) parent.getItemAtPosition(position) ;
             String titleStr = item.getTitle() ;
 
             // 내 커스텀 퀴즈에 스크립트 추가.
-            if( ShowQuizGroupsFragment.Text_New.equals(titleStr) )
+            if( QuizFolder.TEXT_NEW.equals(titleStr) )
                 ; // activity에게 화면전환요청.
             else
                 ; // nothing
@@ -145,13 +143,13 @@ public class ShowQuizGroupDetail extends Fragment {
 
     private boolean isEmptyPlayList()
     {
-        //int playListCount = QuizGroupAdapter.getInstance().getCount();
+        //int playListCount = QuizFolderAdapter.getInstance().getCount();
         //return (playListCount <= 0);
         return true;
     }
 
     private void delQuizAfterProcess()
     {
-        QuizGroupDetailAdapter.getInstance().notifyDataSetChanged();
+        QuizFolderDetailAdapter.getInstance().notifyDataSetChanged();
     }
 }

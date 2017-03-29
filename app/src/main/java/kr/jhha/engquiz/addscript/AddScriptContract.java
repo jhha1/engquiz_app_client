@@ -14,11 +14,11 @@ public class AddScriptContract {
         void showMsg( int what, String arg );
         void showErrorDialog(int what );
 
-        void showQuizGroupSelectDialog( List<String> quizGroupList  );
-        void showNewQuizGroupTitleInputDialog();
+        void showQuizFolderSelectDialog( List<String> quizFolderList  );
+        void showNewQuizFolderTitleInputDialog();
 
         void showAddScriptConfirmDialog( String filename, Float fileSize);
-        void showAddScriptSuccessDialog( String quizGroupName );
+        void showAddScriptSuccessDialog( String quizFolderName );
 
         void showLoadingDialog();
         void closeLoadingDialog();
@@ -32,8 +32,8 @@ public class AddScriptContract {
         void onFileListItemClick( int position );
 
         void scriptSelected();
-        void quizGroupSelected( String quizGroupName );
-        void newQuizGroupTitleInputted(String quizGroupName);
+        void quizFolderSelected( String quizFolderName );
+        void newQuizFolderTitleInputted(String quizFolderName);
 
         void addScript( String pdfFilename);
     }

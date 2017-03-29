@@ -180,9 +180,9 @@ public class UserModel {
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
 
-                    Map quizgroupMap = (HashMap) response.get(EProtocol.QuizGroupInfo);
+                    Map quizfolderMap = (HashMap) response.get(EProtocol.QuizFolder);
                     List syncNeededSentenceIds = (List) response.get(EProtocol.ScriptIds);
-                    initGameData( quizgroupMap, syncNeededSentenceIds );
+                    initGameData( quizfolderMap, syncNeededSentenceIds );
                     callback.onLogInSuccess( syncNeededSentenceIds );
 
                 } else {
@@ -194,17 +194,22 @@ public class UserModel {
         };
     }
 
-    private void initGameData( Map quizgroupMap, List syncNeededSentenceIds )
+    private void initGameData( Map quizfolderMap, List syncNeededSentenceIds )
     {
         // 1. playing quiz
-        if( QuizGroupDetail.isNull(quizgroupMap) ){
-            // 첫 로긴시에는 quizGroup이 없다
+        if( QuizFolder.isNull(quizfolderMap) ){
+            // 첫 로긴시에는 quizFolder이 없다
         } else {
-            QuizGroupDetail quizgroupForPlaying = new QuizGroupDetail();
-            quizgroupForPlaying.deserialize(quizgroupMap);
+            QuizFolder quizfolderForPlaying = new QuizFolder();
+            quizfolderForPlaying.deserialize(quizfolderMap);
+
+            if( QuizFolder.isNull(quizfolderForPlaying) ){
+                Log.e("##################", "QuizFolder is Null " + quizfolderForPlaying.toString());
+                return;
+            }
 
             // 해당 스크립트 로드해 스크립트 맵에 initailize.
-            QuizPlayModel.getInstance().changePlayingQuizGroup( quizgroupForPlaying );
+            QuizPlayModel.getInstance().changePlayingQuizFolder( quizfolderForPlaying );
         }
 
         // 2. 싱크 알람 띄우기
@@ -212,12 +217,12 @@ public class UserModel {
         Log.i("##################", "SYNC ALARM !!!!!~!! " + syncNeededSentenceIds.toString());
 
         Log.i("AppContent", "onLoginSuccess()  " +
-                "quizgroupForPlaying: " + quizgroupMap.toString() +
+                "quizfolderForPlaying: " + quizfolderMap.toString() +
                 ", syncNeededSentenceIds: " + syncNeededSentenceIds.toString()
         );
 
-        // 3. 퀴즈그룹리스트를 서버로부터 받아온다.
-        QuizGroupModel.getInstance().initQuizGroupList( getUserID() );
+        // 3. 퀴즈폴더리스트를 서버로부터 받아온다.
+        QuizFolderRepository.getInstance().initQuizFolderList( getUserID() );
     }
 
     private Integer readMacID() {

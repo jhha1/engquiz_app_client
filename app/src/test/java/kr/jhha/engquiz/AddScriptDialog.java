@@ -74,7 +74,7 @@ public class AddScriptDialog extends Dialog
 
         // 클릭 이벤트 셋팅
         mOKButton = (Button) findViewById(R.id.add_script_btn_ok);
-       // mCancelButton = (Button) findViewById(R.quizGroupId.add_script_btn_cancel);
+       // mCancelButton = (Button) findViewById(R.quizFolderId.add_script_btn_cancel);
         if (mClickListener != null && mClickListener != null) {
             mOKButton.setOnClickListener(mClickListener);
             mCancelButton.setOnClickListener(mClickListener);
@@ -129,7 +129,7 @@ public class AddScriptDialog extends Dialog
                     showDoubleCheckDialog( filename, v );
                     //showDialog(DIALOG_YES_NO_LONG_MESSAGE);
                     break;
-               // case R.quizGroupId.add_script_btn_cancel:
+               // case R.quizFolderId.add_script_btn_cancel:
                     //dismiss();
                 //    break;
             }

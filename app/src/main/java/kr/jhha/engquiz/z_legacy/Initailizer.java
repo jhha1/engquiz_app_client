@@ -4,14 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import kr.jhha.engquiz.data.local.Script;
-import kr.jhha.engquiz.quizgroup.QuizGroupAdapter;
-import kr.jhha.engquiz.quizgroup.QuizGroupSummary;
-
 /**
  * Created by thyone on 2017-02-10.
  *
@@ -57,33 +49,33 @@ public class Initailizer
 /*
 
     // 내 퀴즈 카테고리의 내 퀴즈 리스트 초기화
-    private void initQuizGroups(Context context, Map<Integer, Script> parsedScripts  ) {
-        List <QuizGroupSummary> groups = new DBHelper(context).selectQuizGroups();
+    private void initQuizFolders(Context context, Map<Integer, Script> parsedScripts  ) {
+        List <QuizFolder> groups = new DBHelper(context).selectQuizFolders();
         if( groups.size() <= 0 )
         {
-            QuizGroupSummary item = new QuizGroupSummary();
+            QuizFolder item = new QuizFolder();
             item.setTitle( "New.." );
             item.setDesc( "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다." );
-            QuizGroupAdapter.getInstance().addQuizGroup(item);
+            QuizFolderAdapter.getInstance().addQuizFolder(item);
 
             // 임시적인 셋팅법.
-            // TODO 퀴즈그룹 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
+            // TODO 퀴즈폴더 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
             List<Integer> parsedScriptIndexes = new ArrayList<>();
             int i = 0;
             for( Map.Entry<Integer, Script> e : parsedScripts.entrySet() ) {
                 Integer scriptId = e.getKey();
                 parsedScriptIndexes.add(scriptId) ;
             }
-            item = new QuizGroupSummary();
+            item = new QuizFolder();
             item.setTitle( "Default" );
             item.setDesc( "개의 스크립트가 들어있습니다." );
             item.setScriptIndexes(parsedScriptIndexes);
-            QuizGroupAdapter.getInstance().addQuizGroup(item);
+            QuizFolderAdapter.getInstance().addQuizFolder(item);
             return;
         }
 
-        for( QuizGroupSummary item : groups ) {
-            QuizGroupAdapter.getInstance().addQuizGroup( item );
+        for( QuizFolder item : groups ) {
+            QuizFolderAdapter.getInstance().addQuizFolder( item );
         }
     }
 */

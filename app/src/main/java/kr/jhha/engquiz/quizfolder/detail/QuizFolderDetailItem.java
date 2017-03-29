@@ -1,4 +1,4 @@
-package kr.jhha.engquiz.quizgroup.detail;
+package kr.jhha.engquiz.quizfolder.detail;
 
 import android.graphics.drawable.Drawable;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by jhha on 2016-12-17.
  */
 
-public class QuizGroupDetailItem
+public class QuizFolderDetailItem
 {
     private Drawable iconDrawable ;
     private String scriptTitle;

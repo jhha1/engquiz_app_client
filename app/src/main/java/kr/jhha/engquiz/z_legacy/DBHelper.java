@@ -1,19 +1,11 @@
 package kr.jhha.engquiz.z_legacy;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-
-import kr.jhha.engquiz.util.JsonHelper;
-import kr.jhha.engquiz.quizgroup.QuizGroupSummary;
 
 /**
  * Created by thyone on 2017-02-14.
@@ -24,7 +16,7 @@ public class DBHelper extends SQLiteOpenHelper
     public static final String DB_NAME = "/mnt/sdcard/" + "engquiz.db";
     public static final int DB_VERSION = 1;
 
-    private static final String TB_QUIZGROUPS = "quizgroups";
+    private static final String TB_QUIZGROUPS = "quizfolders";
 
     // DBHelper 생성자로 관리할 DB 이름과 버전 정보를 받음
     public DBHelper( Context context ) {
@@ -66,9 +58,9 @@ public class DBHelper extends SQLiteOpenHelper
         return dateFormat.format( currentTimeMillis );
     }
 /*
-    public boolean insertNewQuizGroup( QuizGroupSummary item )
+    public boolean insertNewQuizFolder( QuizFolder item )
     {
-        Log.i("#####################", "insertNewQuizGroup called DB");
+        Log.i("#####################", "insertNewQuizFolder called DB");
         SQLiteDatabase db = getReadableDatabase();
         ContentValues values  = new ContentValues();
 
@@ -98,14 +90,14 @@ public class DBHelper extends SQLiteOpenHelper
         db.close();
     }
 
-    public List<QuizGroupSummary> selectQuizGroups()
+    public List<QuizFolder> selectQuizFolders()
     {
         // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
         String query = "SELECT _id, tag, title, desc, script_indexes, strftime('%s', created_dt) " +
                         "FROM " + TB_QUIZGROUPS;
 
         // select 결과
-        List<QuizGroupSummary> selectedList = new ArrayList<>();
+        List<QuizFolder> selectedList = new ArrayList<>();
 
         // 읽기가 가능하게 DB 열기
         SQLiteDatabase db = getReadableDatabase();
@@ -126,7 +118,7 @@ public class DBHelper extends SQLiteOpenHelper
                     + " created_dt: " + created_dt;
             Log.d("$$$$$$$$$$$$$$$$$$$$", " SELECT result : " + result);
 
-            QuizGroupSummary item = new QuizGroupSummary();
+            QuizFolder item = new QuizFolder();
             item.setTag( tag );
             item.setTitle( title );
             item.setDesc( desc );

@@ -14,87 +14,35 @@ import java.util.Random;
 
 public class QuizPlayModel
 {
-    public static final QuizPlayModel quizManager = new QuizPlayModel();
-
-    private Map<Integer, Script> scriptMap = new HashMap<Integer, Script>();
-    private List<Sentence> selectedQuizs = new ArrayList<Sentence>();
-    private Random random = new Random();
-    private Integer playingQuizGroupId = 0;
-
+    private static final QuizPlayModel instance = new QuizPlayModel();
     private QuizPlayModel() {}
-
     public static QuizPlayModel getInstance() {
-        return quizManager;
+        return instance;
     }
 
-    public void changePlayingQuizGroup( QuizGroupDetail quizGroup ) {
-        if( quizGroup == null ){
-            Log.e("CONTENT", "quiz group is null");
+    private List<Sentence> selectedQuizs = new ArrayList<Sentence>();
+    private Random random = new Random();
+
+    public void changePlayingQuizFolder( QuizFolder quizFolder ) {
+        Log.i("AppContent", "QuizPlayModel changePlayingQuizFolder() called. quizFolder:"+((quizFolder!=null)?quizFolder.toString():null));
+        if( quizFolder == null ){
+            Log.e("CONTENT", "quiz folder is null");
             return;
         }
 
         this.selectedQuizs.clear();
-        for(Integer scriptId : quizGroup.getScriptIds()) {
-            // TODO 어떻게 읽어옴?
+        for(Integer scriptId : quizFolder.getScriptIds()) {
             Script script = ScriptRepository.getInstance().getScript( scriptId );
             if( script == null ) {
-                Log.e("######", "Script is null. quizGroupId("+scriptId+")");
+                Log.e("######", "Script is null. quizFolderId("+scriptId+")");
                 continue;
             }
+            Log.i("AppContent", "QuizPlayModel changePlayingQuizFolder() script title:"+script.title);
             for( Sentence sentence : script.sentences ) {
                 this.selectedQuizs.add( sentence );
             }
         }
-    }
-
-    List<Sentence> getLastPlayedQuizs()
-    {
-        List<Sentence> lastPlayedQuizs = new ArrayList<Sentence>();
-
-        // file read. last played scriptId. in my quiz.
-        // myquiz : myquizNum { script scriptId 들} , ... lastplay: myquiznum.
-
-        // if( lastplay scriptId == 999 )
-        // 전체 스크립트 리스트 가져옴.
-        // show last played list
-        lastPlayedQuizs = makeQuizList();
-        // if (전체 스크립트 리스트가 없다면)
-        // 개발자 문의
-
-        return lastPlayedQuizs;
-    }
-
-    public List<Sentence> makeQuizList() {
-        // 유저가 선택한 스크립트를 가지고 퀴즈 리스트를 만듬
-        // 아직 미구현이므로, 전체 스크립트를 퀴즈 리스트로.
-        List<Sentence> lastPlayedQuizs = new ArrayList<Sentence>();
-        for(Map.Entry<Integer, Script> e : scriptMap.entrySet()) {
-            Integer index = e.getKey();
-            Script quizset = e.getValue();
-            for(Sentence quizunit : quizset.sentences) {
-                if(quizunit == null) {
-                    Log.e("[ERROR]","sentence is null. scriptIndex("+index+")");
-                }
-                lastPlayedQuizs.add(quizunit);
-            }
-        }
-        Log.d("makeQuizList", "Count(scriptMap:" + scriptMap.size()
-                        + ", selectedQuizs:"+ selectedQuizs.size() +")");
-        System.out.println("[DEBUG] !!!!!!!!!!!!" + toStringScriptMap());
-
-        return lastPlayedQuizs;
-    }
-
-    private String toStringScriptMap() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("////////////////// scriptMap("+ scriptMap.size()+") /////////////////////\n");
-        for(Map.Entry<Integer, Script> e : scriptMap.entrySet()) {
-            Integer index = e.getKey();
-            Script script = e.getValue();
-            buf.append(script.toString() + "\n");
-        }
-        buf.append("////////////////////////////////////////////////////");
-        return buf.toString();
+        Log.i("AppContent", "QuizPlayModel changePlayingQuizFolder() result selectedQuizs:"+selectedQuizs.toString());
     }
 
     public Sentence getQuiz() {
@@ -103,10 +51,6 @@ public class QuizPlayModel
 
         int selectedIndex = randomSelectOne();
         return selectedQuizs.get(selectedIndex);
-    }
-
-    public Object[] getQuizTitleAll() {
-        return this.scriptMap.keySet().toArray();
     }
 
     private int randomSelectOne() {

@@ -9,11 +9,11 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".quizgroup.detail.ShowQuizGroupDetail">
+    tools:context=".quizfolder.detail.ShowQuizFolderDetail">
 
     <!-- explain how to use -->
     <TextView
-        android:id="@+id/playlist_detail_title"
+        android:id="@+id/quizfolder_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -21,13 +21,13 @@
         android:textColor="@color/colorTextDark"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-    <!-- my playlists : listview
+    <!-- my quizfolders : listview
          # 리스트뷰 line color: row간 간격 벌리고 그 틈에 색을 입힘.
                              android:dividerHeight - row간격. android:divider - 간격 틈 색
          # 리스트뷰 text color: content_textstyle_listview.xml
     -->
     <ListView
-        android:id="@+id/playlist_detail_listview"
+        android:id="@+id/quizfolder_detail_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@color/colorPrimary"

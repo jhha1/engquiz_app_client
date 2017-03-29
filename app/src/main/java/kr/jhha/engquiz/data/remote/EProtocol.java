@@ -29,12 +29,12 @@ public enum EProtocol {
 	MacID ("MacID"),
 	UserNickName("UserNickName"),
 	IsExistedUser("IsExistedUser"),
-	bNewQuizGroup("bNewQuizGroup"),
-	QuizGroupId("QuizGroupId"),
-	QuizGroupState("QuizGroupState"),
-	QuizGroupTitle("QuizGroupTitle"),
-	QuizGroupUIOrder("QuizGroupUIOrder"),
-	QuizGroupInfo("QuizGroupInfo"),
+	QuizFolderId("QuizFolderId"),
+	QuizFolderState("QuizFolderState"),
+	QuizFolderTitle("QuizFolderTitle"),
+	QuizFolderUIOrder("QuizFolderUIOrder"),
+	QuizFolder("QuizFolder"),
+	QuizFolders("QuizFolders"),
 	ScriptIds("ScriptIds"),
 
 	

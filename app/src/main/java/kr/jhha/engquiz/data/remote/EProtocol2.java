@@ -14,10 +14,10 @@ public class EProtocol2 {
         LOGIN(1003),
         ParsedSciprt(1004),
         SYNC(1005),
-        AddUserQuizGroup(1006),
-        DelUserQuizGroup(1007),
-        GetUserQuizGroupSummaryList(1008),
-        AddUserQuizGroupDetail(1009),
+        AddUserQuizFolder(1006),
+        DelUserQuizFolder(1007),
+        GetUserQuizFolders(1008),
+        AddUserQuizFolderDetail(1009),
 
         NONE(9999);
 

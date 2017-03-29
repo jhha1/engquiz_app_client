@@ -9,11 +9,11 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".quizgroup.DeleteQuizGroupFragment">
+    tools:context=".quizfolder.DeleteQuizFolderFragment">
 
     <!-- explain how to use -->
     <TextView
-        android:id="@+id/del_playlist_howtouse"
+        android:id="@+id/del_quizfolder_howtouse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -21,9 +21,9 @@
         android:textColor="@color/colorTextWhite"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-    <!-- my playlists : chackable listview -->
+    <!-- my quizfolders : chackable listview -->
     <ListView
-        android:id="@+id/del_playlist_listview"
+        android:id="@+id/del_quizfolder_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
@@ -33,7 +33,7 @@
 
     <!-- complate button  -->
     <Button
-        android:id="@+id/del_playlist_complate_btn"
+        android:id="@+id/del_quizfolder_complate_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"

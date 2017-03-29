@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import kr.jhha.engquiz.data.local.QuizGroupModel;
+import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.ScriptRepository;
 import kr.jhha.engquiz.data.local.UserModel;
 import kr.jhha.engquiz.data.remote.EResultCode;
-import kr.jhha.engquiz.quizgroup.QuizGroupSummary;
-import kr.jhha.engquiz.quizgroup.ShowQuizGroupsFragment;
+import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.util.FileHelper;
 
 /**
@@ -23,7 +22,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
     private final AddScriptContract.View mView;
     private final ScriptRepository mModel;
-    private final QuizGroupModel mQuizGroupModel;
+    private final QuizFolderRepository mQuizFolderModel;
 
     private List<String> mItems = null;     // 리스트 뷰의 각 row에 출력될 파일명
     private List<String> mFilepath = null;  // 파일의 path + name (절대위치)
@@ -31,9 +30,9 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     private String mCurrentDirectoryPath;  // 선택된 파일의 폴더 위치
     private String mSelectedScriptName = null; // 선택된 파일 이름
 
-    private boolean bNewQuizGroup = false;
-    private Integer mSelectedQuizGroupId = -1;
-    private String mSelectedQuizGroupName = null;
+    private boolean bNewQuizFolder = false;
+    private Integer mSelectedQuizFolderId = -1;
+    private String mSelectedQuizFolderName = null;
 
     // 카카오톡 다운로드 폴더 내 파일 리스트 가져오기
     // 수강생들은 카톡단톡방에서 영어스크립트를 다운로드하므로.
@@ -42,7 +41,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     public AddScriptPresenter(AddScriptContract.View view, ScriptRepository model ) {
         mView = view;
         mModel = model;
-        mQuizGroupModel = QuizGroupModel.getInstance();
+        mQuizFolderModel = QuizFolderRepository.getInstance();
     }
 
     @Override
@@ -119,33 +118,33 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         final String filename = mSelectedScriptName;
         boolean bOk = mModel.checkFileFormat(filename); // 파일 형식 체크
         if( bOk ) {
-            List<String> quizGroupList = mQuizGroupModel.getQuizGroupNames();
-            mView.showQuizGroupSelectDialog( quizGroupList );
+            List<String> quizFolderList = mQuizFolderModel.getQuizFolderNames();
+            mView.showQuizFolderSelectDialog( quizFolderList );
         } else {
             mView.showErrorDialog(1);
         }
     }
 
     @Override
-    public void quizGroupSelected( String quizGroupName ) {
-        if( quizGroupName.equals( ShowQuizGroupsFragment.Text_New ) ){
-            mView.showNewQuizGroupTitleInputDialog();
+    public void quizFolderSelected( String quizFolderName ) {
+        if( quizFolderName.equals( QuizFolder.TEXT_NEW ) ){
+            mView.showNewQuizFolderTitleInputDialog();
         } else {
-            bNewQuizGroup = false;
-            callConfirmDialog( quizGroupName, bNewQuizGroup );
+            bNewQuizFolder = false;
+            callConfirmDialog( quizFolderName, bNewQuizFolder );
         }
     }
 
     @Override
-    public void newQuizGroupTitleInputted(String quizGroupName ) {
-        bNewQuizGroup = true;
-        callConfirmDialog( quizGroupName, bNewQuizGroup );
+    public void newQuizFolderTitleInputted(String quizFolderName ) {
+        bNewQuizFolder = true;
+        callConfirmDialog( quizFolderName, bNewQuizFolder );
     }
 
-    private void callConfirmDialog( String quizGroupName, boolean bNewQuizGroup ) {
-        mSelectedQuizGroupName = quizGroupName;
-        if( bNewQuizGroup == false ) {
-            mSelectedQuizGroupId = mQuizGroupModel.getQuizGroupIdByName( quizGroupName );
+    private void callConfirmDialog( String quizFolderName, boolean bNewQuizFolder ) {
+        mSelectedQuizFolderName = quizFolderName;
+        if( bNewQuizFolder == false ) {
+            mSelectedQuizFolderId = mQuizFolderModel.getQuizFolderIdByName( quizFolderName );
         }
         String fileName = mSelectedScriptName;
         final FileHelper file = FileHelper.getInstance();
@@ -161,17 +160,17 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         mModel.addScript( userId,
                 mCurrentDirectoryPath,
                 pdfFileName,
-                onAddScriptCallback( bNewQuizGroup,
-                        mSelectedQuizGroupId,
-                        mSelectedQuizGroupName,
+                onAddScriptCallback( bNewQuizFolder,
+                        mSelectedQuizFolderId,
+                        mSelectedQuizFolderName,
                         mSelectedScriptName,
                         msgForLog) );
         mView.closeLoadingDialog();
     }
 
-    private ScriptRepository.ParseScriptCallback onAddScriptCallback( final boolean bNewQuizGroup,
-                                                                        final Integer quizGroupId,
-                                                                        final String quizGroupName,
+    private ScriptRepository.ParseScriptCallback onAddScriptCallback( final boolean bNewQuizFolder,
+                                                                        final Integer quizFolderId,
+                                                                        final String quizFolderName,
                                                                         final String scriptName,
                                                                         final String msgForLog) {
         return new ScriptRepository.ParseScriptCallback(){
@@ -180,12 +179,12 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
             public void onSuccess() {
                 Log.i("AppContent", "addScript onSuccess()  user: " + msgForLog);
 
-                if( bNewQuizGroup ) {
-                    addQuizGroup(quizGroupName, scriptName);
+                if( bNewQuizFolder ) {
+                    addQuizFolder(quizFolderName, scriptName);
                 } else {
-                    addQuizGroupDetail(quizGroupId, scriptName);
+                    addQuizFolderDetail(quizFolderId, scriptName);
                 }
-                mView.showAddScriptSuccessDialog( quizGroupName );
+                mView.showAddScriptSuccessDialog( quizFolderName );
             }
 
             @Override
@@ -196,20 +195,20 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         };
     }
 
-    private void addQuizGroup( String quizGroupName, String scriptName ) {
-        Log.i("AppContent", "AddScriptPresenter addQuizGroup() called");
+    private void addQuizFolder( String quizFolderName, String scriptName ) {
+        Log.i("AppContent", "AddScriptPresenter addQuizFolder() called");
         Integer userId = UserModel.getInstance().getUserID();
         Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
         List<Integer> scriptIds = new LinkedList<>();
         scriptIds.add(scriptId);
-        mQuizGroupModel.addQuizGroup( userId, quizGroupName, scriptIds, onAddQuizGroup(quizGroupName) );
+        mQuizFolderModel.addQuizFolder( userId, quizFolderName, scriptIds, onAddQuizFolder(quizFolderName) );
     }
 
-    private QuizGroupModel.AddQuizGroupCallback onAddQuizGroup( final String quizGroupName ) {
-        return new QuizGroupModel.AddQuizGroupCallback(){
+    private QuizFolderRepository.AddQuizFolderCallback onAddQuizFolder(final String quizFolderName ) {
+        return new QuizFolderRepository.AddQuizFolderCallback(){
             @Override
             public void onSuccess() {
-                mView.showAddScriptSuccessDialog(quizGroupName);
+                mView.showAddScriptSuccessDialog(quizFolderName);
             }
             @Override
             public void onFail(EResultCode resultCode) {
@@ -217,19 +216,19 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         };
     }
 
-    private void addQuizGroupDetail( Integer quizGroupId, String scriptName ) {
-        Log.i("AppContent", "AddScriptPresenter addQuizGroupDetail() called");
+    private void addQuizFolderDetail( Integer quizFolderId, String scriptName ) {
+        Log.i("AppContent", "AddScriptPresenter addQuizFolderDetail() called");
         Integer userId = UserModel.getInstance().getUserID();
         Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
-        mQuizGroupModel.addQuizGroupDetail( userId, quizGroupId, scriptId, onAddQuizGroupDetail(quizGroupId) );
+        mQuizFolderModel.addQuizFolderDetail( userId, quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
     }
 
-    private QuizGroupModel.AddQuizGroupCallback onAddQuizGroupDetail( final Integer quizGroupId ) {
-        return new QuizGroupModel.AddQuizGroupCallback(){
+    private QuizFolderRepository.AddQuizFolderCallback onAddQuizFolderDetail(final Integer quizFolderId ) {
+        return new QuizFolderRepository.AddQuizFolderCallback(){
             @Override
             public void onSuccess() {
-                String quizGroupName = mQuizGroupModel.getQuizGroupNameById(quizGroupId);
-                mView.showAddScriptSuccessDialog(quizGroupName);
+                String quizFolderName = mQuizFolderModel.getQuizFolderNameById(quizFolderId);
+                mView.showAddScriptSuccessDialog(quizFolderName);
             }
             @Override
             public void onFail(EResultCode resultCode) {

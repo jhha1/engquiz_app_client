@@ -38,7 +38,7 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
     private AlertDialog.Builder mDialogConfirm = null;  // 스크립트 추가 confirm
     private ProgressDialog mDialogLoadingSpinner = null; // 동글뱅이 로딩 중(스크립트 추가중.. ) 다이알로그. 서버통신때씀
     private AlertDialog.Builder mDialogResult = null; // 스크립트 추가(파싱) 결과 다이알로그
-    private AlertDialog.Builder mDialogSelectQuizGroup = null; // 퀴즈그룹 선택 다이알로그
+    private AlertDialog.Builder mDialogSelectQuizFolder = null; // 퀴즈폴더 선택 다이알로그
 
 
     @Override
@@ -48,7 +48,7 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
         initDialogConfirm();
         initDialogLoadingSpinner();
         initDialogResult();
-        initDialogSelectQuizGroup();
+        initDialogSelectQuizFolder();
     }
 
     @Override
@@ -151,45 +151,45 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
     }
 
     @Override
-    public void showQuizGroupSelectDialog( List<String> quizGroupList ) {
+    public void showQuizFolderSelectDialog( List<String> quizFolderList ) {
         // List Adapter 생성
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getActivity(),
                 android.R.layout.select_dialog_singlechoice);
-        // adapter에 quiz group list 집어넣기
-        for( String quizGroupTitle : quizGroupList ){
-            adapter.add(quizGroupTitle);
+        // adapter에 quiz folder list 집어넣기
+        for( String quizFolderTitle : quizFolderList ){
+            adapter.add(quizFolderTitle);
         }
         adapter.notifyDataSetChanged();
 
         // Dialog와 Adapter 연결
-        mDialogSelectQuizGroup.setAdapter(adapter,
+        mDialogSelectQuizFolder.setAdapter(adapter,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // 유저가 quiz group 선택.
+                        // 유저가 quiz folder 선택.
                         String listItemTitle = adapter.getItem(id);
-                        mActionListener.quizGroupSelected( listItemTitle );
+                        mActionListener.quizFolderSelected( listItemTitle );
                         dialog.dismiss();
                     }
                 });
 
-        mDialogSelectQuizGroup.show();
+        mDialogSelectQuizFolder.show();
     }
 
     @Override
-    public void showNewQuizGroupTitleInputDialog() {
+    public void showNewQuizFolderTitleInputDialog() {
         // AlertDialog 안에 있는 AlertDialog
         final AlertDialog.Builder innBuilder = new AlertDialog.Builder(getActivity());
-        innBuilder.setTitle("새 퀴즈그룹의 이름을 기입해주세요.");
-        final EditText inputQuizGroupTitle = new EditText(getActivity());
-        innBuilder.setView( inputQuizGroupTitle );
+        innBuilder.setTitle("새 퀴즈폴더의 이름을 기입해주세요.");
+        final EditText inputQuizFolderTitle = new EditText(getActivity());
+        innBuilder.setView( inputQuizFolderTitle );
         innBuilder.setMessage("영어,한글,숫자만 가능합니다. \n최소 1글자 ~ 최대 30글자까지 가능합니다.");
 
         innBuilder.setPositiveButton("확인",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String inputText = inputQuizGroupTitle.getText().toString();
-                        mActionListener.newQuizGroupTitleInputted( inputText );
+                        String inputText = inputQuizFolderTitle.getText().toString();
+                        mActionListener.newQuizFolderTitleInputted( inputText );
                         dialog.dismiss();
                     }
                 });
@@ -229,9 +229,9 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
     }
 
     @Override
-    public void showAddScriptSuccessDialog(String quizGroupName) {
+    public void showAddScriptSuccessDialog(String quizFolderName) {
         String msg = "스크립트가 추가되었습니다. " +
-                "\n QuizGroup 메뉴의 " + quizGroupName + "를 클릭하면 확인하실 수 있습니다.";
+                "\n QuizFolder 메뉴의 " + quizFolderName + "를 클릭하면 확인하실 수 있습니다.";
         mDialogResult.setMessage(msg);
         mDialogResult.show();
     }
@@ -278,13 +278,13 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
         });
     }
 
-    private void initDialogSelectQuizGroup() {
-        mDialogSelectQuizGroup = new AlertDialog.Builder(getActivity());
-        mDialogSelectQuizGroup.setIcon(android.R.drawable.alert_dark_frame);
-        mDialogSelectQuizGroup.setTitle("스크립트를 넣을 퀴즈그룹을 선택해주세요. \n적당한 퀴즈그룹이 없다면, 퀴즈그룹 리스트 내의 New..를 클릭해 새 퀴즈그룹을 만드실 수 있습니다.");
-        mDialogSelectQuizGroup.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
+    private void initDialogSelectQuizFolder() {
+        mDialogSelectQuizFolder = new AlertDialog.Builder(getActivity());
+        mDialogSelectQuizFolder.setIcon(android.R.drawable.alert_dark_frame);
+        mDialogSelectQuizFolder.setTitle("스크립트를 넣을 퀴즈폴더를 선택해주세요. \n적당한 퀴즈폴더가 없다면, 퀴즈폴더 리스트 내의 New..를 클릭해 새 퀴즈폴더를 만드실 수 있습니다.");
+        mDialogSelectQuizFolder.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
         // 취소 버튼 클릭 이벤트.
-        mDialogSelectQuizGroup.setNegativeButton("뒤로가기", new DialogInterface.OnClickListener() {
+        mDialogSelectQuizFolder.setNegativeButton("뒤로가기", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int which) {
                 // 다이알로그 닫기
                 d.dismiss();

@@ -6,7 +6,6 @@ import java.util.List;
 
 import kr.jhha.engquiz.data.local.User;
 import kr.jhha.engquiz.data.local.UserModel;
-import kr.jhha.engquiz.data.local.QuizGroupDetail;
 import kr.jhha.engquiz.data.remote.EResultCode;
 
 /**
