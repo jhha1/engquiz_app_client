@@ -13,7 +13,6 @@ import kr.jhha.engquiz.data.remote.EProtocol2;
 import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.data.remote.Request;
 import kr.jhha.engquiz.data.remote.Response;
-import kr.jhha.engquiz.util.exception.system.IllegalArgumentException;
 
 /**
  * Created by thyone on 2017-03-19.
@@ -27,12 +26,27 @@ public class QuizFolderRepository {
     }
 
     public interface AddQuizFolderCallback {
-        void onSuccess( );
+        void onSuccess( List<QuizFolder> updatedQuizFolders );
         void onFail(EResultCode resultCode);
     }
 
     public interface DelQuizFolderCallback {
-        void onSuccess( List<QuizFolder> quizFolders );
+        void onSuccess( List<QuizFolder> updatedQuizFolders );
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface GetQuizFolderDetailCallback {
+        void onSuccess( List<Integer> scriptIds );
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface AddQuizFolderScriptCallback {
+        void onSuccess( List<Integer> updatedScriptIds );
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface DelQuizFolderScriptCallback {
+        void onSuccess( List<Integer> updatedScriptIds );
         void onFail(EResultCode resultCode);
     }
 
@@ -45,30 +59,6 @@ public class QuizFolderRepository {
 
     private List<QuizFolder> mQuizFolders = new ArrayList<>();
     private Integer MAX_QUIZ_GROUP_LIST_COUNT = 30;
-
-    /*
-    // 퀴즈폴더리스트 서버로부터 받아오는 시점.
-    // 1. login 성공시.
-    // 2. 유저가 퀴즈폴더 메뉴를 클릭해 퀴즈폴더 리스트를 볼려고 할때, 메모리에 리스트가 없으면.
-    //
-    // 원래 2번만으로 데이터를 받아오는걸 했었음. but,
-    // 2번 시행전 퀴즈폴더데이터가 필요한경우를 대비해  (add script같은)
-    // 퀴즈폴더데이터 얻기 관련 모든 함수에 서버로부터 데이터 참조 코드를 넣어야 함 (=getQuizFolders(callback))
-    // 함수가 다 비대해짐. so, 1번을 먼저 시행하면 2번 경우 제외한
-    // 모든 퀴즈폴더데이터는 메모리의 데이터만 참조해도 왠만히 커버가능.
-    */
-    public void initQuizFolderList( Integer userId ){
-        getQuizFolders( userId, new QuizFolderRepository.GetQuizFolderCallback(){
-            @Override
-            public void onSuccess(List<QuizFolder> quizFolders) {
-            }
-            @Override
-            public void onFail(EResultCode resultCode) {
-                // TODO ?
-                return;
-            }
-        });
-    }
 
     public Integer getMAX_QUIZ_GROUP_LIST_COUNT() {
         return MAX_QUIZ_GROUP_LIST_COUNT;
@@ -97,27 +87,44 @@ public class QuizFolderRepository {
     }
 
     public List<String> getQuizFolderNames(){
-        final List<String> names = new LinkedList<>();
+        if( mQuizFolders == null || mQuizFolders.isEmpty() ){
+            return new LinkedList<>();
+        }
+
+        List<String> names = new LinkedList<>();
         for(QuizFolder quizFolder : mQuizFolders){
             names.add( quizFolder.getTitle() );
         }
         return names;
     }
 
-    public QuizFolder getQuizFolder(final int arrayIndex ){
-        if( 0 > arrayIndex || mQuizFolders.size() < arrayIndex )
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT,
-                    "QuizFolder ListView Position is invalid(pos:"+arrayIndex+", listSize:"+ mQuizFolders.size());
-        return mQuizFolders.get( arrayIndex );
+    public QuizFolder getQuizFolderById( Integer quizFolderId ){
+        quizFolderId = QuizFolder.checkQuizFolderID(quizFolderId);
+        for( QuizFolder folder : mQuizFolders){
+            if( folder.getId() == quizFolderId ){
+                return folder;
+            }
+        }
+        return null;
     }
 
-    public void getQuizFolders(Integer userId, final QuizFolderRepository.GetQuizFolderCallback callback ) {
+    public QuizFolder getQuizFolderByUIOrder(final int uiOrderNumber ){
+        for( QuizFolder folder : mQuizFolders){
+            if( folder.getUiOrder() == uiOrderNumber ){
+                return folder;
+            }
+        }
+        return null;
+    }
+
+    public void getQuizFolders( final QuizFolderRepository.GetQuizFolderCallback callback ) {
         if( null != mQuizFolders && false == mQuizFolders.isEmpty() ){
             callback.onSuccess(mQuizFolders);
             return;
         }
 
         Request request = new Request( EProtocol2.PID.GetUserQuizFolders);
+        Integer userId = UserModel.getInstance().getUserID();
         request.set(EProtocol.UserID, userId);
         AsyncNet net = new AsyncNet( request, onGetQuizFolders(callback) );
         net.execute();
@@ -162,7 +169,7 @@ public class QuizFolderRepository {
                     Log.e("AppContent", "onAddQuizFolder(): "+ quizFolders.toString());
                     // save quiz folders
                     overwriteQuizFoldersAll( quizFolders );
-                    callback.onSuccess( );
+                    callback.onSuccess( mQuizFolders );
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
@@ -214,9 +221,96 @@ public class QuizFolderRepository {
         //     -> download summaries from a server when a quizfolder menu first clicked.
     }
 
+    /*
+       서버에서 UI순서 소팅된 scriptId list를
+        그대로 클라메모리에 저장하므로,
+        List index == uiOderNumber
+    */
+    public String getQuizFolderScriptTitleByUIOrder(int quizFolderId, int uiOrderNumber ){
+        if( uiOrderNumber <= 0 ) {
+            Log.e("########", "invalid uiOrderNumber. " +
+                    "quizFolderId:"+quizFolderId + ", uiOrderNumber:"+uiOrderNumber);
+            return new String();
+        }
 
-    public void addQuizFolderDetail( Integer userId, Integer quizFolderId, Integer scriptId, final AddQuizFolderCallback callback ){
+        List<Integer> scriptIds = getQuizFolderScriptIDs(quizFolderId);
+        Integer scriptId = scriptIds.get(uiOrderNumber);
+        if( scriptId <= 0 ) {
+            Log.e("########", "invalid scriptId. " +
+                    "quizFolderId:"+quizFolderId + ", uiOrderNumber:"+uiOrderNumber+", scriptId:"+scriptId);
+            return new String();
+        }
+
+        return ScriptRepository.getInstance().getScriptTitleAsId(scriptId);
+    }
+
+    public List<Integer> getQuizFolderScriptIDs(Integer quizFolderId ) {
+        quizFolderId = QuizFolder.checkQuizFolderID(quizFolderId);
+        QuizFolder quizFolder = getQuizFolderById( quizFolderId );
+        if( QuizFolder.isNull(quizFolder) ){
+            Log.e("########", "getQuizFolderScriptIDs() quizFolder is null. quizFolderId:"+quizFolderId);
+            return null;
+        }
+        return quizFolder.getScriptIds();
+    }
+
+    private List<Integer> getQuizFolderScriptsFromMemory( Integer quizFolderId ){
+        if(mQuizFolders == null) {
+            Log.e("#######", "mQuizFolders Map is null");
+            return null;
+        }
+
+        if( false == mQuizFolders.contains(quizFolderId)) {
+            Log.e("#######", "NoExist key(quizFolderId) in mQuizFolders Map. id:"+quizFolderId);
+            return null;
+        }
+
+        QuizFolder quizFolder = mQuizFolders.get(quizFolderId);
+        if( quizFolder == null ){
+            Log.e("#######", "Null value(QuizFolder) in mQuizFolders Map. key:"+quizFolderId);
+            return null;
+        }
+
+        return quizFolder.getScriptIds();
+    }
+
+    public void getQuizFolderDetail(Integer userId, Integer quizFolderId, final QuizFolderRepository.GetQuizFolderDetailCallback callback ) {
+        List<Integer> scrpitIds = getQuizFolderScriptsFromMemory(quizFolderId);
+        if( scrpitIds != null ){
+            callback.onSuccess(scrpitIds);
+            return;
+        }
+
+        Request request = new Request( EProtocol2.PID.GetUserQuizFolderDetail);
+        request.set(EProtocol.UserID, userId);
+        AsyncNet net = new AsyncNet( request, onGetQuizFolderDetail(callback) );
+        net.execute();
+    }
+
+    private AsyncNet.Callback onGetQuizFolderDetail(final QuizFolderRepository.GetQuizFolderDetailCallback callback ) {
+        return new AsyncNet.Callback() {
+            @Override
+            public void onResponse(Response response) {
+                if (response.isSuccess()) {
+                    final Integer quizFolderId = (Integer)response.get(EProtocol.QuizFolderId);
+                    final List<Integer> quizFolderScriptIds = (List)response.get(EProtocol.ScriptIds);
+                    Log.e("AppContent", "onGetQuizFolderDetail(): "+ quizFolderScriptIds.toString());
+                    // save quiz folders
+                    overwriteQuizFolderScriptIdList( quizFolderId, quizFolderScriptIds );
+                    callback.onSuccess(quizFolderScriptIds);
+                } else {
+                    // 서버 응답 에러
+                    Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
+                    callback.onFail( response.getResultCode() );
+                }
+            }
+        };
+    }
+
+
+    public void addQuizFolderDetail( Integer quizFolderId, Integer scriptId, final AddQuizFolderScriptCallback callback ){
         Request request = new Request( EProtocol2.PID.AddUserQuizFolderDetail );
+        Integer userId = UserModel.getInstance().getUserID();
         request.set(EProtocol.UserID, userId);
         request.set(EProtocol.QuizFolderId, quizFolderId);
         request.set(EProtocol.ScriptId, scriptId);
@@ -224,7 +318,7 @@ public class QuizFolderRepository {
         net.execute();
     }
 
-    private AsyncNet.Callback onAddQuizFolderDetail( final Integer quizFolderId, final AddQuizFolderCallback callback ) {
+    private AsyncNet.Callback onAddQuizFolderDetail( final Integer quizFolderId, final AddQuizFolderScriptCallback callback ) {
         return new AsyncNet.Callback() {
             @Override
             public void onResponse(Response response) {
@@ -233,7 +327,45 @@ public class QuizFolderRepository {
                     Log.e("AppContent", "onAddQuizFolderDetail(): "+ quizFolderScriptIdList.toString());
                     // save script list
                     overwriteQuizFolderScriptIdList( quizFolderId, quizFolderScriptIdList );
-                    callback.onSuccess();
+                    callback.onSuccess( quizFolderScriptIdList );
+                } else {
+                    // 서버 응답 에러
+                    Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
+                    callback.onFail( response.getResultCode() );
+                }
+            }
+        };
+    }
+
+    public Integer getQuizFolderScriptsCount( Integer quizFolderId ){
+        List<Integer> scriptIds = getQuizFolderScriptIDs(quizFolderId);
+        if( scriptIds == null ){
+            Log.e("########", "getQuizFolderScriptsCount() scriptIds is null. quizFolderId:"+quizFolderId);
+            return 0;
+        }
+        return scriptIds.size();
+    }
+
+    public void delQuizFolderScript( Integer userId, Integer quizfolderId, Integer scriptId, final DelQuizFolderScriptCallback callback ){
+        Request request = new Request( EProtocol2.PID.DelUserQuizFolder );
+        request.set(EProtocol.UserID, userId);
+        request.set(EProtocol.QuizFolderId, quizfolderId);
+        request.set(EProtocol.ScriptId, scriptId);
+        AsyncNet net = new AsyncNet( request, onDelScript(callback) );
+        net.execute();
+    }
+
+    private AsyncNet.Callback onDelScript( final DelQuizFolderScriptCallback callback ) {
+        return new AsyncNet.Callback() {
+            @Override
+            public void onResponse(Response response) {
+                if (response.isSuccess()) {
+                    final Integer quizFolderId = (Integer)response.get(EProtocol.QuizFolderId);
+                    final List<Integer> quizFolderScriptIds = (List)response.get(EProtocol.ScriptIds);
+                    Log.e("AppContent", "onDelScript(): "+ quizFolderScriptIds.toString());
+                    // save summaries.
+                    overwriteQuizFolderScriptIdList( quizFolderId, quizFolderScriptIds );
+                    callback.onSuccess(quizFolderScriptIds);
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());

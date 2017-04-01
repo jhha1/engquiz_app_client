@@ -11,10 +11,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
+import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetailFragment;
 import kr.jhha.engquiz.util.click.ClickDetector;
 import kr.jhha.engquiz.util.click.ListViewClickDetector;
 
@@ -36,7 +39,7 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
     private QuizFolder mListviewSelectedItem = null;
 
-    private final String mTITLE = "Quiz Groups";
+    private final String mTITLE = "Quiz Folders";
 
     public ShowQuizFoldersFragment() {}
 
@@ -44,9 +47,9 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mActionListener = new ShowQuizFolderPresenter( this, QuizFolderRepository.getInstance() );
+
+        mActionListener = new ShowQuizFoldersPresenter( this, QuizFolderRepository.getInstance() );
         mActionListener.getQuizFolderList();
-        mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance() );
         mClickDetector = new ListViewClickDetector( this );
         initDialog();
     }
@@ -147,7 +150,8 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     };
 
     @Override
-    public void onSuccessGetQuizFolderList() {
+    public void onSuccessGetQuizFolderList(List<QuizFolder> quizFolders) {
+        mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance(), quizFolders );
         mAdapter.notifyDataSetChanged();
     }
     @Override
@@ -158,7 +162,8 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     }
 
     @Override
-    public void onSuccessDelQuizFolder() {
+    public void onSuccessDelQuizFolder(List<QuizFolder> updatedQuizFolders) {
+        mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance(), updatedQuizFolders);
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), "퀴즈 폴더가 삭제되었습니다", Toast.LENGTH_SHORT).show();
     }
@@ -195,8 +200,20 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     }
 
     @Override
-    public void onChangeViewFragmet( MainActivity.EFRAGMENT fragment ) {
-        ((MainActivity)getActivity()).changeViewFragment( fragment );
+    public void onChangeFragmetNew(){
+        final MainActivity context = ((MainActivity)getActivity());
+        context.changeViewFragment(MainActivity.EFRAGMENT.QUIZQROUP_NEW);
+    }
+
+    @Override
+    public void onChangeFragmetFolderDetail( Integer quizFolderId, String quizFolderTitle ) {
+        final MainActivity context = ((MainActivity)getActivity());
+        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_DETAIL_SHOW;
+
+        // 퀴즈폴더 디테일보기 프래그먼트는 인자값을 넘겨야함.
+        ShowQuizFolderDetailFragment detailFragment = (ShowQuizFolderDetailFragment) context.getFragment(fragmentID);
+        detailFragment.setSelectedQuizGroupId(quizFolderId, quizFolderTitle);
+        context.changeViewFragment( fragmentID );
     }
 }
 

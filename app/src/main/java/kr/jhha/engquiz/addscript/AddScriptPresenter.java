@@ -117,12 +117,38 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     {
         final String filename = mSelectedScriptName;
         boolean bOk = mModel.checkFileFormat(filename); // 파일 형식 체크
-        if( bOk ) {
-            List<String> quizFolderList = mQuizFolderModel.getQuizFolderNames();
-            mView.showQuizFolderSelectDialog( quizFolderList );
-        } else {
+        if( !bOk ) {
             mView.showErrorDialog(1);
+            return;
         }
+        getQuizFolderList();
+    }
+
+    private void getQuizFolderList(){
+        // 퀴즈폴더 리스트를 로드하기 전에
+        // Add Script에서 퀴즈폴더리스트를 참조하는 경우(1)에 대비해
+        // 아래 함수(2)를 사용해 리스트를 받아온다.
+        //
+        // (1) 유저가 퀴즈폴더메뉴를 클릭하기 전에 Add script를 하는 경우.
+        //      퀴즈폴더메뉴를 클릭하는 시점에 퀴즈폴더데이터로드.
+        // (2) 아래함수: 메모리에 리스트가 있으면 반환 or 없으면 서버로부터 리스트를 받음
+        mQuizFolderModel.getQuizFolders( new QuizFolderRepository.GetQuizFolderCallback(){
+
+            @Override
+            public void onSuccess(List<QuizFolder> quizFolders) {
+                // 모든 로직이 성공하여 mQuizFolderModel에 퀴즈폴더리스트가 저장되어있다.
+                // mQuizFolderModel에서 필요한 데이터를 가져다 쓴다.
+                List<String> quizFolderList = mQuizFolderModel.getQuizFolderNames();
+                // 리스트마지막에 'New..'추가.
+                quizFolderList.add(quizFolderList.size(), QuizFolder.TEXT_NEW);
+                mView.showQuizFolderSelectDialog( quizFolderList );
+            }
+
+            @Override
+            public void onFail(EResultCode resultCode) {
+                mView.showErrorDialog(3);
+            }
+        });
     }
 
     @Override
@@ -196,7 +222,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     }
 
     private void addQuizFolder( String quizFolderName, String scriptName ) {
-        Log.i("AppContent", "AddScriptPresenter addQuizFolder() called");
+        Log.i("AppContent", "AddScriptPresenter addScriptInQuizFolder() called");
         Integer userId = UserModel.getInstance().getUserID();
         Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
         List<Integer> scriptIds = new LinkedList<>();
@@ -205,9 +231,9 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     }
 
     private QuizFolderRepository.AddQuizFolderCallback onAddQuizFolder(final String quizFolderName ) {
-        return new QuizFolderRepository.AddQuizFolderCallback(){
+        return new QuizFolderRepository.AddQuizFolderCallback( ){
             @Override
-            public void onSuccess() {
+            public void onSuccess(List<QuizFolder> updatedQuizFolders) {
                 mView.showAddScriptSuccessDialog(quizFolderName);
             }
             @Override
@@ -220,13 +246,13 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         Log.i("AppContent", "AddScriptPresenter addQuizFolderDetail() called");
         Integer userId = UserModel.getInstance().getUserID();
         Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
-        mQuizFolderModel.addQuizFolderDetail( userId, quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
+        mQuizFolderModel.addQuizFolderDetail( quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
     }
 
-    private QuizFolderRepository.AddQuizFolderCallback onAddQuizFolderDetail(final Integer quizFolderId ) {
-        return new QuizFolderRepository.AddQuizFolderCallback(){
+    private QuizFolderRepository.AddQuizFolderScriptCallback onAddQuizFolderDetail(final Integer quizFolderId ) {
+        return new QuizFolderRepository.AddQuizFolderScriptCallback(){
             @Override
-            public void onSuccess() {
+            public void onSuccess(List<Integer> updatedScriptIds) {
                 String quizFolderName = mQuizFolderModel.getQuizFolderNameById(quizFolderId);
                 mView.showAddScriptSuccessDialog(quizFolderName);
             }

@@ -217,12 +217,9 @@ public class UserModel {
         Log.i("##################", "SYNC ALARM !!!!!~!! " + syncNeededSentenceIds.toString());
 
         Log.i("AppContent", "onLoginSuccess()  " +
-                "quizfolderForPlaying: " + quizfolderMap.toString() +
+                "quizfolderForPlaying: " + ((quizfolderMap!=null)?quizfolderMap.toString():null) +
                 ", syncNeededSentenceIds: " + syncNeededSentenceIds.toString()
         );
-
-        // 3. 퀴즈폴더리스트를 서버로부터 받아온다.
-        QuizFolderRepository.getInstance().initQuizFolderList( getUserID() );
     }
 
     private Integer readMacID() {

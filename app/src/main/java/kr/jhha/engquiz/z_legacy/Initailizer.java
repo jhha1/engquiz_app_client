@@ -56,7 +56,7 @@ public class Initailizer
             QuizFolder item = new QuizFolder();
             item.setTitle( "New.." );
             item.setDesc( "원하는 스크립트를 선택해, 나만의 퀴즈를 만듭니다." );
-            QuizFolderAdapter.getInstance().addQuizFolder(item);
+            QuizFolderAdapter.getInstance().addScriptInQuizFolder(item);
 
             // 임시적인 셋팅법.
             // TODO 퀴즈폴더 정보를 오프라인에 저장후, 읽어와 거기에 잇는 script 정보를 보고 셋팅.
@@ -70,12 +70,12 @@ public class Initailizer
             item.setTitle( "Default" );
             item.setDesc( "개의 스크립트가 들어있습니다." );
             item.setScriptIndexes(parsedScriptIndexes);
-            QuizFolderAdapter.getInstance().addQuizFolder(item);
+            QuizFolderAdapter.getInstance().addScriptInQuizFolder(item);
             return;
         }
 
         for( QuizFolder item : groups ) {
-            QuizFolderAdapter.getInstance().addQuizFolder( item );
+            QuizFolderAdapter.getInstance().addScriptInQuizFolder( item );
         }
     }
 */

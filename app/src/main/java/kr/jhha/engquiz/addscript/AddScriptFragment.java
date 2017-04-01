@@ -138,6 +138,9 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
             case 2:
                 msg = "오류가 발생했습니다. 잠시후에 다시 시도해 주세요";
                 break;
+            case 3:
+                msg = "퀴즈 폴더 리스트를 가져오는데에 실패했습니다. 잠시후에 다시 시도해 주세요.";
+                break;
         }
 
         AlertDialog.Builder d = new AlertDialog.Builder(getActivity());
@@ -183,9 +186,9 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
         innBuilder.setTitle("새 퀴즈폴더의 이름을 기입해주세요.");
         final EditText inputQuizFolderTitle = new EditText(getActivity());
         innBuilder.setView( inputQuizFolderTitle );
-        innBuilder.setMessage("영어,한글,숫자만 가능합니다. \n최소 1글자 ~ 최대 30글자까지 가능합니다.");
+        //innBuilder.setMessage("영어,한글,숫자만 가능합니다. \n최소 1글자 ~ 최대 30글자까지 가능합니다.");
 
-        innBuilder.setPositiveButton("확인",
+        innBuilder.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String inputText = inputQuizFolderTitle.getText().toString();

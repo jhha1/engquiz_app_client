@@ -14,8 +14,6 @@ import kr.jhha.engquiz.data.local.QuizPlayModel;
 import kr.jhha.engquiz.data.local.Sentence;
 import kr.jhha.engquiz.MainActivity;
 
-import static kr.jhha.engquiz.data.local.QuizPlayModel.quizManager;
-
 /**
  * Created by jhha on 2016-12-16.
  */
@@ -108,8 +106,9 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     }
 
     private Sentence getNewQuiz() {
-        if(quizManager != null)
-            return quizManager.getQuiz();
+        final QuizPlayModel model = QuizPlayModel.getInstance();
+        if(model != null)
+            return model.getQuiz();
         return null;
     }
 

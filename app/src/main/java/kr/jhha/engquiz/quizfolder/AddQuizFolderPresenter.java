@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.ScriptRepository;
 import kr.jhha.engquiz.data.local.UserModel;
@@ -31,30 +32,50 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
         mModel = model;
         mView = view;
         mContext = context;
-        mScriptListViewAdapter = makeAdapter();
     }
 
     /*
-         아답터 생성
-         아답터를 리프레쉬할 일이 없어, UI에 둘 필요 없다 판단,,여기로 옮김.
-         기본 안드로이드 아답터 사용. 스크립트 전체 제목리스트를 보여줌.
-     */
-    private ArrayAdapter makeAdapter(){
-        int resourceID = R.layout.content_textstyle_listview_checked_multiple;
-        //int resourceID = android.R.layout.simple_list_item_multiple_choice;
-        String[] scriptTitleAll = ScriptRepository.getInstance().getScriptTitleAll();
-        if(scriptTitleAll == null || scriptTitleAll.length < 0) {
-            Log.e("TAG", "quiz titles null");
-            mView.showEmptyScriptDialog();
-            return null;
-        }
+        아답터 생성
+        아답터를 리프레쉬할 일이 없어, UI에 둘 필요 없다 판단,,여기로 옮김.
+        기본 안드로이드 아답터 사용. 스크립트 전체 제목리스트를 보여줌.
+    */
+    @Override
+    public ArrayAdapter getAdapter() {
+        if( mScriptListViewAdapter == null )
+        {
+            final ScriptRepository scriptRepo = ScriptRepository.getInstance();
+            String[] scriptTitleAll = ScriptRepository.getInstance().getScriptTitleAll();
+            boolean bEmptyScripts =  (scriptTitleAll == null || scriptTitleAll.length <= 0);
+            if( bEmptyScripts ) {
+                Log.e("TAG", "quiz titles null");
+                return null;
+            }
 
-        return new ArrayAdapter<String>(mContext, resourceID, scriptTitleAll);
+            int resourceID = R.layout.content_textstyle_listview_checked_multiple;
+            //int resourceID = android.R.layout.simple_list_item_multiple_choice;
+            return new ArrayAdapter<String>(mContext, resourceID, scriptTitleAll);
+        }
+        return mScriptListViewAdapter;
     }
 
     @Override
-    public ArrayAdapter getAdapter(){
-        return mScriptListViewAdapter;
+    public void selectStartDialog()
+    {
+        if( mScriptListViewAdapter == null ){
+            // 퀴즈폴더에 넣을수있는 스크립트들이 없으면,
+            // 알림다이알로그를 띄우고 퀴즈폴더만들기에서 빠져나옴
+            mView.showEmptyScriptDialog();
+        } else {
+            // 퀴즈폴더에 넣을수있는 스크립트가 있으면,
+            // 퀴즈폴더제목 입력받는 다이알로그 띄움.
+            mView.showQuizFolderTitleDialog();
+        }
+    }
+
+    @Override
+    public void emptyScriptDialogOkButtonClicked() {
+        mView.clearUI();
+        mView.returnToQuizFolderFragment();
     }
 
     @Override
@@ -81,12 +102,12 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
     @Override
     public void addQuizFolder( String title, ListView mItemListView )
     {
-        Log.i("AppContent", "AddQuizFolderPresenter addQuizFolder() called. title:"+title);
+        Log.i("AppContent", "AddQuizFolderPresenter addScriptInQuizFolder() called. title:"+title);
 
         // 선택한 스크립트 개수 체크
         int selectedCount = mItemListView.getCheckedItemCount();
         if( 0 >= selectedCount ) {
-            mView.onFailAddQuizFolder( 0, "선택된 퀴즈가 없습니다" );
+            mView.onFailAddQuizFolder( "선택된 퀴즈가 없습니다" );
             return;
         }
 
@@ -114,13 +135,17 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
         return new QuizFolderRepository.AddQuizFolderCallback(){
 
             @Override
-            public void onSuccess() {
-                mView.onSuccessAddQuizFolder();
+            public void onSuccess(List<QuizFolder> updatedQuizFolders) {
+                mView.onSuccessAddQuizFolder(updatedQuizFolders);
+                mView.clearUI();
+                mView.returnToQuizFolderFragment();
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
-                mView.onFailAddQuizFolder( 1, "새 퀴즈폴더 생성에 실패했습니다. 잠시 후 다시 시도해주세요." );
+                mView.onFailAddQuizFolder(  "새 퀴즈폴더 생성에 실패했습니다. 잠시 후 다시 시도해주세요." );
+                mView.clearUI();
+                mView.returnToQuizFolderFragment();
             }
         };
     }

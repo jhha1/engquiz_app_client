@@ -77,6 +77,10 @@ public class ScriptRepository {
         return FileHelper.getInstance().getAndroidAbsolutePath(path);
     }
 
+    public Integer scriptCount(){
+        return mAllScriptIdsAndTitles.size();
+    }
+
     public String getScriptTitleAsId(Integer scriptId ) {
         return mAllScriptIdsAndTitles.get(scriptId);
     }

@@ -18,6 +18,8 @@ public class EProtocol2 {
         DelUserQuizFolder(1007),
         GetUserQuizFolders(1008),
         AddUserQuizFolderDetail(1009),
+        DelUserQuizFolderDetail(1010),
+        GetUserQuizFolderDetail(1011),
 
         NONE(9999);
 

@@ -1,5 +1,7 @@
 package kr.jhha.engquiz.quizfolder;
 
+import java.util.List;
+
 import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.data.local.QuizFolder;
 
@@ -11,11 +13,13 @@ public class ShowQuizFoldersContract {
 
     interface View {
         // 퀴즈폴더 리스트 가져오기 결과
-        void onSuccessGetQuizFolderList();
+        void onSuccessGetQuizFolderList(List<QuizFolder> quizFolders);
         void onFailGetQuizFolderList();
 
         // 퀴즈 폴더 추가 화면으로 전환
-        void onChangeViewFragmet(MainActivity.EFRAGMENT fragment );
+        void onChangeFragmetNew();
+        // 퀴즈 폴더 디테일 보기 화면전환
+        void onChangeFragmetFolderDetail( Integer QuizFolderId, String title );
 
         // 이 퀴즈폴더를 퀴즈플레이용으로 설정 관련
         void showDialogChangePlayingQuizFolder(QuizFolder mListviewSelectedItem );
@@ -23,7 +27,7 @@ public class ShowQuizFoldersContract {
         void onFailChangePlayingQuizFolder();
 
         // 퀴즈 폴더 삭제 결과
-        void onSuccessDelQuizFolder();
+        void onSuccessDelQuizFolder(List<QuizFolder> updatedQuizFolders);
         void onFailDelQuizFolder(String msg );
     }
 

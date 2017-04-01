@@ -16,9 +16,10 @@ import android.view.MenuItem;
 import kr.jhha.engquiz.quizfolder.AddQuizFolderFragment;
 import kr.jhha.engquiz.quizfolder.ShowQuizFoldersFragment;
 import kr.jhha.engquiz.addscript.AddScriptFragment;
+import kr.jhha.engquiz.quizfolder.detail.AddQuizFolderDetailFragment;
+import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetailFragment;
 import kr.jhha.engquiz.quizplay.QuizPlayFragment;
 import kr.jhha.engquiz.sync.SyncFragment;
-import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetail;
 import kr.jhha.engquiz.user.LoginFragment;
 import kr.jhha.engquiz.user.SignInFragment;
 import kr.jhha.engquiz.util.click.BackPressedCloseHandler;
@@ -38,15 +39,16 @@ public class MainActivity extends AppCompatActivity
     private SyncFragment mSyncFragment;
     private Fragment mAddScriptFragment;
 
-    private Fragment mPlayListFragment;
-    private Fragment mPlayListDetailFragment;
+    private ShowQuizFoldersFragment mQuizFoldersFragment;
+    private ShowQuizFolderDetailFragment mQuizFolderDetailFragment;
+    private AddQuizFolderDetailFragment mAddQuizFolderDetailFragment;
     private Fragment mMakeCustomQuizFragment;
 
     private SignInFragment mSignInFragment;
     private LoginFragment mLoginFragment;
 
     public static enum EFRAGMENT {NONE, PLAYQUIZ, QUIZQROUP_NEW,
-        QUIZGROUP_DETAIL_SHOW, SYNC, ADD_SCRIPT, UPDATE, SIGNIN, LOGIN};
+        QUIZFOLDER_DETAIL_SHOW, QUIZFOLDER_DETAIL_NEW, SYNC, ADD_SCRIPT, UPDATE, SIGNIN, LOGIN};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +89,8 @@ public class MainActivity extends AppCompatActivity
     // 프래그먼트 초기화
     private void initFragments() {
         mPlayQuizFragment = new QuizPlayFragment();
-        mPlayListFragment = new ShowQuizFoldersFragment();
-        mPlayListDetailFragment = new ShowQuizFolderDetail();
+        mQuizFoldersFragment = new ShowQuizFoldersFragment();
+        mQuizFolderDetailFragment = new ShowQuizFolderDetailFragment();
         mMakeCustomQuizFragment = new AddQuizFolderFragment();
         mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_play_quiz) {
             transaction.replace(R.id.container, mPlayQuizFragment);
         } else if (id == R.id.nav_my_quizs) {
-            transaction.replace(R.id.container, mPlayListFragment);
+            transaction.replace(R.id.container, mQuizFoldersFragment);
         } else if (id == R.id.nav_sync) {
             transaction.replace(R.id.container, mSyncFragment);
         }
@@ -173,8 +175,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = mPlayQuizFragment; break;
             case QUIZQROUP_NEW:
                 fragment = mMakeCustomQuizFragment; break;
-            case QUIZGROUP_DETAIL_SHOW:
-                fragment = mPlayListDetailFragment; break;
+            case QUIZFOLDER_DETAIL_SHOW:
+                fragment = mQuizFolderDetailFragment; break;
+            case QUIZFOLDER_DETAIL_NEW:
+                fragment = mAddQuizFolderDetailFragment; break;
             case SYNC:
                 fragment = mSyncFragment; break;
             case ADD_SCRIPT:
@@ -196,9 +200,12 @@ public class MainActivity extends AppCompatActivity
         } else if (EFRAGMENT.QUIZQROUP_NEW == fragment) {
             transaction.addToBackStack(null);
             transaction.replace(R.id.container, mMakeCustomQuizFragment);
-        } else if (EFRAGMENT.QUIZGROUP_DETAIL_SHOW == fragment) {
+        } else if (EFRAGMENT.QUIZFOLDER_DETAIL_SHOW == fragment) {
             transaction.addToBackStack(null);
-            transaction.replace(R.id.container, mPlayListDetailFragment);
+            transaction.replace(R.id.container, mQuizFolderDetailFragment);
+        } else if (EFRAGMENT.QUIZFOLDER_DETAIL_NEW == fragment) {
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.container, mAddQuizFolderDetailFragment);
         } else if (EFRAGMENT.SIGNIN == fragment) {
             transaction.replace(R.id.container, mSignInFragment);
         } else if (EFRAGMENT.LOGIN == fragment) {

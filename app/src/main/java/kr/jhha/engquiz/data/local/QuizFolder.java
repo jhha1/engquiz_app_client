@@ -192,7 +192,7 @@ public class QuizFolder
         }
     }
 
-    public Integer checkQuizFolderID( Integer quizFolderID ) {
+    public static Integer checkQuizFolderID( Integer quizFolderID ) {
         if( quizFolderID <= 0 )
             throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid QuizFolderId:"+quizFolderID);
         return quizFolderID;
@@ -224,7 +224,7 @@ public class QuizFolder
     }
 
     public List<Integer> checkScriptIds( List scriptIds ){
-        if( scriptIds == null || scriptIds.isEmpty() ){
+        if( scriptIds == null  ){
             throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid scriptIds:"+scriptIds);
         }
         return scriptIds;
@@ -236,9 +236,10 @@ public class QuizFolder
         title = checkTitle( m.get(EProtocol.QuizFolderTitle.toString()) );
         uiOrder = checkUiOrder( m.get(EProtocol.QuizFolderUIOrder.toString()) );
         userId = checkUserId( m.get(EProtocol.UserID.toString()) );
-        scriptIds = checkScriptIds( m.get(EProtocol.ScriptIds.toString()) );
+        // scriptId 리스트는 별도로 받아오기 때문에, 지금은 셋팅 안함
+        // 이때는 서버가 empty list로 보냄.
+        //scriptIds = checkScriptIds( m.get(EProtocol.ScriptIds.toString()) );
     }
-
 
 
 }
