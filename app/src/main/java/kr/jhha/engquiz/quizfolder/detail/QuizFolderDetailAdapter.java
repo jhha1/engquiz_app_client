@@ -17,8 +17,6 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.ScriptRepository;
-import kr.jhha.engquiz.data.local.UserModel;
-import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.util.StringHelper;
 
 /**
@@ -43,35 +41,9 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
     public QuizFolderDetailAdapter(ScriptRepository scriptRepository,
                                    Integer quizFolderID, List<Integer> quizFolderScriptIds) {
         mScriptModel = scriptRepository;
-        //mQuizFolderModel = quizFolderModel;
+        mListView = convertFormat(quizFolderScriptIds);
+        mListView.add( makeNewButton() );
         mQuizFolderID = quizFolderID;
-        mListView = setListView(quizFolderScriptIds);
-    }
-
-    private List<ScriptSummary> setListView(List<Integer> quizFolderScriptIds)
-    {
-        List<ScriptSummary> scripts = new ArrayList<>();
-        for(Integer id: quizFolderScriptIds){
-            String title = mScriptModel.getScriptTitleAsId(id);
-
-            ScriptSummary script = new ScriptSummary();
-            script.quizFolderId = mQuizFolderID;
-            script.scriptId = id;
-            script.scriptTitle = title;
-            if( StringHelper.isNullString(title) ){
-                script.scriptTitle = "스크립트 제목을 가져올 수 없습니다";
-            }
-            script.state = QuizFolder.STATE_OTHER;
-            scripts.add(script);
-        }
-
-        ScriptSummary newbutton = new ScriptSummary();
-        newbutton.scriptId = 0;
-        newbutton.scriptTitle = QuizFolder.TEXT_NEW;
-        newbutton.state = QuizFolder.STATE_NEWBUTTON;
-        scripts.add(newbutton);
-
-        return scripts;
     }
 
     /*
@@ -180,5 +152,39 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
         // so, listview의 position은 arraylist의 index다.
         return mQuizFolderModel.getQuizFolderScriptTitleByUIOrder(mQuizFolderID, position);
     }
+
+    public void updateItems( List<Integer> quizFolderScriptIds ){
+        mListView = convertFormat(quizFolderScriptIds);
+        mListView.add( makeNewButton() );
+    }
+
+    private List<ScriptSummary> convertFormat(List<Integer> quizFolderScriptIds)
+    {
+        List<ScriptSummary> scripts = new ArrayList<>();
+        for(Integer id: quizFolderScriptIds){
+            String title = mScriptModel.getParsedScriptTitleAsId(id);
+
+            ScriptSummary script = new ScriptSummary();
+            script.quizFolderId = mQuizFolderID;
+            script.scriptId = id;
+            script.scriptTitle = title;
+            if( StringHelper.isNullString(title) ){
+                script.scriptTitle = "스크립트 제목을 가져올 수 없습니다";
+            }
+            script.state = QuizFolder.STATE_OTHER;
+            scripts.add(script);
+        }
+        return scripts;
+    }
+
+    private ScriptSummary makeNewButton()
+    {
+        ScriptSummary newbutton = new ScriptSummary();
+        newbutton.scriptId = 0;
+        newbutton.scriptTitle = QuizFolder.TEXT_NEW;
+        newbutton.state = QuizFolder.STATE_NEWBUTTON;
+        return newbutton;
+    }
+
 
 }

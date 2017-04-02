@@ -27,21 +27,21 @@ import static kr.jhha.engquiz.util.FileHelper.ParsedFile_AndroidPath;
 public class ScriptRepository {
 
     public interface ParseScriptCallback {
-        void onSuccess();
+        void onSuccess( Script parsedScript );
         void onFail( EResultCode resultCode );
     }
 
     private static final ScriptRepository instance = new ScriptRepository();
 
     // 유저가 서버로부터 파싱받은 '전체 스크립트'의 id, title 만 가진 리스트.
-    private Map<Integer, String> mAllScriptIdsAndTitles = new HashMap<>();
-    private Map<String, Integer> mAllScriptIdsAndTitles_ReMap = new HashMap<String, Integer>();
+    private Map<Integer, String> mAllParsedScriptIdsAndTitles = new HashMap<>();
+    private Map<String, Integer> mAllParsedScriptIdsAndTitles_ReMap = new HashMap<String, Integer>();
 
     // '일부 스크립트'들을 로드한 스크립트맵.
     // 파싱된 스크립트 문장들이 들어있다.
     // 사이즈가 있으므로, 전체 스크립트를 로드 안하고
     // 앱 실행중 스크립트의 문장을 읽을 필요가 있을때만 파일로부터 읽어 이 memory map에 캐싱한다.
-    private Map<Integer, Script> mCachedScriptMap = new HashMap<>();
+    private Map<Integer, Script> mCachedParsedScriptMap = new HashMap<>();
 
     private ScriptRepository() {
         initailize();
@@ -78,22 +78,22 @@ public class ScriptRepository {
     }
 
     public Integer scriptCount(){
-        return mAllScriptIdsAndTitles.size();
+        return mAllParsedScriptIdsAndTitles.size();
     }
 
-    public String getScriptTitleAsId(Integer scriptId ) {
-        return mAllScriptIdsAndTitles.get(scriptId);
+    public String getParsedScriptTitleAsId(Integer scriptId ) {
+        return mAllParsedScriptIdsAndTitles.get(scriptId);
     }
 
-    public Integer getScriptIdAsTitle(@NonNull String title ) {
-        if( mAllScriptIdsAndTitles_ReMap.containsKey(title) ) {
-            return mAllScriptIdsAndTitles_ReMap.get(title);
+    public Integer getParsedScriptIdAsTitle(@NonNull String title ) {
+        if( mAllParsedScriptIdsAndTitles_ReMap.containsKey(title) ) {
+            return mAllParsedScriptIdsAndTitles_ReMap.get(title);
         }
         return -1;
     }
 
     public String[] getScriptTitleAll(){
-        final Map<String, Integer> titleMap = mAllScriptIdsAndTitles_ReMap;
+        final Map<String, Integer> titleMap = mAllParsedScriptIdsAndTitles_ReMap;
         if( titleMap == null || titleMap.isEmpty() ){
             return null;
         }
@@ -104,17 +104,17 @@ public class ScriptRepository {
     public Script getScript( Integer scriptId )
     {
         // 유저가 가지고 있는 스크립트인지 체크
-        if (false == hasScript(scriptId)) {
+        if (false == isDownloadAvaileable(scriptId)) {
             Log.e("############", "invalid scriptID[" + scriptId + "]");
             return null;
         }
 
-        if (hasCachedScript(scriptId)) {
+        if (hasCachedParsedScript(scriptId)) {
             // 스크립트가 메모리캐시에 있으면 리턴.
-            return this.mCachedScriptMap.get(scriptId);
+            return this.mCachedParsedScriptMap.get(scriptId);
         } else {
             // 메모리캐시에 스크립트가 없으면, 파일에서 로드.
-            String scriptTitle = this.mAllScriptIdsAndTitles.get(scriptId);
+            String scriptTitle = this.mAllParsedScriptIdsAndTitles.get(scriptId);
             String scriptText = null;
             try {
                 scriptText = FileHelper.getInstance().readFile(getParsedScriptLocation(), scriptTitle);
@@ -124,7 +124,7 @@ public class ScriptRepository {
             }
             Script script = Parsor.parse(scriptText);
             // 메모리캐시에 추가
-            this.mCachedScriptMap.put( scriptId, script );
+            this.mCachedParsedScriptMap.put( scriptId, script );
             Log.i("!!!!!!!!!!!!!!", "parsedScripts. scriptTitle:" + scriptTitle + ",map: " + script.toString());
             return script;
         }
@@ -144,6 +144,17 @@ public class ScriptRepository {
     public void addScript( Integer userId, String pdfFilePath, String pdfFileName,
                            final ScriptRepository.ParseScriptCallback callback )
     {
+        // 파싱되어 메모리에 저장된 스크립트가 있다면, 그것을 리턴
+        Integer scriptId = getParsedScriptIdAsTitle(pdfFileName);
+        if( scriptId > 0 ){
+            if( hasCachedParsedScript( scriptId ) ){
+                Script script = getScript( scriptId );
+                callback.onSuccess(script);
+                return;
+            }
+        }
+
+        // 없다면, PDF원본을 APP에서 로드해 서버로부터 파싱받아 메모리&파일에 저장.
         byte[] pdfFile = loadPDF( pdfFilePath, pdfFileName );
 
         Request request = new Request( EProtocol2.PID.ParsedSciprt );
@@ -161,7 +172,7 @@ public class ScriptRepository {
                 if (response.isSuccess()) {
                     Map parsedScriptMap = (Map) response.get(EProtocol.ParsedSciprt);
                     Script script = saveParsedScript( parsedScriptMap );
-                    callback.onSuccess();
+                    callback.onSuccess(script);
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "CheckExistUserProtocol() UnkownERROR : "+ response.getResultCodeString());
@@ -179,15 +190,15 @@ public class ScriptRepository {
         }
 
         // 메모리 맵에 저장
-        if( hasCachedScript(newScript.scriptId)
-                || hasScript(newScript.title) ) {
+        if( hasCachedParsedScript(newScript.scriptId)
+                || isDownloadAvaileable(newScript.title) ) {
             Log.e("AppContent", "already exist script [" +newScript.title+ "]" +
-                    "mCachedScriptMap in " + hasCachedScript(newScript.scriptId) +
-                    ", mAllScriptIdsAndTitles_ReMap in " + hasScript(newScript.title));
+                    "mCachedParsedScriptMap in " + hasCachedParsedScript(newScript.scriptId) +
+                    ", mAllParsedScriptIdsAndTitles_ReMap in " + isDownloadAvaileable(newScript.title));
             return null;
         }
         addScriptIdAndTitleInMemory( newScript.scriptId, newScript.title );
-        mCachedScriptMap.put( newScript.scriptId, newScript );
+        mCachedParsedScriptMap.put( newScript.scriptId, newScript );
 
         // 오프라인 파일에 저장
         String fileName = newScript.title + ".txt";
@@ -203,26 +214,26 @@ public class ScriptRepository {
     }
 
     private void addScriptIdAndTitleInMemory(Integer scriptId, String title ){
-        if(hasScript(scriptId) || hasScript(title)){
+        if(isDownloadAvaileable(scriptId) || isDownloadAvaileable(title)){
             Log.e("AppContent", "already exist script [" +scriptId+ ","+title+"]" );
             return;
         }
-        mAllScriptIdsAndTitles.put( scriptId, title );
-        mAllScriptIdsAndTitles_ReMap.put( title, scriptId );
+        mAllParsedScriptIdsAndTitles.put( scriptId, title );
+        mAllParsedScriptIdsAndTitles_ReMap.put( title, scriptId );
     }
 
     // 캐시된 스크립트 중에서 존재여부 체크
-    private boolean hasCachedScript(Integer scriptId ){
-        return mCachedScriptMap.containsKey(scriptId);
+    private boolean hasCachedParsedScript(Integer scriptId ){
+        return mCachedParsedScriptMap.containsKey(scriptId);
     }
 
-    // 유저가 가진 전체 스크립트 중에서 존재여부 체크
-    private boolean hasScript(String title ){
-        return mAllScriptIdsAndTitles_ReMap.containsKey(title);
+    // 서버로부터 파싱된 스크립트를 받는것은, 유저 폰에 비 파싱된 스크립트가 있어야한다
+    private boolean isDownloadAvaileable(String title ){
+        return mAllParsedScriptIdsAndTitles_ReMap.containsKey(title);
     }
     // 유저가 가진 전체 스크립트 중에서 존재여부 체크
-    private boolean hasScript(Integer scriptId ){
-        return mAllScriptIdsAndTitles.containsKey(scriptId);
+    private boolean isDownloadAvaileable(Integer scriptId ){
+        return mAllParsedScriptIdsAndTitles.containsKey(scriptId);
     }
 
     public boolean checkFileFormat( String filename ) {
@@ -233,8 +244,8 @@ public class ScriptRepository {
 
     private String toStringScriptMap() {
         StringBuffer buf = new StringBuffer();
-        buf.append("////////////////// mCachedScriptMap( script conut:"+ mCachedScriptMap.size()+") /////////////////////\n");
-        for(Map.Entry<Integer, Script> e : mCachedScriptMap.entrySet()) {
+        buf.append("////////////////// mCachedParsedScriptMap( script conut:"+ mCachedParsedScriptMap.size()+") /////////////////////\n");
+        for(Map.Entry<Integer, Script> e : mCachedParsedScriptMap.entrySet()) {
             Integer index = e.getKey();
             Script script = e.getValue();
             buf.append(script.toString() + "\n");

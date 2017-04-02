@@ -3,6 +3,7 @@ package kr.jhha.engquiz.quizfolder;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,18 +30,26 @@ public class QuizFolderAdapter extends BaseAdapter {
     private QuizFolderRepository mQuizFolderModel;
     private List<QuizFolder> mListView;
 
+    /*
+        인자값 quizFolders :  QuizFolderRepository.mQuizFolders의 포인터임.
+        mListView = quizFolders;  // 포인터복사로, mListView의 변경값이 QuizFolderRepository.mQuizFolders에 반영.
+        난, mListView = new ArrayList<>(quizFolders); 로 값 복사후, "New.." button 추가.
+        ("New.." button을 listview에 추가하는건 UI쪽이니 이 아답터에서만 들고있길 원하므로)
+     */
     public QuizFolderAdapter( QuizFolderRepository quizFolderRepository, List<QuizFolder> quizFolders) {
         mQuizFolderModel = quizFolderRepository;
-        mListView = addNewButton(quizFolders);
+        mListView = new ArrayList<>(quizFolders);
+        mListView.add( makeNewButton() );
+
+        Log.e("AppContent", "new QuizFolderAdapter() mListView:"+ mListView.toString());
     }
 
-    private List<QuizFolder> addNewButton(List<QuizFolder> quizFolders)
+    private QuizFolder makeNewButton()
     {
         QuizFolder newbutton = new QuizFolder();
         newbutton.setTitle(QuizFolder.TEXT_NEW);
         newbutton.setState(QuizFolder.STATE_NEWBUTTON);
-        quizFolders.add(newbutton);
-        return quizFolders;
+        return newbutton;
     }
 
     /*
@@ -82,6 +91,9 @@ public class QuizFolderAdapter extends BaseAdapter {
         if (QuizFolder.TEXT_NEW.equals(quizFolderItem.getTitle())) {
             descTextView.setText("클릭하여 새로운 퀴즈폴더 만들기");
         }
+        Log.i("AppContent", "QuizFolderAdapter.getView() " +
+                "quizFolderItem:"+ quizFolderItem.toString()
+        +", titleTextView:"+titleTextView.getText());
         return convertView;
     }
 
@@ -128,6 +140,11 @@ public class QuizFolderAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         return mListView.get(position);
+    }
+
+    public void updateItems( List<QuizFolder> quizFolders ){
+        mListView = quizFolders;
+        mListView.add( makeNewButton() );
     }
 
 }

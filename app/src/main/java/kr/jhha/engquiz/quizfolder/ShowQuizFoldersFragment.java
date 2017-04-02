@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,16 +29,18 @@ import kr.jhha.engquiz.util.click.ListViewClickDetector;
 public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFoldersContract.View, ClickDetector.Callback
 {
     private ShowQuizFoldersContract.ActionsListener mActionListener;
-    private QuizFolderAdapter mAdapter;
+    QuizFolderAdapter mAdapter;
 
     // 다이알로그
     private AlertDialog.Builder mDialogChangePlayingQuizFolder = null;
     private AlertDialog.Builder mDialogDeleteItem = null;
+    // 리스트 뷰 UI
+    private ListView mItemListView;
+    // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
+    private QuizFolder mListviewSelectedItem = null;
 
     // 클릭 or 더블클릭 감지자. 안드로이드 더블클릭 감지해 알려주는 지원없어 직접 만듬.
     private ClickDetector mClickDetector = null;
-    // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
-    private QuizFolder mListviewSelectedItem = null;
 
     private final String mTITLE = "Quiz Folders";
 
@@ -49,7 +52,6 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
         super.onCreate(savedInstanceState);
 
         mActionListener = new ShowQuizFoldersPresenter( this, QuizFolderRepository.getInstance() );
-        mActionListener.getQuizFolderList();
         mClickDetector = new ListViewClickDetector( this );
         initDialog();
     }
@@ -77,16 +79,16 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.content_quizfolder, null);
-        ListView itemListView = (ListView) view.findViewById(R.id.quizfolderview);
-        itemListView.setAdapter( mAdapter );
-        // 클릭 이벤트 핸들러 정의: 원클릭-내 퀴즈 디테일 보기, 더블클릭-게임용으로 퀴즈폴더설정
-        itemListView.setOnItemClickListener(mListItemClickListener);
-        // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
-        itemListView.setOnItemLongClickListener(mListItemLongClickListener);
+        Log.d("################","ShowQuizFoldersFragment onCreateView() called");
 
-        // 데이터 변경에 대한 ui 리프레시 요청
-        mAdapter.notifyDataSetChanged();
+        View view = inflater.inflate(R.layout.content_quizfolder, null);
+        mItemListView = (ListView) view.findViewById(R.id.quizfolderview);
+        // 클릭 이벤트 핸들러 정의: 원클릭-내 퀴즈 디테일 보기, 더블클릭-게임용으로 퀴즈폴더설정
+        mItemListView.setOnItemClickListener(mListItemClickListener);
+        // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
+        mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
+
+        mActionListener.getQuizFolderList();
 
         view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
         return view;
@@ -94,6 +96,7 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
 
     @Override
     public void onResume() {
+        Log.d("################","ShowQuizFoldersFragment onResume() called");
         // 툴바에 현 프래그먼트 제목 출력
         ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
         super.onResume();
@@ -151,7 +154,9 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
 
     @Override
     public void onSuccessGetQuizFolderList(List<QuizFolder> quizFolders) {
+        Log.e("AppContent", "Fragment.onSuccessGetQuizFolderList(): "+ quizFolders.toString());
         mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance(), quizFolders );
+        mItemListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
     @Override
@@ -163,7 +168,7 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
 
     @Override
     public void onSuccessDelQuizFolder(List<QuizFolder> updatedQuizFolders) {
-        mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance(), updatedQuizFolders);
+        mAdapter.updateItems( updatedQuizFolders );
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), "퀴즈 폴더가 삭제되었습니다", Toast.LENGTH_SHORT).show();
     }

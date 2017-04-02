@@ -118,7 +118,7 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
             int position = checked.keyAt(i);
             if (checked.valueAt(i)) {
                 String scriptTitle = mScriptListViewAdapter.getItem(position);
-                Integer scriptIndex = ScriptRepository.getInstance().getScriptIdAsTitle( scriptTitle );
+                Integer scriptIndex = ScriptRepository.getInstance().getParsedScriptIdAsTitle( scriptTitle );
                 if( scriptIndex < 0 ) {
                     continue;
                 }

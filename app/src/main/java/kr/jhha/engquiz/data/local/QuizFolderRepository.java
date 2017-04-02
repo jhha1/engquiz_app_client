@@ -118,6 +118,9 @@ public class QuizFolderRepository {
     }
 
     public void getQuizFolders( final QuizFolderRepository.GetQuizFolderCallback callback ) {
+
+        Log.d("##############","QuizFolderRepo.getQuizFolders()"+((mQuizFolders!=null)?mQuizFolders.toString():null));
+
         if( null != mQuizFolders && false == mQuizFolders.isEmpty() ){
             callback.onSuccess(mQuizFolders);
             return;
@@ -138,8 +141,8 @@ public class QuizFolderRepository {
                     List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onGetQuizFolders(): "+ quizFolders.toString());
                     // save quiz folders
-                    overwriteQuizFoldersAll( quizFolders );
-                    callback.onSuccess(mQuizFolders);
+                    List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
+                    callback.onSuccess( deserializedQuizFolders );
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
@@ -149,7 +152,7 @@ public class QuizFolderRepository {
         };
     }
 
-    // 퀴즈폴더 메뉴에서 퀴즈폴더 생성한 경우.
+    // 퀴즈폴더 생성한 경우.
     // 서버에 저장 -> 클라에 저장.
     public void addQuizFolder( Integer userId, String quizFolderTitle, List<Integer> scriptIds, final AddQuizFolderCallback callback ){
         Request request = new Request( EProtocol2.PID.AddUserQuizFolder );
@@ -168,8 +171,8 @@ public class QuizFolderRepository {
                     List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onAddQuizFolder(): "+ quizFolders.toString());
                     // save quiz folders
-                    overwriteQuizFoldersAll( quizFolders );
-                    callback.onSuccess( mQuizFolders );
+                    List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
+                    callback.onSuccess( deserializedQuizFolders );
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
@@ -195,8 +198,8 @@ public class QuizFolderRepository {
                     List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onDelQuizFolder(): "+ quizFolders.toString());
                     // save summaries.
-                    overwriteQuizFoldersAll( quizFolders );
-                    callback.onSuccess(mQuizFolders);
+                    List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
+                    callback.onSuccess(deserializedQuizFolders);
                 } else {
                     // 서버 응답 에러
                     Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
@@ -206,17 +209,26 @@ public class QuizFolderRepository {
         };
     }
 
-    private void overwriteQuizFoldersAll(List<Map<String, Object>> quizFolders ){
-        // 1. save into memory.
-        if( mQuizFolders == null ) {
-            mQuizFolders = new ArrayList<>();
-        }
-        mQuizFolders.clear();
-        for( Map<String, Object> quizFolder : quizFolders ){
+    private List<QuizFolder> deserializeAndSaveMemoryQuizFolderAll( List<Map<String, Object>> quizFolders ){
+
+        List<QuizFolder> deserializedQuizFolders = new ArrayList<>();
+
+        for( Map<String, Object> quizFolder : quizFolders ) {
             QuizFolder obj = new QuizFolder();
-            obj.deserialize( quizFolder );
-            mQuizFolders.add( obj );
+            obj.deserialize(quizFolder);
+            deserializedQuizFolders.add(obj);
         }
+
+        // 1. save into memory.
+        if( this.mQuizFolders == null )
+            this.mQuizFolders = new ArrayList<>();
+
+        this.mQuizFolders.clear();
+        for(QuizFolder folder: deserializedQuizFolders){
+            this.mQuizFolders.add(folder);
+        }
+        return deserializedQuizFolders;
+
         // 2. No save into file.
         //     -> download summaries from a server when a quizfolder menu first clicked.
     }
@@ -241,7 +253,7 @@ public class QuizFolderRepository {
             return new String();
         }
 
-        return ScriptRepository.getInstance().getScriptTitleAsId(scriptId);
+        return ScriptRepository.getInstance().getParsedScriptTitleAsId(scriptId);
     }
 
     public List<Integer> getQuizFolderScriptIDs(Integer quizFolderId ) {
@@ -254,35 +266,16 @@ public class QuizFolderRepository {
         return quizFolder.getScriptIds();
     }
 
-    private List<Integer> getQuizFolderScriptsFromMemory( Integer quizFolderId ){
-        if(mQuizFolders == null) {
-            Log.e("#######", "mQuizFolders Map is null");
-            return null;
-        }
-
-        if( false == mQuizFolders.contains(quizFolderId)) {
-            Log.e("#######", "NoExist key(quizFolderId) in mQuizFolders Map. id:"+quizFolderId);
-            return null;
-        }
-
-        QuizFolder quizFolder = mQuizFolders.get(quizFolderId);
-        if( quizFolder == null ){
-            Log.e("#######", "Null value(QuizFolder) in mQuizFolders Map. key:"+quizFolderId);
-            return null;
-        }
-
-        return quizFolder.getScriptIds();
-    }
-
     public void getQuizFolderDetail(Integer userId, Integer quizFolderId, final QuizFolderRepository.GetQuizFolderDetailCallback callback ) {
-        List<Integer> scrpitIds = getQuizFolderScriptsFromMemory(quizFolderId);
-        if( scrpitIds != null ){
+        List<Integer> scrpitIds = getQuizFolderScriptIDs(quizFolderId);
+        if( scrpitIds != null && ! scrpitIds.isEmpty() ){
             callback.onSuccess(scrpitIds);
             return;
         }
 
         Request request = new Request( EProtocol2.PID.GetUserQuizFolderDetail);
         request.set(EProtocol.UserID, userId);
+        request.set(EProtocol.QuizFolderId, quizFolderId);
         AsyncNet net = new AsyncNet( request, onGetQuizFolderDetail(callback) );
         net.execute();
     }

@@ -87,7 +87,7 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         mShowAnswerBtn.setVisibility(View.INVISIBLE);
         mAnswerView.setVisibility(View.VISIBLE);
         mNextQuestionButton.setVisibility(View.VISIBLE);
-        mAnswerView.setText(quiz.english);
+        mAnswerView.setText(quiz.textEn);
     }
 
     private void doNextQuestion() {
@@ -102,7 +102,7 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
             return;
         }
         mShowAnswerBtn.setVisibility(View.VISIBLE);
-        mQuestionView.setText(quiz.korean);
+        mQuestionView.setText(quiz.textKo);
     }
 
     private Sentence getNewQuiz() {

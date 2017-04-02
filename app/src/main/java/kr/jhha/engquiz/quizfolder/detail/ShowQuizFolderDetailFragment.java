@@ -34,10 +34,12 @@ public class ShowQuizFolderDetailFragment extends Fragment implements ShowQuizFo
     // 다이알로그
     private AlertDialog.Builder mDialogDeleteItem = null;
 
+    // 리스트뷰UI
+    private ListView mItemListView;
     // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
     private ScriptSummary mListviewSelectedItem = null;
-
     private Integer mQuizFolderId = -1;
+
     private String mTITLE = "Quiz ScriptSummary Folders";
 
     public ShowQuizFolderDetailFragment() {}
@@ -66,12 +68,11 @@ public class ShowQuizFolderDetailFragment extends Fragment implements ShowQuizFo
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.content_quizfolder, null);
-        ListView itemListView = (ListView) view.findViewById(R.id.quizfolderview);
-        itemListView.setAdapter( mAdapter );
+        mItemListView = (ListView) view.findViewById(R.id.quizfolderview);
         // 클릭 이벤트 핸들러 정의: 원클릭-내 퀴즈 디테일 보기, 더블클릭-게임용으로 퀴즈폴더설정
-        itemListView.setOnItemClickListener(mListItemClickListener);
+        mItemListView.setOnItemClickListener(mListItemClickListener);
         // 롱 클릭 이벤트 핸들러 정의: 내 퀴즈 삭제
-        itemListView.setOnItemLongClickListener(mListItemLongClickListener);
+        mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
 
         // 데이터 초기화
         mActionListener.getQuizFolderScripts(mQuizFolderId);
@@ -126,8 +127,9 @@ public class ShowQuizFolderDetailFragment extends Fragment implements ShowQuizFo
 
     @Override
     public void onSuccessGetScrpits(List<Integer> quizFolderScriptIds) {
-        // 데이터 변경에 대한 ui 리프레시 요청
         mAdapter = new QuizFolderDetailAdapter( ScriptRepository.getInstance(), mQuizFolderId, quizFolderScriptIds);
+        mItemListView.setAdapter(mAdapter);
+        // 데이터 변경에 대한 ui 리프레시 요청
         mAdapter.notifyDataSetChanged();
     }
 
@@ -141,7 +143,7 @@ public class ShowQuizFolderDetailFragment extends Fragment implements ShowQuizFo
     @Override
     public void onSuccessDelScript(List<Integer> updatedQuizFolderScriptIds) {
         // 데이터 변경에 대한 ui 리프레시 요청
-        mAdapter = new QuizFolderDetailAdapter( ScriptRepository.getInstance(), mQuizFolderId, updatedQuizFolderScriptIds);
+        mAdapter.updateItems( updatedQuizFolderScriptIds );
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), "스크립트가 삭제되었습니다", Toast.LENGTH_SHORT).show();
     }

@@ -186,11 +186,10 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
 
     @Override
     public void onSuccessAddQuizFolder( List<QuizFolder> updatedQuizFolders ) {
-        //  퀴즈폴더 리스트 리프레쉬.
-        // TODO fragment전환시에 onResume()에서라던가 리프레쉬가 되면, 여기서 할 필요 없음
-        QuizFolderAdapter quizFolderAdapter
-                = new QuizFolderAdapter( QuizFolderRepository.getInstance(), updatedQuizFolders );
-        quizFolderAdapter.notifyDataSetChanged();
+        // 퀴즈폴더 리스트 리프레쉬는 안해도됨.
+        //      :프레그먼트 popBackStack()으로 ShowQuizFolder로 되돌아갈때,
+        //      OnCreateView()가 호출됨. 이때, QuizFolder Model로부터 데이터를 받아 셋팅하므로.
+        //      (Model에는 현재 Add된 데이터가 저장되어있다)
 
         Toast.makeText(getActivity(), "새 퀴즈가 추가되었습니다", Toast.LENGTH_SHORT).show();
     }

@@ -51,7 +51,7 @@ public class Parsor
         }
 
         String rows[] = textFile.split(MainSeperator);
-        if(rows.length <= 3) {
+        if(rows.length <= 2) {
             Log.e("Parsor", "Cound not split with. text["+textFile+"]");
             return null;
         }
@@ -62,9 +62,8 @@ public class Parsor
 
         Script script = new Script();
         script.scriptId = Integer.parseInt( rows[0] );
-        script.revision = Integer.parseInt( rows[1] );
-        script.title = rows[2];
-        for(int i=3; i<rows.length; ++i)
+        script.title = rows[1];
+        for(int i=2; i<rows.length; ++i)
         {
             String row = rows[i];
             if(row.isEmpty()) {
@@ -79,8 +78,8 @@ public class Parsor
             }
 
             Sentence unit = new Sentence();
-            unit.korean = new StringBuffer(dividedRow[0].trim());
-            unit.english = new StringBuffer(dividedRow[1].trim());
+            unit.textKo = dividedRow[0].trim();
+            unit.textEn = dividedRow[1].trim();
             script.sentences.add(unit);
         }
         Log.d("Parsor", "COUNT (quizSetLen:"+ script.sentences.size() +")");
@@ -135,10 +134,10 @@ public class Parsor
 }
 
 /*
-        String korean;
-        String english;
+        String textKo;
+        String textEn;
         for(int i = 0; i < 100; ++i) {
-            korean = "["+ i + "]질문 질문 질문 질문 질문 질문 질문 질문?";
-            english = "["+i+"] english strawberry banana caffelatte water is good for your health. lol";
-            testdata.add(new Sentence(korean, english));
+            textKo = "["+ i + "]질문 질문 질문 질문 질문 질문 질문 질문?";
+            textEn = "["+i+"] textEn strawberry banana caffelatte water is good for your health. lol";
+            testdata.add(new Sentence(textKo, textEn));
         }*/

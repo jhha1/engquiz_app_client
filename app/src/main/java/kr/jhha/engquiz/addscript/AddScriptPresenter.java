@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
+import kr.jhha.engquiz.data.local.Script;
 import kr.jhha.engquiz.data.local.ScriptRepository;
 import kr.jhha.engquiz.data.local.UserModel;
 import kr.jhha.engquiz.data.remote.EResultCode;
@@ -202,7 +203,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
         return new ScriptRepository.ParseScriptCallback(){
 
             @Override
-            public void onSuccess() {
+            public void onSuccess( Script script ) {
                 Log.i("AppContent", "addScript onSuccess()  user: " + msgForLog);
 
                 if( bNewQuizFolder ) {
@@ -215,7 +216,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
             @Override
             public void onFail(EResultCode resultCode) {
-                Log.e("AppContent", "addScript onFail() UnkownERROR. user: " + msgForLog);
+                Log.e("AppContent", "addScript onFail() UnkownERROR. resultCode:"+resultCode.toString()+", user: " + msgForLog);
                 mView.showErrorDialog(2);
             }
         };
@@ -224,7 +225,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     private void addQuizFolder( String quizFolderName, String scriptName ) {
         Log.i("AppContent", "AddScriptPresenter addScriptInQuizFolder() called");
         Integer userId = UserModel.getInstance().getUserID();
-        Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
+        Integer scriptId = mModel.getParsedScriptIdAsTitle(scriptName);
         List<Integer> scriptIds = new LinkedList<>();
         scriptIds.add(scriptId);
         mQuizFolderModel.addQuizFolder( userId, quizFolderName, scriptIds, onAddQuizFolder(quizFolderName) );
@@ -245,7 +246,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     private void addQuizFolderDetail( Integer quizFolderId, String scriptName ) {
         Log.i("AppContent", "AddScriptPresenter addQuizFolderDetail() called");
         Integer userId = UserModel.getInstance().getUserID();
-        Integer scriptId = mModel.getScriptIdAsTitle(scriptName);
+        Integer scriptId = mModel.getParsedScriptIdAsTitle(scriptName);
         mQuizFolderModel.addQuizFolderDetail( quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
     }
 

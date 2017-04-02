@@ -7,7 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.util.Parsor;
+import kr.jhha.engquiz.util.exception.system.IllegalArgumentException;
 
 
 /**
@@ -17,7 +19,6 @@ import kr.jhha.engquiz.util.Parsor;
 public class Script
 {
     public Integer scriptId = 0;
-    public Integer revision = 0;
     public String title = "";
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
@@ -33,17 +34,15 @@ public class Script
     };
 */
     public static final String INDEX = "scriptId";
-    public static final String REVISION = "revision";
     public static final String TITLE = "title";
     public static final String SENTENCES = "sentences";
 
     public Script() {}
     public Script( String filename, Integer index,
-                  Integer revision, List<Sentence> sentences )
+                  List<Sentence> sentences )
     {
         this.title = filename;
         this.scriptId = index;
-        this.revision = revision;
         this.sentences = sentences;
     }
 
@@ -60,11 +59,10 @@ public class Script
             return;
         }
 
-        String title = rows[2];
+        String title = rows[1];
         int index = Integer.parseInt( rows[0] );
-        int revision = Integer.parseInt( rows[1] );
         LinkedList<Sentence> sentences = new LinkedList<Sentence>();
-        for(int i=3; i<rows.length; ++i)
+        for(int i=2; i<rows.length; ++i)
         {
             String row = rows[i];
             if(row.isEmpty())
@@ -75,14 +73,13 @@ public class Script
                 continue;
 
             Sentence unit = new Sentence();
-            unit.korean = new StringBuffer(dividedRow[0].trim());
-            unit.english = new StringBuffer(dividedRow[1].trim());
+            unit.textKo = dividedRow[0].trim();
+            unit.textEn = dividedRow[1].trim();
             sentences.add(unit);
         }
 
         this.title = title;
         this.scriptId = index;
-        this.revision = revision;
         this.sentences = sentences;
     }
 
@@ -90,14 +87,11 @@ public class Script
     {
         try {
             int index = (Integer) scriptMap.get(INDEX);
-            int revision = (Integer) scriptMap.get(REVISION);
             String title = (String) scriptMap.get(TITLE);
             List<HashMap> sentencesMap = (List<HashMap>) scriptMap.get(SENTENCES);
 
             if( index < 0 )
                 throw new Exception("invalid scriptId:"+index);
-            if( revision < 0 )
-                throw new Exception("invalid revision:"+revision);
             if( title == null || title.isEmpty() )
                 throw new Exception("invalid title:"+title);
             if( sentencesMap == null || sentencesMap.size() == 0 )
@@ -106,23 +100,13 @@ public class Script
             // parsing script list.  List<HashMap> -> List<Sentence>
             //  : 서버에서 Sentence Object를 json string으로 변환시에, HashMap포맷으로 변환된다.
             List<Sentence> parsedSentences = new LinkedList<Sentence>();
-            for( HashMap sentencePair : sentencesMap )
-            {
-                String ko = null;
-                String en = null;
-                if( sentencePair.containsKey(Sentence.KOREAN) )
-                    ko = (String) sentencePair.get(Sentence.KOREAN);
-                if( sentencePair.containsKey(Sentence.ENGLIST) )
-                    en = (String) sentencePair.get(Sentence.ENGLIST);
-
-                Sentence s = new Sentence( ko, en );
-                parsedSentences.add( s );
+            for( HashMap sentencePair : sentencesMap ) {
+                parsedSentences.add( new Sentence(sentencePair) );
             }
             if( parsedSentences == null || parsedSentences.size() == 0 )
                 throw new Exception("invalid parsedSentences:"+parsedSentences);
 
             this.scriptId = index;
-            this.revision = revision;
             this.title = title;
             this.sentences = parsedSentences;
 
@@ -134,15 +118,29 @@ public class Script
         }
     }
 
+    public static boolean checkScriptID( Object scriptID ) {
+        if( scriptID instanceof Integer ) {
+            return checkScriptID( (Integer)scriptID );
+        } else {
+            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptID Type is not Integer. id:"+scriptID );
+        }
+    }
+
+    public static boolean checkScriptID( Integer scriptID ) {
+        if( scriptID <= 0){
+            return false;
+        }
+        return true;
+    }
+
     public String toTextFileFormat() {
         StringBuffer text = new StringBuffer();
 
         text.append(scriptId + Parsor.MainSeperator);
-        text.append(revision + Parsor.MainSeperator);
         text.append(title + Parsor.MainSeperator);
         for(Sentence unit : sentences)
         {
-            text.append(unit.korean + "\t" + unit.english + Parsor.MainSeperator);
+            text.append(unit.textKo + "\t" + unit.textEn + Parsor.MainSeperator);
         }
         return text.toString();
     }
@@ -151,7 +149,6 @@ public class Script
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("{[scriptId: "+ scriptId +"], " +
-                    "[revision: "+ revision +"], " +
                     "[title: "+ title +"], " +
                     "[sentence count("+ sentences.size() +").. ");
         for(Object o : sentences) {

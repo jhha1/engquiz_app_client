@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         mPlayQuizFragment = new QuizPlayFragment();
         mQuizFoldersFragment = new ShowQuizFoldersFragment();
         mQuizFolderDetailFragment = new ShowQuizFolderDetailFragment();
+        mAddQuizFolderDetailFragment = new AddQuizFolderDetailFragment();
         mMakeCustomQuizFragment = new AddQuizFolderFragment();
         mAddScriptFragment = new AddScriptFragment();
         mSyncFragment = new SyncFragment();
