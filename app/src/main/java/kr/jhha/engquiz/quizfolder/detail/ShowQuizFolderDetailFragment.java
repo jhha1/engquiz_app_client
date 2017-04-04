@@ -143,7 +143,7 @@ public class ShowQuizFolderDetailFragment extends Fragment implements ShowQuizFo
     @Override
     public void onSuccessDelScript(List<Integer> updatedQuizFolderScriptIds) {
         // 데이터 변경에 대한 ui 리프레시 요청
-        mAdapter.updateItems( updatedQuizFolderScriptIds );
+        mAdapter.updateItems( mQuizFolderId, updatedQuizFolderScriptIds );
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), "스크립트가 삭제되었습니다", Toast.LENGTH_SHORT).show();
     }

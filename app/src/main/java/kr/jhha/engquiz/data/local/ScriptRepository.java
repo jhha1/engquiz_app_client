@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import kr.jhha.engquiz.util.FileHelper;
 import kr.jhha.engquiz.util.Parsor;
 import kr.jhha.engquiz.data.remote.EProtocol;
 import kr.jhha.engquiz.data.remote.Response;
+import kr.jhha.engquiz.util.StringHelper;
 
 import static kr.jhha.engquiz.util.FileHelper.ParsedFile_AndroidPath;
 
@@ -65,7 +67,7 @@ public class ScriptRepository {
             }
             Integer scriptId = Integer.parseInt( splitTitle[0] );
             String scriptTitle = splitTitle[1];
-            addScriptIdAndTitleInMemory(scriptId, scriptTitle);
+            addScriptIdAndTitleIntoMemory(scriptId, scriptTitle);
         }
     }
 
@@ -103,29 +105,20 @@ public class ScriptRepository {
 
     public Script getScript( Integer scriptId )
     {
-        // 유저가 가지고 있는 스크립트인지 체크
-        if (false == isDownloadAvaileable(scriptId)) {
-            Log.e("############", "invalid scriptID[" + scriptId + "]");
-            return null;
-        }
-
         if (hasCachedParsedScript(scriptId)) {
             // 스크립트가 메모리캐시에 있으면 리턴.
             return this.mCachedParsedScriptMap.get(scriptId);
         } else {
             // 메모리캐시에 스크립트가 없으면, 파일에서 로드.
-            String scriptTitle = this.mAllParsedScriptIdsAndTitles.get(scriptId);
-            String scriptText = null;
-            try {
-                scriptText = FileHelper.getInstance().readFile(getParsedScriptLocation(), scriptTitle);
-            } catch (IOException e) {
-                e.printStackTrace();
+            Script script = loadParsedTextScript(scriptId);
+            if( Script.isNull(script) ) {
+                Log.i("!!!!!!!!!!!!!!", "Failed loadScriptFile. scriptId:" + scriptId);
                 return null;
             }
-            Script script = Parsor.parse(scriptText);
+
             // 메모리캐시에 추가
             this.mCachedParsedScriptMap.put( scriptId, script );
-            Log.i("!!!!!!!!!!!!!!", "parsedScripts. scriptTitle:" + scriptTitle + ",map: " + script.toString());
+            Log.i("!!!!!!!!!!!!!!", "parsedScripts. scriptTitle:" + script.title + ",map: " + script.toString());
             return script;
         }
     }
@@ -139,6 +132,33 @@ public class ScriptRepository {
         System.out.println("[TEST pdffile] filename:" + filename + ", filepath:" +filepath
                 + ", pdfsize:" + pdfFile.length +", pdf:" + pdfFile);
         return pdfFile;
+    }
+
+    public Script loadParsedTextScript( Integer scriptId ){
+        String scriptTitle = this.mAllParsedScriptIdsAndTitles.get(scriptId);
+
+        // load from file
+        String scriptFileName = Script.makeFileSavedScriptName(scriptId, scriptTitle);
+        if(StringHelper.isNullString(scriptFileName)){
+            return null;
+        }
+
+        String scriptText = null;
+        try {
+            final FileHelper file = FileHelper.getInstance();
+            final String path = getParsedScriptLocation();
+            scriptText = file.readFile(path, scriptFileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        // create script object
+        Script script = new Script();
+        script.scriptId = scriptId;
+        script.title = scriptTitle;
+        script.sentences = Parsor.parse(scriptText);
+        return script;
     }
 
     public void addScript( Integer userId, String pdfFilePath, String pdfFileName,
@@ -171,7 +191,7 @@ public class ScriptRepository {
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
                     Map parsedScriptMap = (Map) response.get(EProtocol.ParsedSciprt);
-                    Script script = saveParsedScript( parsedScriptMap );
+                    Script script = saveParsedScriptInLocalspace( parsedScriptMap );
                     callback.onSuccess(script);
                 } else {
                     // 서버 응답 에러
@@ -182,28 +202,23 @@ public class ScriptRepository {
         };
     }
 
-    private Script saveParsedScript( Map scriptMap ) {
+    private Script saveParsedScriptInLocalspace(Map scriptMap ) {
         Script newScript = new Script( scriptMap );
-        if( newScript == null ) {
+        if( Script.isNull(newScript)) {
             Log.e("AppContent", "script is null");
             return null;
         }
+        Script.checkScriptID(newScript.scriptId);
 
         // 메모리 맵에 저장
-        if( hasCachedParsedScript(newScript.scriptId)
-                || isDownloadAvaileable(newScript.title) ) {
-            Log.e("AppContent", "already exist script [" +newScript.title+ "]" +
-                    "mCachedParsedScriptMap in " + hasCachedParsedScript(newScript.scriptId) +
-                    ", mAllParsedScriptIdsAndTitles_ReMap in " + isDownloadAvaileable(newScript.title));
-            return null;
-        }
-        addScriptIdAndTitleInMemory( newScript.scriptId, newScript.title );
+        addScriptIdAndTitleIntoMemory( newScript.scriptId, newScript.title );
         mCachedParsedScriptMap.put( newScript.scriptId, newScript );
 
         // 오프라인 파일에 저장
-        String fileName = newScript.title + ".txt";
-        boolean bOK = FileHelper.getInstance().overwrite( ParsedFile_AndroidPath,
-                fileName, newScript.toTextFileFormat());
+        String fileName = newScript.makeFileSavedScriptName();
+        String fileText = newScript.makeFileSavedScriptText();
+        boolean bOK = FileHelper.getInstance().overwrite(
+                ParsedFile_AndroidPath, fileName, fileText);
         if( false == bOK ) {
             Log.e("AppContent",
                     "Failed overwrite script into file ["+ newScript.title +"]");
@@ -213,11 +228,7 @@ public class ScriptRepository {
         return newScript;
     }
 
-    private void addScriptIdAndTitleInMemory(Integer scriptId, String title ){
-        if(isDownloadAvaileable(scriptId) || isDownloadAvaileable(title)){
-            Log.e("AppContent", "already exist script [" +scriptId+ ","+title+"]" );
-            return;
-        }
+    private void addScriptIdAndTitleIntoMemory(Integer scriptId, String title ){
         mAllParsedScriptIdsAndTitles.put( scriptId, title );
         mAllParsedScriptIdsAndTitles_ReMap.put( title, scriptId );
     }
@@ -225,15 +236,6 @@ public class ScriptRepository {
     // 캐시된 스크립트 중에서 존재여부 체크
     private boolean hasCachedParsedScript(Integer scriptId ){
         return mCachedParsedScriptMap.containsKey(scriptId);
-    }
-
-    // 서버로부터 파싱된 스크립트를 받는것은, 유저 폰에 비 파싱된 스크립트가 있어야한다
-    private boolean isDownloadAvaileable(String title ){
-        return mAllParsedScriptIdsAndTitles_ReMap.containsKey(title);
-    }
-    // 유저가 가진 전체 스크립트 중에서 존재여부 체크
-    private boolean isDownloadAvaileable(Integer scriptId ){
-        return mAllParsedScriptIdsAndTitles.containsKey(scriptId);
     }
 
     public boolean checkFileFormat( String filename ) {

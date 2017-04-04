@@ -7,8 +7,15 @@ package kr.jhha.engquiz.quizplay;
 public class QuizPlayContract {
 
     interface View {
+        void showTitle(String title);
+        void showNextQuestion(String question);
+        void showNotAvailableQuiz();
+        void showAnswer(String answer);
     }
 
     interface UserActionsListener {
+        void initTitle();
+        void doNextQuestion();
+        void getAnswer();
     }
 }

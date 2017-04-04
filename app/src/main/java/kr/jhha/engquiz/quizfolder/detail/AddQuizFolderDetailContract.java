@@ -14,6 +14,7 @@ import kr.jhha.engquiz.data.local.QuizFolder;
 public class AddQuizFolderDetailContract {
 
     interface View {
+        void showScriptList( String[] scriptTitleAll );
         void showEmptyScriptDialog();
         void onSuccessAddScriptInQuizFolder(List<Integer> updatedScriptIds);
         void onFailAddQuizFolder(String msg);
@@ -23,10 +24,8 @@ public class AddQuizFolderDetailContract {
     }
 
     interface ActionsListener {
-        ArrayAdapter getAdapter();
-
-        void addScriptInQuizFolder(Integer quizFolderId, ListView listView );
-
+        void initScriptList();
+        void addScriptIntoQuizFolder(Integer quizFolderId, String scriptTitle );
         void emptyScriptDialogOkButtonClicked();
     }
 }

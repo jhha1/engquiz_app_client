@@ -9,6 +9,7 @@ import java.util.Map;
 
 import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.util.Parsor;
+import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.system.IllegalArgumentException;
 
 
@@ -22,17 +23,6 @@ public class Script
     public String title = "";
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
-    /*
-    private enum EValueName {
-        INDEX ("scriptId"), REVISION ("revision"),
-        TITLE ("title"), SENTENCES ("sentences");
-
-        private String value;
-        private EValueName( String value ) {
-            this.value = value;
-        }
-    };
-*/
     public static final String INDEX = "scriptId";
     public static final String TITLE = "title";
     public static final String SENTENCES = "sentences";
@@ -118,6 +108,20 @@ public class Script
         }
     }
 
+    public static boolean isNull( Script script ){
+        if( script == null ){
+            return true;
+        }
+
+        if( StringHelper.isNullString(script.title)
+                && script.scriptId == 0
+                && (script.sentences == null
+                    || script.sentences.isEmpty()))
+            return true;
+
+        return false;
+    }
+
     public static boolean checkScriptID( Object scriptID ) {
         if( scriptID instanceof Integer ) {
             return checkScriptID( (Integer)scriptID );
@@ -133,16 +137,31 @@ public class Script
         return true;
     }
 
-    public String toTextFileFormat() {
-        StringBuffer text = new StringBuffer();
+    public String makeFileSavedScriptName(){
+        StringBuffer filename = new StringBuffer();
+        filename.append(this.scriptId + Parsor.MainSeperator);
+        filename.append(this.title + ".txt");
+        return filename.toString();
+    }
 
-        text.append(scriptId + Parsor.MainSeperator);
-        text.append(title + Parsor.MainSeperator);
+    public static String makeFileSavedScriptName(Integer scriptId, String scriptTitle){
+        if( scriptId <= 0 || StringHelper.isNullString(scriptTitle)){
+            return new String();
+        }
+
+        StringBuffer filename = new StringBuffer();
+        filename.append(scriptId + Parsor.MainSeperator);
+        filename.append(scriptTitle);
+        return filename.toString();
+    }
+
+    public String makeFileSavedScriptText() {
+        StringBuffer fileText = new StringBuffer();
         for(Sentence unit : sentences)
         {
-            text.append(unit.textKo + "\t" + unit.textEn + Parsor.MainSeperator);
+            fileText.append(unit.textKo + "\t" + unit.textEn + Parsor.MainSeperator);
         }
-        return text.toString();
+        return fileText.toString();
     }
 
     // just for logging

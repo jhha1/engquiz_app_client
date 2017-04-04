@@ -141,7 +141,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
                 // mQuizFolderModel에서 필요한 데이터를 가져다 쓴다.
                 List<String> quizFolderList = mQuizFolderModel.getQuizFolderNames();
                 // 리스트마지막에 'New..'추가.
-                quizFolderList.add(quizFolderList.size(), QuizFolder.TEXT_NEW);
+                quizFolderList.add(quizFolderList.size(), QuizFolder.TEXT_NEW_FOLDER);
                 mView.showQuizFolderSelectDialog( quizFolderList );
             }
 
@@ -154,7 +154,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
     @Override
     public void quizFolderSelected( String quizFolderName ) {
-        if( quizFolderName.equals( QuizFolder.TEXT_NEW ) ){
+        if( quizFolderName.equals( QuizFolder.TEXT_NEW_FOLDER) ){
             mView.showNewQuizFolderTitleInputDialog();
         } else {
             bNewQuizFolder = false;
@@ -216,14 +216,19 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
             @Override
             public void onFail(EResultCode resultCode) {
-                Log.e("AppContent", "addScript onFail() UnkownERROR. resultCode:"+resultCode.toString()+", user: " + msgForLog);
-                mView.showErrorDialog(2);
+                Log.e("AppContent", "addScript onFail() UnkownERROR. " +
+                        "resultCode:"+resultCode.toString()+", user: " + msgForLog);
+                switch (resultCode) {
+                    default:
+                        mView.showErrorDialog(2);
+                        break;
+                }
             }
         };
     }
 
     private void addQuizFolder( String quizFolderName, String scriptName ) {
-        Log.i("AppContent", "AddScriptPresenter addScriptInQuizFolder() called");
+        Log.i("AppContent", "AddScriptPresenter addScriptIntoQuizFolder() called");
         Integer userId = UserModel.getInstance().getUserID();
         Integer scriptId = mModel.getParsedScriptIdAsTitle(scriptName);
         List<Integer> scriptIds = new LinkedList<>();

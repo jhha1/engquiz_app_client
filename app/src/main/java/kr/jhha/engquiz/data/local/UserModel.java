@@ -209,7 +209,7 @@ public class UserModel {
             }
 
             // 해당 스크립트 로드해 스크립트 맵에 initailize.
-            QuizPlayModel.getInstance().changePlayingQuizFolder( quizfolderForPlaying );
+            QuizPlayModel.getInstance().initPlayingQuizFolder( quizfolderForPlaying );
         }
 
         // 2. 싱크 알람 띄우기

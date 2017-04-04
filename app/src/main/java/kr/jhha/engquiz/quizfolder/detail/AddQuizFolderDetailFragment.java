@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,10 +19,8 @@ import java.util.List;
 
 import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.ScriptRepository;
-import kr.jhha.engquiz.quizfolder.QuizFolderAdapter;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -30,18 +29,20 @@ import kr.jhha.engquiz.quizfolder.QuizFolderAdapter;
 public class AddQuizFolderDetailFragment extends Fragment implements  AddQuizFolderDetailContract.View {
 
     private AddQuizFolderDetailContract.ActionsListener mActionListener;
-
+    private ArrayAdapter mScriptListViewAdapter;
     private ListView mItemListView = null;
 
-    private final String mTITLE = "Add a Script in a Quiz Folder";
     private Integer mQuizFolderId = -1;
+    private String mSelectedScriptTitle;
     private Button mButtonConfirmTitle;
+
+    private final String mTITLE = "Add a Script in a Quiz Folder";
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mActionListener = new AddQuizFolderDetailPresenter( getActivity(), this, QuizFolderRepository.getInstance() );
+        mActionListener = new AddQuizFolderDetailPresenter( this, QuizFolderRepository.getInstance() );
     }
 
     @Override
@@ -59,9 +60,11 @@ public class AddQuizFolderDetailFragment extends Fragment implements  AddQuizFol
 
         // 플레이 리스트뷰
         mItemListView = (ListView) view.findViewById(R.id.add_quizfolder_listview);
-        // 플레이 리스트 아답터 연결
-        ArrayAdapter adapter = mActionListener.getAdapter();
-        mItemListView.setAdapter(adapter);
+        mItemListView.setOnItemClickListener(mListItemClickListener);
+
+        // 퀴즈폴더에 추가할 파싱된스크립트 리스트 가져오기
+        mActionListener.initScriptList();
+
         view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
         return view;
     }
@@ -73,17 +76,15 @@ public class AddQuizFolderDetailFragment extends Fragment implements  AddQuizFol
         super.onResume();
     }
 
-    // 스크립트 추가 버튼이벤트 리스너
-    Button.OnClickListener mClickListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            switch(v.getId())
-            {
-                case R.id.add_quizfolder_complate_btn:
-                    mActionListener.addScriptInQuizFolder( mQuizFolderId, mItemListView );
-                    break;
-            }
-        }
-    };
+    @Override
+    public void showScriptList(String[] scriptTitleAll) {
+        // 플레이 리스트 아답터 연결
+        int resourceID = R.layout.content_textstyle_listview_checked_multiple;
+        //int resourceID = android.R.layout.simple_list_item_multiple_choice;
+        mScriptListViewAdapter = new ArrayAdapter<String>(getActivity(), resourceID, scriptTitleAll);
+        mItemListView.setAdapter(mScriptListViewAdapter);
+        mScriptListViewAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void showEmptyScriptDialog() {
@@ -102,6 +103,27 @@ public class AddQuizFolderDetailFragment extends Fragment implements  AddQuizFol
         dialog.show();
     }
 
+    // 리스트뷰 클릭 이벤트 리스너
+    private AdapterView.OnItemClickListener mListItemClickListener
+            = new AdapterView.OnItemClickListener()
+    {
+        @Override
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
+            mSelectedScriptTitle = (String) mScriptListViewAdapter.getItem(position);
+        }
+    };
+
+    // 스크립트 추가 버튼이벤트 리스너
+    Button.OnClickListener mClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            switch(v.getId())
+            {
+                case R.id.add_quizfolder_complate_btn:
+                    mActionListener.addScriptIntoQuizFolder( mQuizFolderId, mSelectedScriptTitle );
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onSuccessAddScriptInQuizFolder(List<Integer> updatedScriptIds ) {

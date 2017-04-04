@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -122,8 +123,12 @@ public class FileHelper
     }
 
     public List listFileNames( String dirPath ) {
-        List<String> fileNames = new LinkedList<>();
         File[] files = listFiles( dirPath );
+        if( files == null ) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<String> fileNames = new LinkedList<>();
         for( File file : files ) {
             fileNames.add( file.getName() );
         }

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import java.util.List;
 
-import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.UserModel;
@@ -49,7 +48,7 @@ public class ShowQuizFolderDetailPresenter implements ShowQuizFolderDetailContra
     public void listViewItemClicked(Integer scriptID, String scriptTitle) {
         Log.d("%%%%%%%%%%%%%%%", "ShowQuizFolderDetailPresenter.listViewItemClicked. title:" + scriptTitle);
 
-        if( QuizFolder.TEXT_NEW.equals(scriptTitle) ) {
+        if( QuizFolder.TEXT_ADD_SCRIPT_INTO_QUIZFOLDER.equals(scriptTitle) ) {
             // 스크립트추가 화면 전환
             mView.onChangeFragmetNew();
         } else {

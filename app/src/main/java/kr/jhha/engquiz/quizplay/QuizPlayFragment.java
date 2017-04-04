@@ -22,19 +22,11 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
 {
     private QuizPlayContract.UserActionsListener mActionListener;
 
-    private final String mTITLE = "TODO: MyQuiz 이름";
-
-    private Sentence quiz;
-
     private TextView mQuestionView;
     private TextView mAnswerView;
     private Button mShowAnswerBtn;
     private Button mNextQuestionButton;
     private NestedScrollView mScrollView;
-
-    // 여러 커스텀 퀴즈들 중, 어떤 것을 플레이 할 것인가
-    // TODO view 말고 model이나 컨트롤러로 이동
-    private static int selectedQuizID = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,18 +51,19 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         mShowAnswerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAnswer();
+                mActionListener.getAnswer();
             }
         });
         mNextQuestionButton = (Button) view.findViewById(R.id.nextQuestionBtn);
         mNextQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doNextQuestion();
+                mActionListener.doNextQuestion();
             }
         });
 
-        doNextQuestion();
+        mActionListener.initTitle();
+        mActionListener.doNextQuestion();
 
         // Inflate the layout for this fragment
         return view;
@@ -79,41 +72,35 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     @Override
     public void onResume() {
         // 툴바에 현 프래그먼트 제목 출력
-        ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
+        mActionListener.initTitle();
         super.onResume();
     }
 
-    private void showAnswer() {
-        mShowAnswerBtn.setVisibility(View.INVISIBLE);
-        mAnswerView.setVisibility(View.VISIBLE);
-        mNextQuestionButton.setVisibility(View.VISIBLE);
-        mAnswerView.setText(quiz.textEn);
+    @Override
+    public void showTitle(String title) {
+        ((MainActivity)getActivity()).setActionBarTitle( title );
     }
 
-    private void doNextQuestion() {
+    @Override
+    public void showNextQuestion(String question) {
         mScrollView.scrollTo(0, 0);
         mAnswerView.setVisibility(View.INVISIBLE);
         mNextQuestionButton.setVisibility(View.INVISIBLE);
-
-        quiz = getNewQuiz();
-        if(quiz == null) {
-            mQuestionView.setText("퀴즈 데이터가 없습니다. 스크립트를 추가해, 나만의 퀴즈를 만들어 퀴즈게임을 즐길 수 있습니다");
-            mShowAnswerBtn.setVisibility(View.INVISIBLE);
-            return;
-        }
         mShowAnswerBtn.setVisibility(View.VISIBLE);
-        mQuestionView.setText(quiz.textKo);
+        mQuestionView.setText(question);
     }
 
-    private Sentence getNewQuiz() {
-        final QuizPlayModel model = QuizPlayModel.getInstance();
-        if(model != null)
-            return model.getQuiz();
-        return null;
+    @Override
+    public void showNotAvailableQuiz(){
+        mQuestionView.setText("퀴즈 데이터가 없습니다. 스크립트를 추가해, 나만의 퀴즈를 만들어 퀴즈게임을 즐길 수 있습니다");
+        mShowAnswerBtn.setVisibility(View.INVISIBLE);
     }
 
-    public static boolean setQuizList (int quizId) {
-        selectedQuizID = quizId;
-        return true;
+    @Override
+    public void showAnswer(String answer) {
+        mShowAnswerBtn.setVisibility(View.INVISIBLE);
+        mAnswerView.setVisibility(View.VISIBLE);
+        mNextQuestionButton.setVisibility(View.VISIBLE);
+        mAnswerView.setText(answer);
     }
 }

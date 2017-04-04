@@ -155,10 +155,12 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_play_quiz) {
             transaction.replace(R.id.container, mPlayQuizFragment);
-        } else if (id == R.id.nav_my_quizs) {
+        } else if (id == R.id.nav_quiz_folders) {
             transaction.replace(R.id.container, mQuizFoldersFragment);
         } else if (id == R.id.nav_sync) {
             transaction.replace(R.id.container, mSyncFragment);
+        } else if(id == R.id.nav_add_script){
+            transaction.replace(R.id.container, mAddScriptFragment);
         }
 
         //transaction.addToBackStack(null);

@@ -9,6 +9,8 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,8 +31,8 @@ import kr.jhha.engquiz.MainActivity;
 public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderContract.View {
 
     private AddQuizFolderContract.ActionsListener mActionListener;
-
     private ListView mItemListView = null;
+
     private EditText mInputTitleQuizFolder;
     private Button mButtonConfirmTitle;
 
@@ -39,7 +41,7 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
     // 커스텀 퀴즈 리스트 추가 재확인 다이알로그
     private AlertDialog.Builder mDialogAddQuizFolder = null;
 
-    private final String mTITLE = "Add Quiz Group";
+    private final String mTITLE = "Add Quiz Folder";
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -89,18 +91,17 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
         // 포커스를 제목입력창으로 이동
        // mInputTitleQuizFolder.requestFocus();
 
-        // 2. 플레이리스트 제목입력/추가완료 버튼: 클릭 이벤트 핸들러 정의
-        //mButtonConfirmTitle = (Button) view.findViewById(R.id.add_quizfolder_set_title_btn);
+        // 2. 플레이리스트 추가완료 버튼: 클릭 이벤트 핸들러 정의
+       //mButtonConfirmTitle = (Button) view.findViewById(R.id.add_quizfolder_set_title_btn);
        // mButtonConfirmTitle.setOnClickListener(mClickListener);
-       // view.findViewById(R.id.add_quizfolder_complate_btn).setOnClickListener(mClickListener);
+        view.findViewById(R.id.add_quizfolder_complate_btn).setOnClickListener(mClickListener);
 
         // 3. 플레이 리스트뷰
         mItemListView = (ListView) view.findViewById(R.id.add_quizfolder_listview);
-        // 플레이 리스트 아답터 연결
-        ArrayAdapter adapter = mActionListener.getAdapter();
-        mItemListView.setAdapter(adapter);
+        mItemListView.setOnItemClickListener(mListItemClickListener);
 
-        mActionListener.selectStartDialog();
+        // 퀴즈폴더에 추가할 파싱된스크립트 리스트 가져오기
+        mActionListener.initScriptList();
 
         view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
         return view;
@@ -113,6 +114,31 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
         super.onResume();
     }
 
+    @Override
+    public void setAdapter(ArrayAdapter<String> adapter) {
+        mItemListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showEmptyScriptDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder( getActivity() );
+        dialog.setIcon(android.R.drawable.alert_dark_frame);
+        dialog.setTitle("퀴즈폴더를 만들기 실패");
+        dialog.setMessage("스크립트가 없어서 퀴즈폴더를 만들 수 없습니다." +
+                "\n'스크립트 추가' 메뉴에서 스크립트를 추가하세요.");
+        dialog.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
+        // 버튼 클릭 이벤트.
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int which) {
+                // 다이알로그와 이 프레그먼트를 닫고, quiz folder fragment로 돌아간다.
+                d.dismiss();
+                mActionListener.emptyScriptDialogOkButtonClicked();
+            }
+        });
+        dialog.show();
+    }
+
     // 퀴즈폴더 제목 입력 다이알로그
     @Override
     public void showQuizFolderTitleDialog(){
@@ -120,21 +146,34 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
             public void onClick(DialogInterface d, int which) {
                 // 제목입력완료 버튼
                 String title = mInputTitleQuizFolder.getText().toString();
-                Integer nextAction = mActionListener.newQuizFolderTitleInputted( title );
+                Integer nextAction = mActionListener.checkInputtedTitle( title );
                 switch ( nextAction ){
                     case 0:
                         d.dismiss();
-
                         break;
                     case 1:
                         mInputTitleQuizFolder.requestFocus(); // 커서를 제목입력칸으로 이동
                         Toast.makeText(getActivity(), "제목을 다시 입력해주세요", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+                        mInputTitleQuizFolder.requestFocus(); // 커서를 제목입력칸으로 이동
+                        Toast.makeText(getActivity(), "제목은 30자 이하여야 합니다. ", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
         });
         mDialogQuizFolderTitleInput.show();
     }
+
+    // 리스트뷰 클릭 이벤트 리스너
+    private AdapterView.OnItemClickListener mListItemClickListener
+            = new AdapterView.OnItemClickListener()
+    {
+        @Override
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
+           //
+        }
+    };
 
     // 새 퀴즈폴더 만들기 버튼이벤트 리스너
     Button.OnClickListener mClickListener = new View.OnClickListener() {
@@ -161,28 +200,6 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
         });
         mDialogAddQuizFolder.show();
     }
-
-
-
-    @Override
-    public void showEmptyScriptDialog() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder( getActivity() );
-        dialog.setIcon(android.R.drawable.alert_dark_frame);
-        dialog.setTitle("퀴즈폴더를 만들기 실패");
-        dialog.setMessage("스크립트가 없어서 퀴즈폴더를 만들 수 없습니다." +
-                "\n'스크립트 추가' 메뉴에서 스크립트를 추가하세요.");
-        dialog.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
-        // 버튼 클릭 이벤트.
-        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                // 다이알로그와 이 프레그먼트를 닫고, quiz folder fragment로 돌아간다.
-                d.dismiss();
-                mActionListener.emptyScriptDialogOkButtonClicked();
-            }
-        });
-        dialog.show();
-    }
-
 
     @Override
     public void onSuccessAddQuizFolder( List<QuizFolder> updatedQuizFolders ) {

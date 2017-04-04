@@ -340,7 +340,7 @@ public class QuizFolderRepository {
     }
 
     public void delQuizFolderScript( Integer userId, Integer quizfolderId, Integer scriptId, final DelQuizFolderScriptCallback callback ){
-        Request request = new Request( EProtocol2.PID.DelUserQuizFolder );
+        Request request = new Request( EProtocol2.PID.DelUserQuizFolderDetail );
         request.set(EProtocol.UserID, userId);
         request.set(EProtocol.QuizFolderId, quizfolderId);
         request.set(EProtocol.ScriptId, scriptId);
@@ -368,13 +368,11 @@ public class QuizFolderRepository {
         };
     }
 
-    // Add Script메뉴에서 기존퀴즈폴더에 스크립트를 추가한경우.
+    // 퀴즈폴더 디테일 (스크립트 리스트 보기/스크립트 추가/스크립트 삭제 시 호출)
+    // 스크립트 변동에 따른 UI 재소팅 결과를 저장.
     // 클라에 저장. 서버는 이미 저장됨.
     public void overwriteQuizFolderScriptIdList(Integer quizFolderId, List<Integer> scriptIds )
     {
-        // 기존퀴즈폴더에 스크립트를 추가한경우
-        // 새로 추가된 스크립트를 포함해 UI에 보일순서 재 소팅된..
-        // 퀴즈 폴더 내의 스크립트 리스트를 저장.
         for( QuizFolder quizFolder : mQuizFolders ){
             if( quizFolder.getId() == quizFolderId ){
                 quizFolder.setScriptIds(scriptIds);

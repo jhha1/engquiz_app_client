@@ -28,7 +28,8 @@ public class QuizFolder
     public static final int STATE_OTHER = 2;
     public static final int STATE_NEWBUTTON = 3;
 
-    public static final String TEXT_NEW = "New..";
+    public static final String TEXT_NEW_FOLDER = "New Folder";
+    public static final String TEXT_ADD_SCRIPT_INTO_QUIZFOLDER = "Add Script";
 
     public QuizFolder()
     {
@@ -134,7 +135,7 @@ public class QuizFolder
     }
 
     public void setScriptIds(List<Integer> scriptIds) {
-        if( scriptIds == null || scriptIds.isEmpty() ){
+        if( scriptIds == null ){
             throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "setScriptIds() ids is null." );
         }
         this.scriptIds = scriptIds;

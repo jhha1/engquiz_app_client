@@ -5,13 +5,21 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_play_quiz"
-            android:icon="@drawable/ic_play_circle_filled_black_48dp"
+            android:icon="@drawable/ic_play_arrow_black_48dp"
             android:title="Quiz Play"
             />
         <item
-            android:id="@+id/nav_my_quizs"
-            android:icon="@drawable/ic_stars_black_48dp"
+            android:id="@+id/nav_quiz_folders"
+            android:icon="@drawable/ic_folder_open_black_48dp"
             android:title="Quiz Folders" />
+        <item
+            android:id="@+id/nav_add_script"
+            android:icon="@drawable/ic_add_black_48dp"
+            android:title="Add Script" />
+        <item
+            android:id="@+id/nav_add_sentence"
+            android:icon="@drawable/ic_edit_black_48dp"
+            android:title="Add Sentence" />
         <item
             android:id="@+id/nav_sync"
             android:icon="@drawable/ic_cached_black_48dp"

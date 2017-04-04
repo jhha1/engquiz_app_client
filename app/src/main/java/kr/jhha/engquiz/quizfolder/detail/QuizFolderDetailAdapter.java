@@ -36,14 +36,12 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
         Integer state;
     }
     private List<ScriptSummary> mListView;
-    private Integer mQuizFolderID;
 
     public QuizFolderDetailAdapter(ScriptRepository scriptRepository,
                                    Integer quizFolderID, List<Integer> quizFolderScriptIds) {
         mScriptModel = scriptRepository;
-        mListView = convertFormat(quizFolderScriptIds);
+        mListView = convertFormat(quizFolderID, quizFolderScriptIds);
         mListView.add( makeNewButton() );
-        mQuizFolderID = quizFolderID;
     }
 
     /*
@@ -75,58 +73,32 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
         ImageView iconImageView = (ImageView) convertView.findViewById(R.id.imageView1);
         TextView titleTextView = (TextView) convertView.findViewById(R.id.textView1);
-        TextView descTextView = (TextView) convertView.findViewById(R.id.textView2);
 
         // 아이템 내 각 위젯에 데이터 반영
-        int resourceID = R.drawable.ic_format_align_left_grey600_48dp;
-        Drawable icon = ContextCompat.getDrawable(mContext, resourceID);
-        iconImageView.setImageDrawable(icon);
+        iconImageView.setImageDrawable(getIcon(script.state));
         titleTextView.setText(script.scriptTitle);
-        // set description
-        if ("New..".equals(script.scriptTitle)) {
-            descTextView.setText("클릭하여 스크립트 추가하기");
-        } else {
-            descTextView.setText("");
-        }
         return convertView;
     }
 
-    public View getView_legacy(int position, View convertView, ViewGroup parent) {
-        if( mContext == null )
-            mContext = parent.getContext();
-
-        // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
-        int uiOrderNumber = position + 1;
-        String scriptTitle = mQuizFolderModel.getQuizFolderScriptTitleByUIOrder(mQuizFolderID, uiOrderNumber);
-
-        // "listview_item" Layout을 inflate하여 convertView 참조 획득.
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater)  mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.content_quizfolder_listview_item, parent, false);
+    private Drawable getIcon(Integer state){
+        int resourceID;
+        switch (state){
+            case QuizFolder.STATE_NEW:
+                resourceID = R.drawable.ic_fiber_new_black_36dp;
+                break;
+            case QuizFolder.STATE_OTHER:
+                resourceID = R.drawable.ic_playlist_play_black_36dp;
+                break;
+            case QuizFolder.STATE_NEWBUTTON:
+                resourceID = R.drawable.ic_playlist_add_black_36dp;
+                break;
+            default:
+                resourceID = R.drawable.ic_playlist_play_black_36dp;
+                break;
         }
-
-        // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
-        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.imageView1);
-        TextView titleTextView = (TextView) convertView.findViewById(R.id.textView1);
-        TextView descTextView = (TextView) convertView.findViewById(R.id.textView2);
-
-        // 아이템 내 각 위젯에 데이터 반영
-        int resourceID = R.drawable.ic_format_align_left_grey600_48dp;
         Drawable icon = ContextCompat.getDrawable(mContext, resourceID);
-        iconImageView.setImageDrawable(icon);
-        // set title
-        if(StringHelper.isNullString(scriptTitle)){
-            titleTextView.setText("스크립트 제목을 읽어올 수 없습니다..");
-        } else {
-            titleTextView.setText(scriptTitle);
-        }
-        // set description
-        if ("New..".equals(scriptTitle)) {
-            descTextView.setText("클릭하여 스크립트 추가하기");
-        } else {
-            descTextView.setText("");
-        }
-        return convertView;
+
+        return icon;
     }
 
     /*
@@ -147,25 +119,19 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
         return mListView.get(position);
     }
 
-    public Object getItem_legacy(int position) {
-        // model의 summary list 배열 순서대로 UI listveiw에 뿌려지게 된다.
-        // so, listview의 position은 arraylist의 index다.
-        return mQuizFolderModel.getQuizFolderScriptTitleByUIOrder(mQuizFolderID, position);
-    }
-
-    public void updateItems( List<Integer> quizFolderScriptIds ){
-        mListView = convertFormat(quizFolderScriptIds);
+    public void updateItems( Integer quizFolderID, List<Integer> quizFolderScriptIds ){
+        mListView = convertFormat(quizFolderID, quizFolderScriptIds);
         mListView.add( makeNewButton() );
     }
 
-    private List<ScriptSummary> convertFormat(List<Integer> quizFolderScriptIds)
+    private List<ScriptSummary> convertFormat(Integer quizFolderID, List<Integer> quizFolderScriptIds)
     {
         List<ScriptSummary> scripts = new ArrayList<>();
         for(Integer id: quizFolderScriptIds){
             String title = mScriptModel.getParsedScriptTitleAsId(id);
 
             ScriptSummary script = new ScriptSummary();
-            script.quizFolderId = mQuizFolderID;
+            script.quizFolderId = quizFolderID;
             script.scriptId = id;
             script.scriptTitle = title;
             if( StringHelper.isNullString(title) ){
@@ -181,7 +147,7 @@ public class QuizFolderDetailAdapter extends BaseAdapter {
     {
         ScriptSummary newbutton = new ScriptSummary();
         newbutton.scriptId = 0;
-        newbutton.scriptTitle = QuizFolder.TEXT_NEW;
+        newbutton.scriptTitle = QuizFolder.TEXT_ADD_SCRIPT_INTO_QUIZFOLDER;
         newbutton.state = QuizFolder.STATE_NEWBUTTON;
         return newbutton;
     }

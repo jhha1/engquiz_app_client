@@ -2,8 +2,10 @@ package kr.jhha.engquiz.util;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,29 +23,7 @@ public class Parsor
     public static final String VeticalSeperator = "||";
     public static final String EqualSeperator = "=";
 
-    public static Map<Integer, Script> parse(List<String> textfiles)
-    {
-        if(textfiles == null || textfiles.isEmpty()) {
-            Log.e("Parsor.parse", "textFiles is null.");
-            return Collections.emptyMap();
-        }
-
-        Map<Integer, Script> parsedMap = new HashMap<Integer, Script>();
-        for(String text : textfiles) {
-            Script script = parse(text);
-            if(null == script) {
-                System.out.println("[ERROR] parse failed. ");
-                continue;
-            }
-            parsedMap.put(script.scriptId, script);
-        }
-        Log.d("Parsor.parse", "COUNT (textScript:"+ textfiles.size()
-                        + ", parsedScript:"+parsedMap.size() +")");
-
-        return parsedMap;
-    }
-
-    public static Script parse(String textFile)
+    public static List<Sentence> parse(String textFile)
     {
         if(isNull(textFile)) {
             Log.e("Parsor", "textFile is null");
@@ -51,19 +31,18 @@ public class Parsor
         }
 
         String rows[] = textFile.split(MainSeperator);
-        if(rows.length <= 2) {
+        if(rows == null) {
             Log.e("Parsor", "Cound not split with. text["+textFile+"]");
             return null;
         }
 
+        // test log...
         for(String r : rows) {
             Log.d("[test]",r);
         }
 
-        Script script = new Script();
-        script.scriptId = Integer.parseInt( rows[0] );
-        script.title = rows[1];
-        for(int i=2; i<rows.length; ++i)
+        List<Sentence> sentences = new LinkedList<>();
+        for(int i=0; i<rows.length; ++i)
         {
             String row = rows[i];
             if(row.isEmpty()) {
@@ -80,10 +59,10 @@ public class Parsor
             Sentence unit = new Sentence();
             unit.textKo = dividedRow[0].trim();
             unit.textEn = dividedRow[1].trim();
-            script.sentences.add(unit);
+            sentences.add(unit);
         }
-        Log.d("Parsor", "COUNT (quizSetLen:"+ script.sentences.size() +")");
-        return script;
+        Log.d("Parsor", "Sentences COUNT ("+ sentences.size() +")");
+        return sentences;
     }
 
     /*

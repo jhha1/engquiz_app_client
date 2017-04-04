@@ -198,9 +198,26 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     }
 
     @Override
-    public void onFailChangePlayingQuizFolder() {
-        String msg = "이 퀴즈폴더를 게임플레이용으로 변경하는데 실패했습니다." +
-                "\n잠시 후 다시 시도해주세요.";
+    public void onFailChangePlayingQuizFolder(int reason) {
+        String msg = "";
+        switch (reason){
+            case 1:
+                msg = "이 퀴즈폴더를 게임플레이용으로 변경하는데 실패했습니다." +
+                        "\n앱 재 시작 후 다시 시도해주세요.";
+                break;
+            case 2:
+                msg = "New 버튼은 게임플레이용으로 지정할 수 없습니다.";
+                break;
+            case 3:
+                msg = "퀴즈폴더에 스크립트가 없어서 게임용 전환이 불가합니다. " +
+                        "\n퀴즈폴더에 스크립트를 먼저 추가해주세요.";
+                break;
+            default:
+                msg = "이 퀴즈폴더를 게임플레이용으로 변경하는데 실패했습니다." +
+                        "\n앱 재 시작 후 다시 시도해주세요.";
+                break;
+        }
+
         Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 

@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.quizfolder;
 
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -15,6 +16,8 @@ import kr.jhha.engquiz.data.local.QuizFolder;
 public class AddQuizFolderContract {
 
     interface View {
+        void setAdapter(ArrayAdapter<String> adapter);
+
         void showEmptyScriptDialog();
         void showQuizFolderTitleDialog();
         void showAddQuizFolderConfirmDialog();
@@ -27,12 +30,11 @@ public class AddQuizFolderContract {
     }
 
     interface ActionsListener {
-        ArrayAdapter getAdapter();
-        void selectStartDialog();
+        void initScriptList();
 
-        Integer newQuizFolderTitleInputted( String title );
+        Integer checkInputtedTitle(String title );
         void scriptsSelected();
-        void addQuizFolder( String title, ListView listView );
+        void addQuizFolder( String title, ListView listView);
 
         void emptyScriptDialogOkButtonClicked();
     }
