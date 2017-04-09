@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -15,7 +14,7 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.ScriptRepository;
-import kr.jhha.engquiz.data.local.UserModel;
+import kr.jhha.engquiz.data.local.UserRepository;
 import kr.jhha.engquiz.data.remote.EResultCode;
 
 /**
@@ -109,7 +108,7 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
             if (checked.valueAt(i)) {
                 int position = checked.keyAt(i);
                 String scriptTitle = mScriptListViewAdapter.getItem(position);
-                Integer scriptId = scriptRepo.getParsedScriptIdAsTitle( scriptTitle );
+                Integer scriptId = scriptRepo.getScriptIdByTitle( scriptTitle );
                 if( scriptId < 0 ) {
                     Log.e("#########","Invalid ScrpitId. " +
                             "but ignore it and continue Add other scripts into QuizFolder. " +
@@ -126,7 +125,7 @@ public class AddQuizFolderPresenter implements AddQuizFolderContract.ActionsList
         }
 
         // 서버통신 퀴즈폴더 추가
-        Integer userId = UserModel.getInstance().getUserID();
+        Integer userId = UserRepository.getInstance().getUserID();
         mModel.addQuizFolder( userId, title, selectedItems, onAddQuizFolder() );
     }
 

@@ -15,6 +15,7 @@ public class AddScriptContract {
         void showErrorDialog(int what );
 
         void showQuizFolderSelectDialog( List<String> quizFolderList  );
+        void showNeedMakeQuizFolderDialog();
         void showNewQuizFolderTitleInputDialog();
 
         void showAddScriptConfirmDialog( String filename, Float fileSize);

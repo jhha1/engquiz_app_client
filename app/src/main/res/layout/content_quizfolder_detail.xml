@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".quizfolder.detail.ShowQuizFolderDetail">
+    tools:context=".quizfolder.scripts.ShowQuizFolderDetail">
 
     <!-- explain how to use -->
     <TextView

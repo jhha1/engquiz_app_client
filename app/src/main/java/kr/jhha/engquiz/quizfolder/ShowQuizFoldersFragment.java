@@ -18,7 +18,7 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.MainActivity;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
-import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetailFragment;
+import kr.jhha.engquiz.quizfolder.scripts.ShowQuizFolderScriptsFragment;
 import kr.jhha.engquiz.util.click.ClickDetector;
 import kr.jhha.engquiz.util.click.ListViewClickDetector;
 
@@ -79,7 +79,7 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d("################","ShowQuizFoldersFragment onCreateView() called");
+        Log.d("################","ReportFragment onCreateView() called");
 
         View view = inflater.inflate(R.layout.content_quizfolder, null);
         mItemListView = (ListView) view.findViewById(R.id.quizfolderview);
@@ -96,7 +96,7 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
 
     @Override
     public void onResume() {
-        Log.d("################","ShowQuizFoldersFragment onResume() called");
+        Log.d("################","ReportFragment onResume() called");
         // 툴바에 현 프래그먼트 제목 출력
         ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
         super.onResume();
@@ -224,16 +224,16 @@ public class ShowQuizFoldersFragment extends Fragment implements  ShowQuizFolder
     @Override
     public void onChangeFragmetNew(){
         final MainActivity context = ((MainActivity)getActivity());
-        context.changeViewFragment(MainActivity.EFRAGMENT.QUIZQROUP_NEW);
+        context.changeViewFragment(MainActivity.EFRAGMENT.QUIZFOLDER_NEW);
     }
 
     @Override
     public void onChangeFragmetFolderDetail( Integer quizFolderId, String quizFolderTitle ) {
         final MainActivity context = ((MainActivity)getActivity());
-        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_DETAIL_SHOW;
+        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_SCRIPT_LIST_SHOW;
 
         // 퀴즈폴더 디테일보기 프래그먼트는 인자값을 넘겨야함.
-        ShowQuizFolderDetailFragment detailFragment = (ShowQuizFolderDetailFragment) context.getFragment(fragmentID);
+        ShowQuizFolderScriptsFragment detailFragment = (ShowQuizFolderScriptsFragment) context.getFragment(fragmentID);
         detailFragment.setSelectedQuizGroupId(quizFolderId, quizFolderTitle);
         context.changeViewFragment( fragmentID );
     }

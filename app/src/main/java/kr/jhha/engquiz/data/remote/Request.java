@@ -3,6 +3,7 @@ package kr.jhha.engquiz.data.remote;
 import java.util.HashMap;
 import java.util.Map;
 
+import kr.jhha.engquiz.data.local.UserRepository;
 import kr.jhha.engquiz.util.JsonHelper;
 
 /**
@@ -20,8 +21,8 @@ public class Request {
 
     private void setRequiredFields( EProtocol2.PID pid ) {
         set( EProtocol.PID, pid.toInt() );
-        //set( EProtocol.UserID, UserManager.getInstance().getUserID() );
-        //set( EProtocol.UserKey, UserManager.getInstance().getNickname() );
+        Integer userId = UserRepository.getInstance().getUserID();
+        set( EProtocol.UserID, userId );
     }
 
     public void set( EProtocol key, Object vaule ) {

@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.data.local;
 
-import android.util.Log;
-
 import kr.jhha.engquiz.util.Parsor;
 import kr.jhha.engquiz.util.StringHelper;
 
@@ -11,15 +9,11 @@ import kr.jhha.engquiz.util.StringHelper;
 
 public class User {
     private Integer userID = -1;
-    private String userKey = null;
-    private String nickname = null;
-    //private Integer macID = -1;
+    private String username = null;
 
     // serialize keys
     final public static String USER_ID = "USER_ID";
-    final public static String USER_KEY = "USER_KEY";
-    final public static String NICKNAME = "NICKNAME";
-    final public static String MAC_ID = "MAC_ID";
+    final public static String USER_NAME = "USER_NAME";
 
     // check values
     final public static Integer NICKNAME_LEN_MIN = 1;
@@ -27,10 +21,9 @@ public class User {
 
     public User() {}
 
-    public User( Integer userID, String nickname, String userKey ) {
+    public User( Integer userID, String userName  ) {
         this.userID = checkUserID(userID);
-        this.nickname = checkNickname(nickname);
-        this.userKey = checkUserKey(userKey);
+        this.username = checkUserKey(userName);
     }
 
     public boolean isNull(){
@@ -42,9 +35,7 @@ public class User {
             return true;
 
         if( user.userID == -1
-               // && user.macID == -1
-                && user.userKey == null
-                && user.nickname == null)
+                && user.username == null)
             return true;
 
         return false;
@@ -53,11 +44,8 @@ public class User {
     public Integer getUserID() {
         return this.userID;
     }
-    public String getUserKey() {
-        return this.userKey;
-    }
-    public String getNickName() {
-        return this.nickname;
+    public String getUserName() {
+        return this.username;
     }
 
     public static Integer checkUserID( String userIdString ) {
@@ -106,8 +94,7 @@ public class User {
     public String serialize() {
         StringBuilder serialized = new StringBuilder();
         serialized.append( USER_ID + Parsor.EqualSeperator + this.userID + Parsor.MainSeperator);
-        serialized.append( USER_KEY + Parsor.EqualSeperator + this.userKey + Parsor.MainSeperator);
-        serialized.append( NICKNAME + Parsor.EqualSeperator + this.nickname );
+        serialized.append( USER_NAME + Parsor.EqualSeperator + this.username + Parsor.MainSeperator);
         return serialized.toString();
     }
 
@@ -135,8 +122,7 @@ public class User {
 
             switch ( key ) {
                 case USER_ID:  this.userID = checkUserID(value); break;
-                case USER_KEY:  this.userKey = checkUserKey(value); break;
-                case NICKNAME:  this.nickname = checkNickname(value); break;
+                case USER_NAME:  this.username = checkUserKey(value); break;
             }
         }
     }

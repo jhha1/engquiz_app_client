@@ -5,8 +5,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import java.util.ArrayList;
@@ -27,10 +29,16 @@ public class Http
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(url);
 
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+
             List params = new ArrayList();
             params.add(new BasicNameValuePair("json", requestString));
             UrlEncodedFormEntity requestEntity = new UrlEncodedFormEntity(params, "UTF_8");
             post.setEntity( requestEntity );
+
+            //post.setEntity( new UrlEncodedFormEntity(params,"utf-8") );
+            //requestString = "JSON="+requestString;
+            //post.setEntity( new StringEntity(requestString,"utf-8") );
 
             System.out.println("[HTTP REQUEST:URL{" + post.getURI() + "},DATA{" + requestString + "}");
             HttpResponse responsePost = client.execute(post);
@@ -41,7 +49,7 @@ public class Http
                 return null;
             }
             String responseString = EntityUtils.toString( responseEntity );
-            System.out.println("[HTTP RESPONSE:URL{" + post.getURI() + "},DATA{" + responseString +"}");
+            System.out.println("[HTTP RESPONSE:URL{" + post.getURI() + "},ENCODE:{"+responseEntity.getContentEncoding()+"},DATA{" + responseString +"}");
 
             return responseString;
 

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.ScriptRepository;
 import kr.jhha.engquiz.util.StringHelper;
 
@@ -156,6 +157,20 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
     }
 
     @Override
+    public void showNeedMakeQuizFolderDialog(){
+        String msg = "스크립트를 넣을 퀴즈폴더가 없습니다." +
+                    "\n'새 폴더 만들기' 버튼을 눌러 새폴더를 만드세요.";
+        mDialogSelectQuizFolder.setMessage(msg);
+        mDialogSelectQuizFolder.setNeutralButton("새 폴더 만들기", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int which) {
+                mActionListener.quizFolderSelected( QuizFolder.TEXT_NEW_FOLDER );
+            }
+        });
+
+        mDialogSelectQuizFolder.show();
+    }
+
+    @Override
     public void showQuizFolderSelectDialog( List<String> quizFolderList ) {
         // List Adapter 생성
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -177,6 +192,12 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
                         dialog.dismiss();
                     }
                 });
+
+        mDialogSelectQuizFolder.setNeutralButton("새 폴더 만들기", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int which) {
+                mActionListener.quizFolderSelected( QuizFolder.TEXT_NEW_FOLDER );
+            }
+        });
 
         mDialogSelectQuizFolder.show();
     }
@@ -286,10 +307,10 @@ public class AddScriptFragment extends Fragment implements AddScriptContract.Vie
     private void initDialogSelectQuizFolder() {
         mDialogSelectQuizFolder = new AlertDialog.Builder(getActivity());
         mDialogSelectQuizFolder.setIcon(android.R.drawable.alert_dark_frame);
-        mDialogSelectQuizFolder.setTitle("스크립트를 넣을 퀴즈폴더를 선택해주세요. \n적당한 퀴즈폴더가 없다면, 퀴즈폴더 리스트 내의 New..를 클릭해 새 퀴즈폴더를 만드실 수 있습니다.");
+        mDialogSelectQuizFolder.setTitle("스크립트를 넣을 퀴즈폴더를 선택해주세요.");
         mDialogSelectQuizFolder.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
         // 취소 버튼 클릭 이벤트.
-        mDialogSelectQuizFolder.setNegativeButton("뒤로가기", new DialogInterface.OnClickListener() {
+        mDialogSelectQuizFolder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int which) {
                 // 다이알로그 닫기
                 d.dismiss();

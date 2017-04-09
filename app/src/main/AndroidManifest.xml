@@ -15,17 +15,13 @@
             # 대신, 자동으로 포커스라던가 되지 않으니 수동으로 레이아웃을 해줘야? 한다고 함a
             -->
         <activity
-            android:name=".Intro.IntroActivity"
-            android:theme="@style/AppTheme.Intro">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
     </application>

@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.data.remote.EProtocol;
 import kr.jhha.engquiz.data.remote.EResultCode;
+import kr.jhha.engquiz.util.JsonHelper;
 import kr.jhha.engquiz.util.StringHelper;
-import kr.jhha.engquiz.util.exception.system.IllegalArgumentException;
+import kr.jhha.engquiz.util.exception.system.MyIllegalArgumentException;
 
 /**
  * Created by jhha on 2016-12-17.
@@ -20,7 +20,7 @@ public class QuizFolder
     private Integer state;
     private String title;
     private Integer uiOrder;
-    private Integer userId = -1;
+    private Integer userId;
     private List<Integer> scriptIds = new LinkedList<>();
 
     public static final int STATE_PLAYING = 0;
@@ -31,8 +31,17 @@ public class QuizFolder
     public static final String TEXT_NEW_FOLDER = "New Folder";
     public static final String TEXT_ADD_SCRIPT_INTO_QUIZFOLDER = "Add Script";
 
+    // field for serialize/unserialize
+    public static final String Field_USERID = "USERID";
+    public static final String Field_QUIZFOLDER_ID = "QUIZFOLDER_ID";
+    public static final String Field_UI_ORDER = "UI_ORDER";
+    public static final String Field_STATE = "STATE";
+    public static final String Field_TITLE = "TITLE";
+    public static final String Field_SCRIPT_ID_LIST = "SCRIPT_ID_LIST";
+
     public QuizFolder()
     {
+        userId = -1;
         quizFolderId = 0;
         state = -1;
         title = "";
@@ -54,27 +63,22 @@ public class QuizFolder
         return false;
     }
 
-    // QuizFolderInfo={id=0, userId=-1, uiOrder=-1, state=-1, title=, scriptIdsJson=, createdTime_UnixTimestamp=0, scriptIndexes=[], teminatedNEWState=true}, MSG=SUCCESS, UserID=7}
+    // QuizFolderInfo={sentenceId=0, userId=-1, uiOrder=-1, state=-1, title=, scriptIdsJson=, createdTime_UnixTimestamp=0, scriptIndexes=[], teminatedNEWState=true}, MSG=SUCCESS, UserID=7}
     public static boolean isNull( Map<String, Object> quizfolder ){
         if( quizfolder == null || quizfolder.isEmpty() )
             return true;
 
-        if( quizfolder.get("quizFolderId") instanceof Integer && (Integer)quizfolder.get("quizFolderId") != 0 ) return false;
-        if( quizfolder.get("userId") instanceof Integer && (Integer)quizfolder.get("userId") != -1 ) return false;
-        if( quizfolder.get("uiOrder") instanceof Integer && (Integer)quizfolder.get("uiOrder") != -1 ) return false;
-        if( quizfolder.get("state") instanceof Integer && (Integer)quizfolder.get("state") != -1 ) return false;
-        if( quizfolder.get("title") instanceof String ){
-            String title = (String)quizfolder.get("title");
+        if( quizfolder.get(Field_QUIZFOLDER_ID) instanceof Integer && (Integer)quizfolder.get(Field_QUIZFOLDER_ID) != 0 ) return false;
+        if( quizfolder.get(Field_USERID) instanceof Integer && (Integer)quizfolder.get(Field_USERID) != -1 ) return false;
+        if( quizfolder.get(Field_UI_ORDER) instanceof Integer && (Integer)quizfolder.get(Field_UI_ORDER) != -1 ) return false;
+        if( quizfolder.get(Field_STATE) instanceof Integer && (Integer)quizfolder.get(Field_STATE) != -1 ) return false;
+        if( quizfolder.get(Field_TITLE) instanceof String ){
+            String title = (String)quizfolder.get(Field_TITLE);
             if( title != null && !title.isEmpty() )
                 return false;
         }
-        if( quizfolder.get("scriptIdsJson") instanceof String ){
-            String scriptIdsJson = (String)quizfolder.get("scriptIdsJson");
-            if( scriptIdsJson != null && !scriptIdsJson.isEmpty() )
-                return false;
-        }
-        if( quizfolder.get("scriptIndexes") instanceof List ){
-            List scriptIds = (List)quizfolder.get("scriptIndexes");
+        if( quizfolder.get(Field_SCRIPT_ID_LIST) instanceof List ){
+            List scriptIds = (List)quizfolder.get(Field_SCRIPT_ID_LIST);
             if( scriptIds != null && !scriptIds.isEmpty() )
                 return false;
         }
@@ -136,7 +140,7 @@ public class QuizFolder
 
     public void setScriptIds(List<Integer> scriptIds) {
         if( scriptIds == null ){
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "setScriptIds() ids is null." );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "setScriptIds() ids is null." );
         }
         this.scriptIds = scriptIds;
     }
@@ -145,7 +149,7 @@ public class QuizFolder
         if( quizFolderID instanceof Integer ) {
             return checkQuizFolderID( (Integer)quizFolderID );
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "QuizFolderId Type is not Integer. id:"+quizFolderID );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "QuizFolderId Type is not Integer. sentenceId:"+quizFolderID );
         }
     }
 
@@ -153,7 +157,7 @@ public class QuizFolder
         if( newState instanceof Integer ) {
             return checkState( (Integer)newState );
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "newState Type is not Integer. state:"+newState );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "newState Type is not Integer. state:"+newState );
         }
     }
 
@@ -161,7 +165,7 @@ public class QuizFolder
         if( title instanceof String ) {
             return checkTitle( (String)title );
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "title Type is not String. title:"+title );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "title Type is not String. title:"+title );
         }
     }
 
@@ -169,7 +173,7 @@ public class QuizFolder
         if( uiOrder instanceof Integer ) {
             return checkUiOrder( (Integer)uiOrder );
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "uiOrder Type is not Integer. id:"+uiOrder );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "uiOrder Type is not Integer. sentenceId:"+uiOrder );
         }
     }
 
@@ -177,7 +181,7 @@ public class QuizFolder
         if( userId instanceof Integer ) {
             return checkUserId((Integer)userId);
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "UserId Type is not Integer. id:"+userId );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "UserId Type is not Integer. sentenceId:"+userId );
         }
     }
 
@@ -185,37 +189,37 @@ public class QuizFolder
         if( scriptIds instanceof List ) {
             for( Object id: (List)scriptIds){
                 if( false == (id instanceof Integer) )
-                    throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptId Type is not Integer. id:"+id );
+                    throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptId Type is not Integer. sentenceId:"+id );
             }
             return checkScriptIds((List)scriptIds);
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptIds Type is not List. id:"+scriptIds );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptIds Type is not List. sentenceId:"+scriptIds );
         }
     }
 
     public static Integer checkQuizFolderID( Integer quizFolderID ) {
         if( quizFolderID <= 0 )
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid QuizFolderId:"+quizFolderID);
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid QuizFolderId:"+quizFolderID);
         return quizFolderID;
     }
 
     public Integer checkState( Integer newState ){
         if( newState < STATE_PLAYING || newState > STATE_NEWBUTTON ) {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid newState:"+newState);
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid newState:"+newState);
         }
         return newState;
     }
 
     public String checkTitle( String title ){
         if(StringHelper.isNullString(title)) {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "null title:"+title);
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "null title:"+title);
         }
         return title;
     }
 
     public Integer checkUiOrder( Integer uiOrder ){
         if( uiOrder <= 0 ){
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid uiOrder:"+uiOrder);
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid uiOrder:"+uiOrder);
         }
         return uiOrder;
     }
@@ -226,17 +230,19 @@ public class QuizFolder
 
     public List<Integer> checkScriptIds( List scriptIds ){
         if( scriptIds == null  ){
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid scriptIds:"+scriptIds);
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "invalid scriptIds:"+scriptIds);
         }
         return scriptIds;
     }
 
-    public void deserialize( Map<String, Object> m ){
-        quizFolderId = checkQuizFolderID( m.get(EProtocol.QuizFolderId.toString()) );
-        state = checkState( m.get(EProtocol.QuizFolderState.toString()) );
-        title = checkTitle( m.get(EProtocol.QuizFolderTitle.toString()) );
-        uiOrder = checkUiOrder( m.get(EProtocol.QuizFolderUIOrder.toString()) );
-        userId = checkUserId( m.get(EProtocol.UserID.toString()) );
+    public void deserialize( String quizFolderJsonString ){
+
+        Map<String, Object> m = JsonHelper.json2map(quizFolderJsonString);
+        quizFolderId = checkQuizFolderID( m.get(Field_QUIZFOLDER_ID) );
+        state = checkState( m.get(Field_STATE) );
+        title = checkTitle( m.get(Field_TITLE) );
+        uiOrder = checkUiOrder( m.get(Field_UI_ORDER) );
+        userId = checkUserId( m.get(Field_USERID) );
         // scriptId 리스트는 별도로 받아오기 때문에, 지금은 셋팅 안함
         // 이때는 서버가 empty list로 보냄.
         //scriptIds = checkScriptIds( m.get(EProtocol.ScriptIds.toString()) );

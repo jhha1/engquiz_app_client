@@ -10,7 +10,7 @@ import java.util.List;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
 import kr.jhha.engquiz.data.local.Script;
 import kr.jhha.engquiz.data.local.ScriptRepository;
-import kr.jhha.engquiz.data.local.UserModel;
+import kr.jhha.engquiz.data.local.UserRepository;
 import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.util.FileHelper;
@@ -140,9 +140,11 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
                 // 모든 로직이 성공하여 mQuizFolderModel에 퀴즈폴더리스트가 저장되어있다.
                 // mQuizFolderModel에서 필요한 데이터를 가져다 쓴다.
                 List<String> quizFolderList = mQuizFolderModel.getQuizFolderNames();
-                // 리스트마지막에 'New..'추가.
-                quizFolderList.add(quizFolderList.size(), QuizFolder.TEXT_NEW_FOLDER);
-                mView.showQuizFolderSelectDialog( quizFolderList );
+                if( quizFolderList == null || quizFolderList.isEmpty() ){
+                    mView.showNeedMakeQuizFolderDialog();
+                } else {
+                    mView.showQuizFolderSelectDialog( quizFolderList );
+                }
             }
 
             @Override
@@ -183,7 +185,7 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
     public void addScript( String pdfFileName) {
         String msgForLog = "pdfFilePath:"+ mCurrentDirectoryPath + ", pdfFileName:"+pdfFileName;
         mView.showLoadingDialog();
-        Integer userId = UserModel.getInstance().getUserID();
+        Integer userId = UserRepository.getInstance().getUserID();
         mModel.addScript( userId,
                 mCurrentDirectoryPath,
                 pdfFileName,
@@ -229,8 +231,8 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
     private void addQuizFolder( String quizFolderName, String scriptName ) {
         Log.i("AppContent", "AddScriptPresenter addScriptIntoQuizFolder() called");
-        Integer userId = UserModel.getInstance().getUserID();
-        Integer scriptId = mModel.getParsedScriptIdAsTitle(scriptName);
+        Integer userId = UserRepository.getInstance().getUserID();
+        Integer scriptId = mModel.getScriptIdByTitle(scriptName);
         List<Integer> scriptIds = new LinkedList<>();
         scriptIds.add(scriptId);
         mQuizFolderModel.addQuizFolder( userId, quizFolderName, scriptIds, onAddQuizFolder(quizFolderName) );
@@ -250,8 +252,8 @@ public class AddScriptPresenter implements AddScriptContract.ActionsListener {
 
     private void addQuizFolderDetail( Integer quizFolderId, String scriptName ) {
         Log.i("AppContent", "AddScriptPresenter addQuizFolderDetail() called");
-        Integer userId = UserModel.getInstance().getUserID();
-        Integer scriptId = mModel.getParsedScriptIdAsTitle(scriptName);
+        Integer userId = UserRepository.getInstance().getUserID();
+        Integer scriptId = mModel.getScriptIdByTitle(scriptName);
         mQuizFolderModel.addQuizFolderDetail( quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
     }
 

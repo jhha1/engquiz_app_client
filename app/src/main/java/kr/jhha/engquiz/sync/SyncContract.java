@@ -7,10 +7,14 @@ package kr.jhha.engquiz.sync;
 public class SyncContract {
 
     interface View {
-        void onDrawSyncNeededImg();
+        void onSuccessSync();
+        void onFailedSync(String msg);
+
+        void showView(String msg);
     }
 
     interface UserActionsListener {
+        void initView();
         void sync();
     }
 }

@@ -11,17 +11,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
+import kr.jhha.engquiz.Intro.IntroFragment;
+import kr.jhha.engquiz.addsentence.AddSentenceFragment;
 import kr.jhha.engquiz.quizfolder.AddQuizFolderFragment;
 import kr.jhha.engquiz.quizfolder.ShowQuizFoldersFragment;
 import kr.jhha.engquiz.addscript.AddScriptFragment;
-import kr.jhha.engquiz.quizfolder.detail.AddQuizFolderDetailFragment;
-import kr.jhha.engquiz.quizfolder.detail.ShowQuizFolderDetailFragment;
+import kr.jhha.engquiz.quizfolder.scripts.AddQuizFolderScriptFragment;
+import kr.jhha.engquiz.quizfolder.scripts.ShowQuizFolderScriptsFragment;
+import kr.jhha.engquiz.quizfolder.scripts.sentences.ShowSentenceFragment;
 import kr.jhha.engquiz.quizplay.QuizPlayFragment;
+import kr.jhha.engquiz.report.ReportFragment;
 import kr.jhha.engquiz.sync.SyncFragment;
-import kr.jhha.engquiz.user.LoginFragment;
-import kr.jhha.engquiz.user.SignInFragment;
 import kr.jhha.engquiz.util.click.BackPressedCloseHandler;
 import kr.jhha.engquiz.util.click.ClickDetector;
 
@@ -34,21 +39,31 @@ public class MainActivity extends AppCompatActivity
     // 앱 종료 핸들러 (백 버튼 2번 누르면 종료)
     private ClickDetector mBackPressedCloseHandler;
 
+    private IntroFragment mIntroFragment;
     private QuizPlayFragment mPlayQuizFragment;
-
     private SyncFragment mSyncFragment;
-    private Fragment mAddScriptFragment;
-
+    private AddScriptFragment mAddScriptFragment;
+    private AddSentenceFragment mAddSentenceFragment;
     private ShowQuizFoldersFragment mQuizFoldersFragment;
-    private ShowQuizFolderDetailFragment mQuizFolderDetailFragment;
-    private AddQuizFolderDetailFragment mAddQuizFolderDetailFragment;
-    private Fragment mMakeCustomQuizFragment;
+    private ShowQuizFolderScriptsFragment mQuizFolderScriptListFragment;
+    private AddQuizFolderScriptFragment mQuizFolderAddScriptFragment;
+    private Fragment mAddQuizFolderFragment;
+    private ReportFragment mReportFragment;
 
-    private SignInFragment mSignInFragment;
-    private LoginFragment mLoginFragment;
+    private ShowSentenceFragment mShowSentenceFragment;
 
-    public static enum EFRAGMENT {NONE, PLAYQUIZ, QUIZQROUP_NEW,
-        QUIZFOLDER_DETAIL_SHOW, QUIZFOLDER_DETAIL_NEW, SYNC, ADD_SCRIPT, UPDATE, SIGNIN, LOGIN};
+    public enum EFRAGMENT {
+        NONE,
+        PLAYQUIZ,
+        ADD_SCRIPT,
+        ADD_SENTENCE,
+        QUIZFOLDER_NEW,
+        QUIZFOLDER_SCRIPT_LIST_SHOW,
+        QUIZFOLDER_SCRIPT_ADD,
+        QUIZFOLDER_SENTENCE_LIST_SHOW,
+        SYNC,
+        Report
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +94,13 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // TODO
+        boolean bAdmin = true;
+        if( ! bAdmin ) {
+            Menu nav_Menu = navigationView.getMenu();
+            nav_Menu.findItem(R.id.nav_report).setVisible(false);
+        }
     }
 
     // 앱 종료 핸들러
@@ -88,27 +110,26 @@ public class MainActivity extends AppCompatActivity
 
     // 프래그먼트 초기화
     private void initFragments() {
+        mIntroFragment = new IntroFragment();
         mPlayQuizFragment = new QuizPlayFragment();
         mQuizFoldersFragment = new ShowQuizFoldersFragment();
-        mQuizFolderDetailFragment = new ShowQuizFolderDetailFragment();
-        mAddQuizFolderDetailFragment = new AddQuizFolderDetailFragment();
-        mMakeCustomQuizFragment = new AddQuizFolderFragment();
+        mQuizFolderScriptListFragment = new ShowQuizFolderScriptsFragment();
+        mQuizFolderAddScriptFragment = new AddQuizFolderScriptFragment();
+        mAddQuizFolderFragment = new AddQuizFolderFragment();
         mAddScriptFragment = new AddScriptFragment();
+        mAddSentenceFragment = new AddSentenceFragment();
         mSyncFragment = new SyncFragment();
-        mSignInFragment = new SignInFragment();
-        mLoginFragment = new LoginFragment();
+
+        mShowSentenceFragment = new ShowSentenceFragment();
+        mReportFragment = new ReportFragment();
     }
 
     // 첫 화면 셋팅
     private void initFirstView() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.addToBackStack(null);
-        transaction.add(R.id.container, mLoginFragment);
+        transaction.add(R.id.container, mIntroFragment);
         transaction.commit();
-    }
-
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
     }
 
     @Override
@@ -122,28 +143,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        Action Bar
+     */
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int quizFolderId = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (quizFolderId == R.quizFolderId.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -155,12 +159,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_play_quiz) {
             transaction.replace(R.id.container, mPlayQuizFragment);
+        } else if(id == R.id.nav_add_script){
+            transaction.replace(R.id.container, mAddScriptFragment);
+        } else if(id == R.id.nav_add_sentence){
+            transaction.replace(R.id.container, mAddSentenceFragment);
         } else if (id == R.id.nav_quiz_folders) {
             transaction.replace(R.id.container, mQuizFoldersFragment);
         } else if (id == R.id.nav_sync) {
             transaction.replace(R.id.container, mSyncFragment);
-        } else if(id == R.id.nav_add_script){
-            transaction.replace(R.id.container, mAddScriptFragment);
+        } else if(id == R.id.nav_report){
+            transaction.replace(R.id.container,mReportFragment);
         }
 
         //transaction.addToBackStack(null);
@@ -176,20 +184,19 @@ public class MainActivity extends AppCompatActivity
         switch ( eFragment ){
             case PLAYQUIZ:
                 fragment = mPlayQuizFragment; break;
-            case QUIZQROUP_NEW:
-                fragment = mMakeCustomQuizFragment; break;
-            case QUIZFOLDER_DETAIL_SHOW:
-                fragment = mQuizFolderDetailFragment; break;
-            case QUIZFOLDER_DETAIL_NEW:
-                fragment = mAddQuizFolderDetailFragment; break;
+            case QUIZFOLDER_NEW:
+                fragment = mAddQuizFolderFragment; break;
+            case QUIZFOLDER_SCRIPT_LIST_SHOW:
+                fragment = mQuizFolderScriptListFragment; break;
+            case QUIZFOLDER_SCRIPT_ADD:
+                fragment = mQuizFolderAddScriptFragment; break;
+            case QUIZFOLDER_SENTENCE_LIST_SHOW:
+                fragment = mShowSentenceFragment; break;
             case SYNC:
                 fragment = mSyncFragment; break;
             case ADD_SCRIPT:
                 fragment = mAddScriptFragment; break;
-            case SIGNIN:
-                fragment = mSignInFragment; break;
-            case LOGIN:
-                fragment = mLoginFragment; break;
+
         }
         return fragment;
     }
@@ -200,22 +207,27 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (EFRAGMENT.PLAYQUIZ == fragment) {
             transaction.replace(R.id.container, mPlayQuizFragment);
-        } else if (EFRAGMENT.QUIZQROUP_NEW == fragment) {
+        } else if (EFRAGMENT.QUIZFOLDER_NEW == fragment) {
             transaction.addToBackStack(null);
-            transaction.replace(R.id.container, mMakeCustomQuizFragment);
-        } else if (EFRAGMENT.QUIZFOLDER_DETAIL_SHOW == fragment) {
+            transaction.replace(R.id.container, mAddQuizFolderFragment);
+        } else if (EFRAGMENT.QUIZFOLDER_SCRIPT_LIST_SHOW == fragment) {
             transaction.addToBackStack(null);
-            transaction.replace(R.id.container, mQuizFolderDetailFragment);
-        } else if (EFRAGMENT.QUIZFOLDER_DETAIL_NEW == fragment) {
+            transaction.replace(R.id.container, mQuizFolderScriptListFragment);
+        } else if (EFRAGMENT.QUIZFOLDER_SENTENCE_LIST_SHOW == fragment) {
             transaction.addToBackStack(null);
-            transaction.replace(R.id.container, mAddQuizFolderDetailFragment);
-        } else if (EFRAGMENT.SIGNIN == fragment) {
-            transaction.replace(R.id.container, mSignInFragment);
-        } else if (EFRAGMENT.LOGIN == fragment) {
-            transaction.replace(R.id.container, mLoginFragment);
+            transaction.replace(R.id.container, mShowSentenceFragment);
+        } else if (EFRAGMENT.QUIZFOLDER_SCRIPT_ADD == fragment) {
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.container, mQuizFolderAddScriptFragment);
         }
 
         transaction.commit();
+    }
+
+    public void finishApp(){
+        moveTaskToBack(true);
+        finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }
 

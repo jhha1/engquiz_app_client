@@ -2,14 +2,11 @@ package kr.jhha.engquiz.util;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.data.local.Script;
 import kr.jhha.engquiz.data.local.Sentence;
 
 /**
@@ -20,10 +17,11 @@ public class Parsor
 {
 
     public static final String MainSeperator = "@@@";
+    public static final String TabSeperator = "\t";
     public static final String VeticalSeperator = "||";
     public static final String EqualSeperator = "=";
 
-    public static List<Sentence> parse(String textFile)
+    public static List<Sentence> parse(Integer scriptId, String textFile)
     {
         if(isNull(textFile)) {
             Log.e("Parsor", "textFile is null");
@@ -50,15 +48,17 @@ public class Parsor
                 continue;
             }
 
-            String[] dividedRow = row.split("\t");
-            if(dividedRow.length != 2) {
+            String[] dividedRow = row.split(TabSeperator);
+            if(dividedRow.length != 3) {
                 Log.w("Parsor", "split 'TAP' row count is :" + dividedRow.length);
                 continue;
             }
 
             Sentence unit = new Sentence();
-            unit.textKo = dividedRow[0].trim();
-            unit.textEn = dividedRow[1].trim();
+            unit.scriptId = scriptId;
+            unit.sentenceId = Integer.parseInt(dividedRow[0].trim());
+            unit.textKo = dividedRow[1].trim();
+            unit.textEn = dividedRow[2].trim();
             sentences.add(unit);
         }
         Log.d("Parsor", "Sentences COUNT ("+ sentences.size() +")");

@@ -6,36 +6,47 @@ import java.util.Map;
 
 public enum EProtocol {
 
-	// required 
+	// Required
 	JSON ("JSON"),
-	
 	PID ("pid"),	// string
-	iPID ("iPID"),  // integer 
-	UserID("UserID"),
-	UserKey("UserKey"),
-	
-	// required in response
+	iPID ("iPID"),  // integer
+	// Response Only
 	CODE("code"),
 	MSG("msg"),
 
-	// others
+	// user
+	UserID ("UserID"),
+	UserName("UserName"),
+	IsExistedUser("IsExistedUser"),
+
+	// Script
+	ScriptId("ScriptId"),
+	ScriptIds("ScriptIds"),
 	ScriptTitle("title"),
-	ScriptId("scriptId"),
-	ScriptRevision("revision"),
 	ScriptSentences("sentences"),
 	ParsedSciprt("parsedScript"),
 	SciprtPDF("scriptPDF"),
+	SciprtDOCX("scriptDocx"),
 
-	MacID ("MacID"),
-	UserNickName("UserNickName"),
-	IsExistedUser("IsExistedUser"),
+	// Sentence
+	SentenceId("SentenceId"),
+	Revision("Revision"),
+	SentenceKo("SenteceKo"),
+	SentenceEn("SenteceEn"),
+
+	// QuizFolder
 	QuizFolderId("QuizFolderId"),
 	QuizFolderState("QuizFolderState"),
 	QuizFolderTitle("QuizFolderTitle"),
 	QuizFolderUIOrder("QuizFolderUIOrder"),
 	QuizFolder("QuizFolder"),
 	QuizFolders("QuizFolders"),
-	ScriptIds("ScriptIds"),
+
+	// Sync
+	SyncResult("SyncResult"),
+
+	// Report
+	ReportList("ReportList"),
 
 	
 	// for test

@@ -2,11 +2,12 @@ package kr.jhha.engquiz.sync;
 
 import android.util.Log;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import kr.jhha.engquiz.data.local.SyncModel;
+import kr.jhha.engquiz.data.local.ScriptRepository;
+import kr.jhha.engquiz.data.local.Sentence;
 import kr.jhha.engquiz.data.remote.EResultCode;
-import kr.jhha.engquiz.data.local.UserModel;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -15,34 +16,78 @@ import kr.jhha.engquiz.data.local.UserModel;
 public class SyncPresenter implements SyncContract.UserActionsListener {
 
     private final SyncContract.View mView;
-    private SyncModel mModel;
+    private ScriptRepository mModel;
 
-    public SyncPresenter( SyncContract.View view, SyncModel model ) {
+    public SyncPresenter( SyncContract.View view, ScriptRepository model ) {
         mView = view;
         mModel = model;
     }
 
-    @Override
-    public void sync() {
-        Integer userId = UserModel.getInstance().getUserID();
-        mModel.sync( userId, onSyncCallback(userId) );
+    public void initView(){
+        Integer count = mModel.getSyncNeededCount();
+        if( count > 0 ){
+            float sizeMB = (float)count * 0.01f;
+            String msg = "총 " + sizeMB + "MB의 데이터를 다운로드 합니다."
+                        +"\n Wifi 접속이 아닐경우 데이터 요금이 부과됩니다."
+                        + " \n계속하시겠습니까?";
+            mView.showView(msg);
+        } else {
+            String msg = "모든 스크립트가 최신입니다.";
+            mView.showView(msg);
+        }
     }
 
-    private SyncModel.SyncCallback onSyncCallback(final Integer userId ) {
-        return new SyncModel.SyncCallback(){
+    @Override
+    public void sync() {
+        mModel.getSentencesForSync( onSyncCallback() );
+    }
+
+    private ScriptRepository.SyncCallback onSyncCallback() {
+        return new ScriptRepository.SyncCallback(){
 
             @Override
-            public void onSuccess( Integer userId, List sentencesForSync ) {
-                Log.i("AppContent", "onSuccess()  userId: " + userId + ", sentencesForSync:" + sentencesForSync.toString());
+            public void onSuccess( List<Sentence> sentencesForSync ) {
+                Log.i("AppContent", "getSentencesForSync().onSuccess() sentencesForSyncCount:" + sentencesForSync.size());
 
+                List<Integer> updateFailedResult = mModel.syncClient(sentencesForSync);
+                if(false == updateFailedResult.isEmpty()){
+                    sendSyncFailed(updateFailedResult);
+                    String msg = "동기화에 실패 했습니다. \n 앱 재시작 후 다시 시도해주시기 바랍니다.";
+                    mView.showView(msg);
+                } else {
+                    mView.onSuccessSync();
+                }
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
-                Log.e("AppContent", "onFail() UnkownERROR. resultCode: " + resultCode);
-                // TODO 실패 메세지
+                Log.e("AppContent", "sync().onFail() UnkownERROR. resultCode: " + resultCode);
+                String msg = "동기화에 실패 했습니다. \n 앱 재시작 후 다시 시도해주시기 바랍니다.";
+                mView.showView(msg);
             }
         };
     }
 
+    private void sendSyncFailed(  List<Integer> updateFailedResult ) {
+        mModel.sendSyncFailed(updateFailedResult, onSyncFailedCallback());
+    }
+
+    private ScriptRepository.SyncFailedCallback onSyncFailedCallback() {
+        return new ScriptRepository.SyncFailedCallback(){
+
+            @Override
+            public void onSuccess() {
+                Log.i("AppContent", "onSyncFailedCallback().onSuccess() ");
+                String msg = "일부 동기화에 실패 했습니다. \n 앱 재시작 후 다시 동기화 받으실 수 있습니다.";
+                mView.onFailedSync(msg);
+            }
+
+            @Override
+            public void onFail(EResultCode resultCode) {
+                Log.e("AppContent", "onSyncFailedCallback().onFail() resultCode: " + resultCode);
+                String msg = "일부 동기화에 실패 했습니다.";
+                mView.onFailedSync(msg);
+            }
+        };
+    }
 }

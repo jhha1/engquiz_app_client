@@ -87,12 +87,12 @@ public class AddQuizFolderFragment extends Fragment implements  AddQuizFolderCon
         View view = inflater.inflate(R.layout.content_quizfolder_add, container, false);
 
         // 1. 플레이리스트 제목 입력창
-        //mInputTitleQuizFolder = (EditText) view.findViewById (R.id.add_quizfolder_subject);
+        //mInputTitleQuizFolder = (EditText) view.findViewById (R.sentenceId.add_quizfolder_subject);
         // 포커스를 제목입력창으로 이동
        // mInputTitleQuizFolder.requestFocus();
 
         // 2. 플레이리스트 추가완료 버튼: 클릭 이벤트 핸들러 정의
-       //mButtonConfirmTitle = (Button) view.findViewById(R.id.add_quizfolder_set_title_btn);
+       //mButtonConfirmTitle = (Button) view.findViewById(R.sentenceId.add_quizfolder_set_title_btn);
        // mButtonConfirmTitle.setOnClickListener(mClickListener);
         view.findViewById(R.id.add_quizfolder_complate_btn).setOnClickListener(mClickListener);
 

@@ -6,8 +6,8 @@ import java.util.List;
 
 import kr.jhha.engquiz.data.local.QuizFolder;
 import kr.jhha.engquiz.data.local.QuizFolderRepository;
-import kr.jhha.engquiz.data.local.QuizPlayModel;
-import kr.jhha.engquiz.data.local.UserModel;
+import kr.jhha.engquiz.data.local.QuizPlayRepository;
+import kr.jhha.engquiz.data.local.UserRepository;
 import kr.jhha.engquiz.data.remote.EResultCode;
 
 import static kr.jhha.engquiz.data.local.QuizFolder.STATE_NEWBUTTON;
@@ -27,7 +27,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
     }
 
     public void getQuizFolderList() {
-        Log.i("AppContent", "ShowQuizFoldersPresenter getQuizFolders() called");
+        Log.i("AppContent", "ReportPresenter getQuizFolders() called");
         mQuizFolderModel.getQuizFolders( onGetQuizFolderList() );
     }
 
@@ -49,7 +49,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
     @Override
     public void listViewItemClicked(QuizFolder quizFolder) {
         String title = quizFolder.getTitle();
-        Log.d("%%%%%%%%%%%%%%%", "ShowQuizFoldersFragment.listViewItemClicked. title:" + title);
+        Log.d("%%%%%%%%%%%%%%%", "ReportFragment.listViewItemClicked. title:" + title);
 
         if( QuizFolder.TEXT_NEW_FOLDER.equals(title) ) {
             // 새 커스텀 퀴즈 리스트 만들기 화면 전환
@@ -69,7 +69,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
     @Override
     // 이 퀴즈폴더를 게임 플레이용으로 설정
     public void changePlayingQuizFolder(QuizFolder item) {
-        Log.i("AppContent", "ShowQuizFoldersPresenter changePlayingQuizFolder() called. item:"+((item!=null)?item.toString():null));
+        Log.i("AppContent", "ReportPresenter changePlayingQuizFolder() called. item:"+((item!=null)?item.toString():null));
         if( QuizFolder.isNull(item)){
             mView.onFailChangePlayingQuizFolder(1);
             return;
@@ -81,7 +81,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
         }
 
         // 1.퀴즈폴더를 플레이용으로 변경위해서는,
-        //  퀴즈폴더 내 script id 들이 필요하다.
+        //  퀴즈폴더 내 script sentenceId 들이 필요하다.
         // 2. script id들은 퀴즈폴더 상세보기를 클릭했을때 load 되도록 설계되어있다.
         // 만약, 유저가 퀴즈폴더 상세보기를 안하고 플레이용으로 변경시도한다면 1,2의 조건에 위배.
         // 이 부분 커버위해, script Id가 없으면 load.
@@ -90,16 +90,22 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
         if( bQuizFolderDetailNotLoaded ){
             loadQuizFolderScriptIdsAndChangePlayingQuizFolder(item);
         } else {
-            final QuizPlayModel quizPlayModel = QuizPlayModel.getInstance();
-            quizPlayModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
+            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
         }
     }
 
-    private QuizPlayModel.ChangePlayingQuizFolderCallback onChangePlayingQuizFolder() {
-        return new QuizPlayModel.ChangePlayingQuizFolderCallback(){
+    private QuizFolderRepository.ChangePlayingQuizFolderCallback onChangePlayingQuizFolder() {
+        return new QuizFolderRepository.ChangePlayingQuizFolderCallback(){
 
             @Override
-            public void onSuccess() {
+            public void onSuccess(QuizFolder playingQuizFolder) {
+                // change folder of Memory
+                final QuizPlayRepository quizPlayRepo = QuizPlayRepository.getInstance();
+                EResultCode code = quizPlayRepo.changePlayingQuizFolder( playingQuizFolder, playingQuizFolder.getScriptIds() );
+                if(code != EResultCode.SUCCESS){
+                    mView.onFailChangePlayingQuizFolder(1);
+                    return;
+                }
                 mView.onSucessChangePlayingQuizFolder();
             }
 
@@ -120,15 +126,14 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
 
     private void loadQuizFolderScriptIdsAndChangePlayingQuizFolder(final QuizFolder item )
     {
-        final Integer userId = UserModel.getInstance().getUserID();
-        mQuizFolderModel.getQuizFolderDetail(
+        final Integer userId = UserRepository.getInstance().getUserID();
+        mQuizFolderModel.getQuizFolderScriptList(
                 userId,
                 item.getId(),
-                new QuizFolderRepository.GetQuizFolderDetailCallback() {
+                new QuizFolderRepository.GetQuizFolderScriptListCallback() {
                         @Override
                         public void onSuccess(List<Integer> quizFolderScripts) {
-                            final QuizPlayModel quizPlayModel = QuizPlayModel.getInstance();
-                            quizPlayModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
+                            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
                         }
 
                         @Override
@@ -140,7 +145,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
 
     @Override
     public void delQuizFolder( QuizFolder item ){
-        Log.i("AppContent", "ShowQuizFoldersPresenter delQuizFolderScript() called");
+        Log.i("AppContent", "ReportPresenter delQuizFolderScript() called");
 
         if( item == null ) {
             String msg = "삭제할 퀴즈폴더가 없습니다";
@@ -148,7 +153,7 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
             return;
         }
 
-        Integer userId = UserModel.getInstance().getUserID();
+        Integer userId = UserRepository.getInstance().getUserID();
         Integer quizFolderId = item.getId();
         mQuizFolderModel.delQuizFolder( userId, quizFolderId, onDelQuizFolder() );
     }
@@ -164,6 +169,14 @@ public class ShowQuizFoldersPresenter implements ShowQuizFoldersContract.Actions
             @Override
             public void onFail(EResultCode resultCode) {
                 String msg = "퀴즈폴더 삭제에 실패했습니다";
+                switch (resultCode){
+                    case QUIZFOLDER__NOALLOWED_DELETE_NEWBUTTON:
+                        msg = "퀴즈폴더 만들기 버튼은 삭제할 수 없습니다.";
+                        break;
+                    case quizFolder__NOALLOWED_DELETE_PLAYING:
+                        msg = "플레이중인 퀴즈폴더는 삭제할 수 없습니다. 다른 퀴즈폴더를 플레이용으로 지정한 후 삭제해주세요.";
+                        break;
+                }
                 mView.onFailDelQuizFolder(msg);
             }
         };

@@ -9,7 +9,8 @@
     android:paddingLeft="50dp"
     android:paddingRight="50dp"
     android:paddingTop="100dp"
-    tools:context="kr.jhha.engquiz.Intro.IntroActivity">
+    android:background="@color/colorGamePlayBackground"
+    tools:context="kr.jhha.engquiz.Intro.IntroFragment">
 
     <Button
         android:id="@+id/intro_game_play_btn"

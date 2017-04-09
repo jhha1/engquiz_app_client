@@ -2,7 +2,6 @@ package kr.jhha.engquiz.data.local;
 
 import android.util.Log;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
 import kr.jhha.engquiz.data.remote.EResultCode;
 import kr.jhha.engquiz.util.Parsor;
 import kr.jhha.engquiz.util.StringHelper;
-import kr.jhha.engquiz.util.exception.system.IllegalArgumentException;
+import kr.jhha.engquiz.util.exception.system.MyIllegalArgumentException;
 
 
 /**
@@ -23,9 +22,9 @@ public class Script
     public String title = "";
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
-    public static final String INDEX = "scriptId";
-    public static final String TITLE = "title";
-    public static final String SENTENCES = "sentences";
+    public final static String Field_SCRIPT_ID = "SCRIPT_ID";
+    public final static String Field_SCRIPT_TITLE = "SCRIPT_TITLE";
+    public final static String Field_SENTENCES = "SENTENCES";
 
     public Script() {}
     public Script( String filename, Integer index,
@@ -73,40 +72,7 @@ public class Script
         this.sentences = sentences;
     }
 
-    public Script( Map<String , Object> scriptMap )
-    {
-        try {
-            int index = (Integer) scriptMap.get(INDEX);
-            String title = (String) scriptMap.get(TITLE);
-            List<HashMap> sentencesMap = (List<HashMap>) scriptMap.get(SENTENCES);
 
-            if( index < 0 )
-                throw new Exception("invalid scriptId:"+index);
-            if( title == null || title.isEmpty() )
-                throw new Exception("invalid title:"+title);
-            if( sentencesMap == null || sentencesMap.size() == 0 )
-                throw new Exception("invalid sentencesMap:"+sentencesMap);
-
-            // parsing script list.  List<HashMap> -> List<Sentence>
-            //  : 서버에서 Sentence Object를 json string으로 변환시에, HashMap포맷으로 변환된다.
-            List<Sentence> parsedSentences = new LinkedList<Sentence>();
-            for( HashMap sentencePair : sentencesMap ) {
-                parsedSentences.add( new Sentence(sentencePair) );
-            }
-            if( parsedSentences == null || parsedSentences.size() == 0 )
-                throw new Exception("invalid parsedSentences:"+parsedSentences);
-
-            this.scriptId = index;
-            this.title = title;
-            this.sentences = parsedSentences;
-
-        } catch ( Exception e ) {
-            Log.e("AppContent", "ERROR invalid param. " +
-                    "map[" + scriptMap.toString() + "]");
-            e.printStackTrace();
-            return;
-        }
-    }
 
     public static boolean isNull( Script script ){
         if( script == null ){
@@ -126,7 +92,7 @@ public class Script
         if( scriptID instanceof Integer ) {
             return checkScriptID( (Integer)scriptID );
         } else {
-            throw new IllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptID Type is not Integer. id:"+scriptID );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "scriptID Type is not Integer. sentenceId:"+scriptID );
         }
     }
 
@@ -137,14 +103,14 @@ public class Script
         return true;
     }
 
-    public String makeFileSavedScriptName(){
+    public String makeScriptFileName() {
         StringBuffer filename = new StringBuffer();
         filename.append(this.scriptId + Parsor.MainSeperator);
         filename.append(this.title + ".txt");
         return filename.toString();
     }
 
-    public static String makeFileSavedScriptName(Integer scriptId, String scriptTitle){
+    public static String makeScriptFileName(Integer scriptId, String scriptTitle) {
         if( scriptId <= 0 || StringHelper.isNullString(scriptTitle)){
             return new String();
         }
@@ -155,21 +121,64 @@ public class Script
         return filename.toString();
     }
 
-    public String makeFileSavedScriptText() {
+    public String makeScriptFileText() {
         StringBuffer fileText = new StringBuffer();
         for(Sentence unit : sentences)
         {
-            fileText.append(unit.textKo + "\t" + unit.textEn + Parsor.MainSeperator);
+            fileText.append(unit.sentenceId + Parsor.TabSeperator);
+            fileText.append(unit.textKo + Parsor.TabSeperator);
+            fileText.append(unit.textEn + Parsor.MainSeperator);
         }
         return fileText.toString();
+    }
+
+
+    /*
+        Deserialize a AddScript Server Result
+     */
+    public static Script deserialize( Map<String , Object> map )
+    {
+        Script script = new Script();
+        try {
+            int id = (Integer) map.get(Field_SCRIPT_ID);
+            String title = (String) map.get(Field_SCRIPT_TITLE);
+            List<Map<String, Object>> sentencesMap = (List<Map<String, Object>>) map.get(Field_SENTENCES);
+
+            if( id < 0 )
+                throw new Exception("invalid scriptId:"+id);
+            if( title == null || title.isEmpty() )
+                throw new Exception("invalid title:"+title);
+            if( sentencesMap == null || sentencesMap.size() == 0 )
+                throw new Exception("invalid sentencesMap:"+sentencesMap);
+
+            // unserialize Sentence Objects
+            List<Sentence> unserializedSentences = new LinkedList<Sentence>();
+            for( Map<String, Object> sentence : sentencesMap ) {
+                Sentence unserializedSentence = Sentence.deserialize(sentence);
+                unserializedSentences.add( unserializedSentence );
+            }
+            if( unserializedSentences == null || unserializedSentences.size() == 0 )
+                throw new Exception("invalid parsedSentences:"+unserializedSentences);
+
+            script.scriptId = id;
+            script.title = title;
+            script.sentences = unserializedSentences;
+            return script;
+
+        } catch ( Exception e ) {
+            Log.e("AppContent", "ERROR invalid param. " +
+                    "map[" + script.toString() + "]");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // just for logging
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("{[scriptId: "+ scriptId +"], " +
-                    "[title: "+ title +"], " +
-                    "[sentence count("+ sentences.size() +").. ");
+                "[title: "+ title +"], " +
+                "[sentence count("+ sentences.size() +").. ");
         for(Object o : sentences) {
             Sentence s = (Sentence) o;
             buf.append("\n[" + s.toString() + "]");

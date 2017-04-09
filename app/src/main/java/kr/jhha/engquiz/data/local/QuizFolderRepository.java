@@ -35,7 +35,12 @@ public class QuizFolderRepository {
         void onFail(EResultCode resultCode);
     }
 
-    public interface GetQuizFolderDetailCallback {
+    public interface ChangePlayingQuizFolderCallback {
+        void onSuccess( QuizFolder playingQuizFolder );
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface GetQuizFolderScriptListCallback {
         void onSuccess( List<Integer> scriptIds );
         void onFail(EResultCode resultCode);
     }
@@ -127,7 +132,7 @@ public class QuizFolderRepository {
         }
 
         Request request = new Request( EProtocol2.PID.GetUserQuizFolders);
-        Integer userId = UserModel.getInstance().getUserID();
+        Integer userId = UserRepository.getInstance().getUserID();
         request.set(EProtocol.UserID, userId);
         AsyncNet net = new AsyncNet( request, onGetQuizFolders(callback) );
         net.execute();
@@ -138,7 +143,7 @@ public class QuizFolderRepository {
             @Override
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
-                    List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
+                    List<String> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onGetQuizFolders(): "+ quizFolders.toString());
                     // save quiz folders
                     List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
@@ -168,7 +173,7 @@ public class QuizFolderRepository {
             @Override
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
-                    List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
+                    List<String> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onAddQuizFolder(): "+ quizFolders.toString());
                     // save quiz folders
                     List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
@@ -195,7 +200,7 @@ public class QuizFolderRepository {
             @Override
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
-                    List<Map<String, Object>> quizFolders = (List)response.get(EProtocol.QuizFolders);
+                    List<String> quizFolders = (List)response.get(EProtocol.QuizFolders);
                     Log.e("AppContent", "onDelQuizFolder(): "+ quizFolders.toString());
                     // save summaries.
                     List<QuizFolder> deserializedQuizFolders = deserializeAndSaveMemoryQuizFolderAll( quizFolders );
@@ -209,13 +214,13 @@ public class QuizFolderRepository {
         };
     }
 
-    private List<QuizFolder> deserializeAndSaveMemoryQuizFolderAll( List<Map<String, Object>> quizFolders ){
+    private List<QuizFolder> deserializeAndSaveMemoryQuizFolderAll( List<String> quizFolders ){
 
         List<QuizFolder> deserializedQuizFolders = new ArrayList<>();
 
-        for( Map<String, Object> quizFolder : quizFolders ) {
+        for( String quizFolderString : quizFolders ) {
             QuizFolder obj = new QuizFolder();
-            obj.deserialize(quizFolder);
+            obj.deserialize(quizFolderString);
             deserializedQuizFolders.add(obj);
         }
 
@@ -232,6 +237,46 @@ public class QuizFolderRepository {
         // 2. No save into file.
         //     -> download summaries from a server when a quizfolder menu first clicked.
     }
+
+    /*
+        서버 데이터 변경 성공시, 클라 데이터 변경
+        클라 데이터 변경 실패시, 앱 재접속 유도해서
+        서버로부터 받은 플레잉퀴즈폴더 데이터로 다시 셋팅하게 함
+     */
+    public void changePlayingQuizFolder( QuizFolder quizfolder,
+                                         final ChangePlayingQuizFolderCallback callback )
+    {
+        Log.i("AppContent", "QuizPlayRepository changePlayingQuizFolder() called.");
+
+        // change folder of Server
+        final Integer userId = UserRepository.getInstance().getUserID();
+        Request request = new Request( EProtocol2.PID.ChangePlayingQuizFolder );
+        request.set(EProtocol.UserID, userId);
+        request.set(EProtocol.QuizFolderId, quizfolder.getId());
+        AsyncNet net = new AsyncNet( request, onChangePlayingQuizFolder(quizfolder, callback) );
+        net.execute();
+    }
+
+    private AsyncNet.Callback onChangePlayingQuizFolder(final QuizFolder newQuizFolder,
+                                                        final ChangePlayingQuizFolderCallback callback ) {
+        return new AsyncNet.Callback() {
+            @Override
+            public void onResponse(Response response) {
+                if (response.isSuccess()) {
+
+                    List<String> quizFolders = (List)response.get(EProtocol.QuizFolders);
+                    Log.e("AppContent", "onChangePlayingQuizFolder(): "+ quizFolders.toString());
+                    deserializeAndSaveMemoryQuizFolderAll( quizFolders );
+                    callback.onSuccess( newQuizFolder );
+                } else {
+                    // 서버 응답 에러
+                    Log.e("AppContent", "onGetQuizFolders() UnkownERROR : "+ response.getResultCodeString());
+                    callback.onFail( response.getResultCode() );
+                }
+            }
+        };
+    }
+
 
     /*
        서버에서 UI순서 소팅된 scriptId list를
@@ -253,7 +298,7 @@ public class QuizFolderRepository {
             return new String();
         }
 
-        return ScriptRepository.getInstance().getParsedScriptTitleAsId(scriptId);
+        return ScriptRepository.getInstance().getScriptTitleById(scriptId);
     }
 
     public List<Integer> getQuizFolderScriptIDs(Integer quizFolderId ) {
@@ -266,7 +311,8 @@ public class QuizFolderRepository {
         return quizFolder.getScriptIds();
     }
 
-    public void getQuizFolderDetail(Integer userId, Integer quizFolderId, final QuizFolderRepository.GetQuizFolderDetailCallback callback ) {
+    public void getQuizFolderScriptList(Integer userId, Integer quizFolderId, final GetQuizFolderScriptListCallback callback ) {
+        // TODO script Id + title 같이 넘기자.
         List<Integer> scrpitIds = getQuizFolderScriptIDs(quizFolderId);
         if( scrpitIds != null && ! scrpitIds.isEmpty() ){
             callback.onSuccess(scrpitIds);
@@ -276,18 +322,18 @@ public class QuizFolderRepository {
         Request request = new Request( EProtocol2.PID.GetUserQuizFolderDetail);
         request.set(EProtocol.UserID, userId);
         request.set(EProtocol.QuizFolderId, quizFolderId);
-        AsyncNet net = new AsyncNet( request, onGetQuizFolderDetail(callback) );
+        AsyncNet net = new AsyncNet( request, onGetQuizFolderScriptList(callback) );
         net.execute();
     }
 
-    private AsyncNet.Callback onGetQuizFolderDetail(final QuizFolderRepository.GetQuizFolderDetailCallback callback ) {
+    private AsyncNet.Callback onGetQuizFolderScriptList(final GetQuizFolderScriptListCallback callback ) {
         return new AsyncNet.Callback() {
             @Override
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
                     final Integer quizFolderId = (Integer)response.get(EProtocol.QuizFolderId);
                     final List<Integer> quizFolderScriptIds = (List)response.get(EProtocol.ScriptIds);
-                    Log.e("AppContent", "onGetQuizFolderDetail(): "+ quizFolderScriptIds.toString());
+                    Log.e("AppContent", "onGetQuizFolderScriptList(): "+ quizFolderScriptIds.toString());
                     // save quiz folders
                     overwriteQuizFolderScriptIdList( quizFolderId, quizFolderScriptIds );
                     callback.onSuccess(quizFolderScriptIds);
@@ -303,7 +349,7 @@ public class QuizFolderRepository {
 
     public void addQuizFolderDetail( Integer quizFolderId, Integer scriptId, final AddQuizFolderScriptCallback callback ){
         Request request = new Request( EProtocol2.PID.AddUserQuizFolderDetail );
-        Integer userId = UserModel.getInstance().getUserID();
+        Integer userId = UserRepository.getInstance().getUserID();
         request.set(EProtocol.UserID, userId);
         request.set(EProtocol.QuizFolderId, quizFolderId);
         request.set(EProtocol.ScriptId, scriptId);

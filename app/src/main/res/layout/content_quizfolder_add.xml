@@ -23,7 +23,7 @@
               # maxLength: 최대 입력가능 글자수
 
             <EditText
-                android:id="@+id/add_quizfolder_subject"
+                android:sentenceId="@+sentenceId/add_quizfolder_subject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="제목을 입력해주세요"
@@ -37,7 +37,7 @@
 
 
             <Button
-                android:id="@+id/add_quizfolder_set_title_btn"
+                android:sentenceId="@+sentenceId/add_quizfolder_set_title_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="OK"
