@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.jhha.engquiz.util.FileHelper;
-import kr.jhha.engquiz.data.local.ScriptRepository;
+import kr.jhha.engquiz.model.local.ScriptRepository;
 
 /**
  * Created by thyone on 2016-12-29.

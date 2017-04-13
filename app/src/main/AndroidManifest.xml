@@ -8,15 +8,20 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <!--
-        windowSoftInputMode="adjustPan  :
-            #키보드창이 올라올때, 레이아웃이 변화된 화면에 맞게 재조정되는것 방지.
-            # edittext에 입력시, 키보드가 올라오면서 화면이 위로 밀려서 edittext가 밀려올라가 없어져
-             타자내용이 안보여서 선택.
-            # 대신, 자동으로 포커스라던가 되지 않으니 수동으로 레이아웃을 해줘야? 한다고 함a
+        필드 설명
+        1. android:screenOrientation="portrait"
+               : 화면을 portrait(세로) 화면으로 고정하고 싶은 경우
+
+        2. windowSoftInputMode="adjustPan
+                : #키보드창이 올라올때, 레이아웃이 변화된 화면에 맞게 재조정되는것 방지.
+                # edittext에 입력시, 키보드가 올라오면서 화면이 위로 밀려서 edittext가 밀려올라가 없어져
+                 타자내용이 안보여서 선택.
+                # 대신, 자동으로 포커스라던가 되지 않으니 수동으로 레이아웃을 해줘야? 한다고 함a
             -->
         <activity
-            android:name=".MainActivity"
+            android:name=".presenter_view.MainActivity"
             android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

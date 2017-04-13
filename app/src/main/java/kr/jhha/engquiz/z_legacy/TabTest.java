@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.MainActivity;
+import kr.jhha.engquiz.presenter_view.MainActivity;
 
 //import static kr.jhha.engquiz.z_legacy.TabTest.TabView.UPDATE;
 //import static kr.jhha.engquiz.z_legacy.TabTest.TabView.UPLOAD;
@@ -31,8 +31,7 @@ public class TabTest extends Fragment  {
 
     @Override
     public void onResume() {
-        // 툴바에 현 프래그먼트 제목 출력
-        ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
+
         super.onResume();
     }
 
@@ -88,7 +87,7 @@ public class TabTest extends Fragment implements SyncContract.View
     @Override
     public void onResume() {
         // 툴바에 현 프래그먼트 제목 출력
-        ((MainActivity)getActivity()).setActionBarTitle( mTITLE );
+        ((MainActivity)getActivity()).setToolBarTitle( mTITLE );
         super.onResume();
     }
 
@@ -121,7 +120,7 @@ public class TabTest extends Fragment implements SyncContract.View
         public TabPagerAdapter(FragmentManager fm, int tabCount) {
             super(fm);
             tab1 = new SyncFragment();
-            tab2 = new AddScriptFragment();
+            tab2 = new ParseScriptFragment();
             this.tabCount = tabCount;
         }
 

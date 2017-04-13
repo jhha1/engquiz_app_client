@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".addsentence.AddSentenceFragment">
+    tools:context=".presenter_view.addsentence.AddSentenceFragment">
 
     <!-- explain how to use -->
     <TextView
@@ -21,45 +21,67 @@
         android:textColor="@color/colorTextDark"
         android:text="문장을 입력해주세요." />
 
-    <EditText
-        android:id="@+id/sentence_add_ko"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/nav_header_vertical_spacing"
-        android:hint="한글 문장 입력.."
-        android:textColorHint="@color/colorTextDark"
-        android:minLines="5"
-        android:maxLines="10"
-        android:textColor="@color/colorTextWhite"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:imeOptions="actionNext"
-        android:layout_weight="1"/>
-
-    <EditText
-        android:id="@+id/sentence_add_en"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/nav_header_vertical_spacing"
-        android:hint="영어 문장 입력.."
-        android:textColorHint="@color/colorTextDark"
-        android:minLines="5"
-        android:maxLines="10"
-        android:textColor="@color/colorTextWhite"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:imeOptions="actionNext"
-        android:layout_weight="1"/>
-
-    <!-- complate button  -->
-    <Button
-        android:id="@+id/sentence_add_complate_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/nav_header_vertical_spacing"
-        android:layout_marginRight="@dimen/nav_header_vertical_spacing"
-        android:layout_marginBottom="@dimen/nav_header_vertical_spacing"
-        android:layout_gravity="bottom|center"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        android:text="추가"
-        android:layout_weight="1"/>
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1">
 
+        <EditText
+            android:id="@+id/sentence_add_ko"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="한글 문장 입력.."
+            android:textColorHint="@color/lite_gray"
+            android:textColor="@color/colorTextDark"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:lines="10"
+            android:minLines="5"
+            android:maxLines="10"
+            android:scrollbars="vertical"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/sentence_add_next_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/nav_header_vertical_spacing"
+            android:layout_gravity="center"
+            android:text="NEXT"
+            android:layout_weight="3"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1">
+        <EditText
+            android:id="@+id/sentence_add_en"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="영어 문장 입력.."
+            android:textColorHint="@color/lite_gray"
+            android:textColor="@color/colorTextDark"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:lines="10"
+            android:minLines="5"
+            android:maxLines="10"
+            android:scrollbars="vertical"
+            android:layout_weight="1"/>
+
+        <!-- complate button  -->
+        <Button
+            android:id="@+id/sentence_add_complate_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/nav_header_vertical_spacing"
+            android:layout_gravity="center"
+            android:text="ADD"
+            android:layout_weight="3"/>
+    </LinearLayout>
 </LinearLayout>

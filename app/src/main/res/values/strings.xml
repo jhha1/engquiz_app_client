@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EngQuiz</string>
+    <string name="app_name">Engish Quiz</string>
     <string name="empty_string">empty string</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,5 +11,18 @@
     반드시!<b>Sonya의 pdf(answer 포함)</b>만 추가하셔야 합니다.
     </br></br><font color=red>스크립트는 클라우드 서버를 통해 분석 및 추가됩니다.
     클라우드 서버에 없는 스크립트면, 앱을 사용하는 모든 수강생에게 공유됩니다</font>]]></string>
+
+
+
+    <!-- Navigation Drawer -->
+    <string name="nav_menu__play_quiz">Play Quiz</string>
+    <string name="nav_menu__add_script">Add Script</string>
+    <string name="nav_menu__add_sentence">Add Sentence</string>
+    <string name="nav_menu__folder">Folders</string>
+    <string name="nav_menu__sync">Sync</string>
+    <string name="nav_menu__report">Report</string>
+    <string name="tools_text_account_information_username">Sotti</string>
+    <string name="tools_text_account_information_email">sotti@sottocorp.com</string>
+    <!-- /////////////////////////////////////////////////////////// -->
 
 </resources>

@@ -1,20 +1,51 @@
 apply plugin: 'com.android.application'
 
+/*
+compileSdkVersion:
+compileSdkVersion으로 Gradle에 어떤 안드로이드 SDK 버전으로 앱을 컴파일할지 알려줍니다. 즉, 지원할 수 있는 가장 높은 API 버전을 의미합니다.
+컴파일 시에만 적용되므로 runtime 동안에는 영향을 미치지 않습니다.
+항상 최신 버전의 SDK로 지정하는 것이 좋습니다.
+
+minSdkVersion:
+minSdkVersion은 앱이 지원할 가장 낮은 API 버전을 지정합니다.
+Google Play에서 사용자의 기기에 앱이 설치될 수 있을지 결정하는 요소입니다.
+minSdkVersion 보다 높은 API를 사용하면 lint에서 경고를 띄워 알려주므로 미리 방지할 수 있습니다.
+Support Library나 Google Play Service는 자체 minSdkVersion을 가지므로 이 중 가장 높은 버전 이상으로 맞춰야 합니다.
+
+targetSdkVersion:
+targetSdkVersion이 바뀌어야 앱의 행동 로직이 바뀌므로, 안드로이드가 상위 호환성을 제공할 수 있습니다.
+예를 들어 Android 6.0에서 도입된 선택적 권한 부여(runtime permissions model, 자세한 설명은 여기를 참조하세요)행동 로직은 API 23을 targetSdkVersion으로 지정해야 적용됩니다.
+
+세 종류의 SDK 버전 관계는 다음과 같습니다.
+minSdkVersion <= targetSdkVersion <= compileSdkVersion
+
+안정적인 앱을 원한다면 다음처럼 설정하세요.
+minSdkVersion (최소 레벨의 SDK) <=
+    targetSdkVersion == compileSdkVersion (최대 레벨의 SDK)
+
+# 라이브러리 리스트. (dependencies complie('..')에 들어가는.
+https://developer.android.com/topic/libraries/support-library/features.html?hl=ko#v4
+
+# last build tool version
+https://developer.android.com/studio/releases/build-tools.html
+
+ */
+
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "kr.jhha.engquiz"
-        minSdkVersion 15
-        targetSdkVersion 24
+        minSdkVersion 16
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -37,9 +68,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    testCompile 'junit:junit:4.12'
     compile files('libs/commons-codec-1.6.jar')
     compile files('libs/commons-logging-1.1.1.jar')
     compile files('libs/fluent-hc-4.2.jar')
@@ -49,4 +77,11 @@ dependencies {
     compile files('libs/httpmime-4.2.jar')
     compile files('libs/jackson-all-1.9.0.jar')
     compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:recyclerview-v7:25.0.1'
+    compile 'com.android.support:design:25.3.0'
+    compile 'com.android.support:percent:25.3.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:support-annotations:25.3.0'
+    testCompile 'junit:junit:4.12'
 }

@@ -14,23 +14,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!-- 반드시 슬라이딩메뉴가 컨텐츠레이아웃보다 나중에 선언되어야 한다!!
-    안그러면, 슬라이딩메뉴 클릭 안됨 -->
+    <!--
+        # 반드시 슬라이딩메뉴가 컨텐츠레이아웃보다 나중에 선언되어야 한다!!
+          안그러면, 슬라이딩메뉴 클릭 안됨
+
+        # layout_gravity: 왼쪽에서 슬라이딩.
+        # app:itemTextColor: 메뉴글씨색, itemIconTint:메뉴아이콘색, background: 메뉴배경색
+
+        # style 로 넣었을 때 사이드 정상동작하지 않는 필드들은 이곳에 직접셋팅
+     -->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="240dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer"
-        android:background="@color/colorSlidingDrawerBackground"
+        android:maxWidth="@dimen/navigation_drawer_max_width"
+        app:elevation="@dimen/elevation_nav_drawer"
+        android:background="@color/white"
         app:itemTextColor="@color/colorSlidingDrawerMenuIconText"
-        app:itemIconTint="@color/colorSlidingDrawerMenuIconText"/>
-    <!--  layout_gravity: 왼쪽에서 슬라이딩.
-    app:itemTextColor: 메뉴글씨색, itemIconTint:메뉴아이콘색, background: 메뉴배경색
-      app:itemTextColor="@color/colorSlidingDrawerMenuIconText"
         app:itemIconTint="@color/colorSlidingDrawerMenuIconText"
-        -->
+        android:theme="@style/MyNavigationView"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/navigation_drawer_body"
+        />
 
 </android.support.v4.widget.DrawerLayout>

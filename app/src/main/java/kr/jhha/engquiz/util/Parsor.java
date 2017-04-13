@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import kr.jhha.engquiz.data.local.Sentence;
+import kr.jhha.engquiz.model.local.Sentence;
 
 /**
  * Created by jhha on 2016-10-14.
@@ -72,14 +72,14 @@ public class Parsor
     public static String[] splitParsedScriptTitleAndId( String before ) {
         String[] divideStr = before.split( Parsor.MainSeperator);
         if( divideStr == null || divideStr.length != 2 ) {
-            Log.e("###########", "Failed scplit with ParsedSciprt's Title and Id (" + before + ")");
+            Log.e("###########", "Failed scplit with ParseSciprt's Title and Id (" + before + ")");
             return null;
         }
         return divideStr;
     }
 
     public static Map<String, String> parseUserInfo( String textdump ){
-        if(StringHelper.isNullString(textdump)) {
+        if(StringHelper.isNull(textdump)) {
             throw new IllegalArgumentException("textdump is null (" + textdump + ")");
         }
 
@@ -97,7 +97,7 @@ public class Parsor
             }
             String key = splitStr[0];
             String value = splitStr[1];
-            if( StringHelper.isNullString(key) || StringHelper.isNullString(value) ){
+            if( StringHelper.isNull(key) || StringHelper.isNull(value) ){
                 throw new IllegalArgumentException("Invalied UserInfo. null key or value. "+
                         "key("+key+"),value("+value+")");
             }

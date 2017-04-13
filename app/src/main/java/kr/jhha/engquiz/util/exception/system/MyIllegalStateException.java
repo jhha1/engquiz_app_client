@@ -1,6 +1,6 @@
 package kr.jhha.engquiz.util.exception.system;
 
-import kr.jhha.engquiz.data.remote.EResultCode;
+import kr.jhha.engquiz.util.exception.EResultCode;
 
 @SuppressWarnings("serial")
 public class MyIllegalStateException extends SystemException

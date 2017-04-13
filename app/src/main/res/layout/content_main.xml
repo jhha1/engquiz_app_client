@@ -9,17 +9,25 @@
     android:background="@color/colorTextWhite"
     tools:showIn="@layout/activity_main">
 
-    <!-- Toolbar -->
+    <!--
+        kr.jhha.engquiz.presenter_view.MyToolbarar
+        android:background = 툴바에 배경 이미지 넣기
+        app:contentInsetEnd="0dp"  배경 이미지 넣을때 같이 긁어온 설정.
+        app:contentInsetStart="0dp"
+    -->
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/AppTheme.AppBarOverlay" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        android:background="@drawable/image_toolbar__background">
+        </android.support.v7.widget.Toolbar>
+
     </android.support.design.widget.AppBarLayout>
 
     <!-- Content Container -->
@@ -28,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="kr.jhha.engquiz.MainActivity"
+        tools:context="kr.jhha.engquiz.presenter_view.MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </FrameLayout>
 
@@ -54,7 +62,7 @@
         android:layout_height="wrap_content">
 
 
-        <android.support.v7.widget.Toolbar
+        <android.support.v7.widget.kr.jhha.engquiz.presenter_view.MyToolbarar
             android:quizFolderId="@+quizFolderId/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"

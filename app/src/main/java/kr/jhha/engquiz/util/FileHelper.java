@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -95,7 +94,7 @@ public class FileHelper
             return false;
 
         String absoluteRootPath = root.getAbsolutePath();
-        if( StringHelper.isNullString(absoluteRootPath) )
+        if( StringHelper.isNull(absoluteRootPath) )
             return false;
 
         return dirPath.contains(absoluteRootPath);
@@ -103,7 +102,7 @@ public class FileHelper
 
     public String getAndroidAbsolutePath(String path)
     {
-        if( StringHelper.isNullString( path ) ) {
+        if( StringHelper.isNull( path ) ) {
             Log.e("Tag", "File Path is null. path:["+ path +"]");
             return null;
         }
@@ -137,7 +136,7 @@ public class FileHelper
 
     public File[] listFiles( String dirPath )
     {
-        if( StringHelper.isNullString( dirPath ) ) {
+        if( StringHelper.isNull( dirPath ) ) {
             Log.e("Tag", "File Path is null. path:["+ dirPath +"]");
             return null;
         }
@@ -166,7 +165,7 @@ public class FileHelper
 
     public String getParentDirectoryName( String childDirPath )
     {
-        if( StringHelper.isNullString( childDirPath ) )
+        if( StringHelper.isNull( childDirPath ) )
             return new String();
 
         File file = new File(childDirPath);
@@ -201,7 +200,7 @@ public class FileHelper
     }
 
     public Long getFileByteSize( String filepath, String filename ) {
-        if( StringHelper.isNullString( filepath ) || StringHelper.isNullString( filename ) ) {
+        if( StringHelper.isNull( filepath ) || StringHelper.isNull( filename ) ) {
             Log.e("Tag", "path or name is null. path["+ filepath +"], name["+filename+"]");
             return 0L;
         }
@@ -215,7 +214,7 @@ public class FileHelper
     }
 
     public String readFile(String dir, String name) throws IOException {
-        if( StringHelper.isNullString( dir ) || StringHelper.isNullString( name ) ) {
+        if( StringHelper.isNull( dir ) || StringHelper.isNull( name ) ) {
             throw new IllegalArgumentException("invalid filePath or fileName. dir["+ dir +"], name["+name+"]");
         }
         String path = dir + name;
@@ -243,7 +242,7 @@ public class FileHelper
 
     public byte[] readBinary( String filepath, String filename )
     {
-        if (StringHelper.isNullString(filepath) || StringHelper.isNullString(filename)) {
+        if (StringHelper.isNull(filepath) || StringHelper.isNull(filename)) {
             Log.e("Tag", "path or name is null. path[" + filepath + "], name[" + filename + "]");
             return null;
         }

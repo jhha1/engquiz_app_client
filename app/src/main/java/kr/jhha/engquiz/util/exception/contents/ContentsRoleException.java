@@ -1,7 +1,7 @@
 package kr.jhha.engquiz.util.exception.contents;
 
 import kr.jhha.engquiz.util.exception.ErrorCode;
-import kr.jhha.engquiz.data.remote.EResultCode;
+import kr.jhha.engquiz.util.exception.EResultCode;
 
 @SuppressWarnings("serial")
 public class ContentsRoleException extends Exception implements ErrorCode

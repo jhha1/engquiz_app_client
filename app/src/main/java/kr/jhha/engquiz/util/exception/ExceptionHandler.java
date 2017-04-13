@@ -2,7 +2,6 @@ package kr.jhha.engquiz.util.exception;
 
 import kr.jhha.engquiz.util.exception.contents.ContentsRoleException;
 import kr.jhha.engquiz.util.exception.system.SystemException;
-import kr.jhha.engquiz.data.remote.EResultCode;
 
 public class ExceptionHandler {
 

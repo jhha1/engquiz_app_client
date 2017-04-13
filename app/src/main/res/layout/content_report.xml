@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".report.ReportFragment">
+    tools:context=".presenter_view.admin.report.ReportFragment">
 
     <TextView
         android:id="@+id/report_total_count"
