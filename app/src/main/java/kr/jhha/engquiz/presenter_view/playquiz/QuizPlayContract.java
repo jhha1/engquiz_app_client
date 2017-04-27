@@ -12,6 +12,7 @@ public class QuizPlayContract {
         void showNotAvailableQuiz();
         void showAnswer(String answer);
 
+        void showSendReportDialog();
         void onSuccessSendReport();
         void onFailSendReport(int what);
     }
@@ -21,6 +22,7 @@ public class QuizPlayContract {
         void doNextQuestion();
         void getAnswer();
 
+        void sendReportBtnClicked();
         void sendReport();
     }
 }

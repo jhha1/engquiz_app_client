@@ -1,16 +1,13 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts.sentences;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,28 +18,41 @@ import kr.jhha.engquiz.model.local.Sentence;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
+import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.StringHelper;
+import kr.jhha.engquiz.util.ui.Etc;
+import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
+import kr.jhha.engquiz.util.ui.click_detector.ListViewClickDetector;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_INTO_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
 
 /**
  * Created by jhha on 2016-12-16.
  */
 
-public class SentenceFragment extends Fragment implements SentenceContract.View
+public class SentenceFragment extends Fragment implements SentenceContract.View, ClickDetector.Callback
 {
     private SentenceContract.ActionsListener mActionListener;
 
     private Integer mScriptId;
     private String mScriptTitle;
 
-    // 수정 가능한 문장을 보여주는 뷰 관련
+    /*
+     READ-ONLY 문장 보여주는 뷰 관련
+      */
+    private TextView mTextView;
+
+    /*
+     수정 가능한 문장을 보여주는 뷰 관련
+      - EditText ListView
+      */
     private SentenceAdapter mAdapter;
     private ListView mItemListView;
-    private AlertDialog.Builder mDialogModify = null;
-    private EditText mEditTextKo = null;
-    private EditText mEditTextEn = null;
-
-    // READ-ONLY 문장 보여주는 뷰 관련
-    private TextView mTextView;
+    // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
+    private Sentence mListviewSelectedItem = null;
+    // 클릭 or 더블클릭 감지자. 안드로이드 더블클릭 감지해 알려주는 지원없어 직접 만듬.
+    private ClickDetector mClickDetector = null;
 
     public SentenceFragment() {}
 
@@ -51,7 +61,7 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     {
         super.onCreate(savedInstanceState);
         mActionListener = new SentencePresenter( this, ScriptRepository.getInstance() );
-        initDialog();
+        mClickDetector = new ListViewClickDetector( this );
     }
 
     @Override
@@ -70,6 +80,9 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
         // 유저가 만든 스크립트 문장을 보는경우.
         // 수정을 유저가 직접해야하므로, 각 문장의 선택이벤트 등 구별위해 리스트뷰에 뿌려준다.
         mItemListView = (ListView) view.findViewById(R.id.sentence_listview);
+        // 클릭 이벤트 핸들러 정의: 원클릭-내 퀴즈 디테일 보기, 더블클릭-게임용으로 퀴즈폴더설정
+        mItemListView.setOnItemClickListener(mListItemClickListener);
+        // 롱 클릭 이벤트 핸들러 정의: 문장 삭제
         mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
 
         // 조건에 따라 어떤 뷰를 보여줄지 다르기 때문에,
@@ -89,13 +102,18 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     }
 
     private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        String title = "Sentences";
-        if( !StringHelper.isNull(mScriptTitle) ){
-            title = mScriptTitle;
+        MyToolbar.getInstance().setToolBar(SHOW_SENTENCES_IN_SCRIPT);
+
+        // 툴바에 현 프래그먼트 제목 출력
+        mActionListener.initToolbarTitle(mScriptId);
+    }
+
+    @Override
+    public void showTitle(String title) {
+        if(StringHelper.isNull(title)){
+            title = "Sentences";
         }
-        toolbar.setToolBarTitle( title );
-        toolbar.switchBackground("image");
+        MyToolbar.getInstance().setToolbarTitle( title );
     }
 
     /*
@@ -139,31 +157,38 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
 
     @Override
     public void onFailGetSentences() {
-        String msg = "문장 리스트를 가져오는데 실패했습니다." +
-                "\n잠시 후 다시 시도해 주세요.";
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__fail_get_list),
+                Toast.LENGTH_SHORT).show();
     }
 
-    private void initDialog()
+    // 리스트뷰 클릭 이벤트 리스너
+    private AdapterView.OnItemClickListener mListItemClickListener
+            = new AdapterView.OnItemClickListener()
     {
-        mDialogModify = new AlertDialog.Builder( getActivity() );
-        mDialogModify.setTitle("Modify");
-        mDialogModify.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                d.dismiss();
-            }
-        });
+        @Override
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
 
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        mEditTextKo = new EditText(getActivity());
-        mEditTextEn = new EditText(getActivity());
-        layout.addView(mEditTextKo);
-        layout.addView(mEditTextEn);
-        mDialogModify.setView(layout);
+            Sentence item = (Sentence) parent.getItemAtPosition(position) ;
+            mListviewSelectedItem = item;
+            // 클릭과 더블클릭을 구분해 그에따른 동작.
+            mClickDetector.onClick( position );
+        }
+    };
+
+    // 한번 클릭 (리스트뷰 아이템)
+    @Override
+    public void onSingleClicked() {
+        // nothing
     }
 
-    // 롱 클릭시, 문장 수정 다이알로그를 띄운다
+    // 더블 클릭 (리스트뷰 아이템) : 문장 수정 다이알로그를 띄운다
+    @Override
+    public void onDoubleClicked() {
+        mActionListener.sentenceDoubleClicked( mListviewSelectedItem );
+    }
+
+    // 롱 클릭 (리스트뷰 아이템) : 문장 삭제 다이알로그 띄운다
     private AdapterView.OnItemLongClickListener mListItemLongClickListener
             = new AdapterView.OnItemLongClickListener()
     {
@@ -178,23 +203,30 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
 
     @Override
     public void showModifyDialog(final Sentence item){
-        mEditTextKo.setText(item.textKo);
-        mEditTextEn.setText(item.textEn);
-        mDialogModify.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
+        final EditText editTextKo = Etc.makeEditText(getActivity(), item.textKo);
+        final EditText editTextEN = Etc.makeEditText(getActivity(), item.textEn);
+        String neutralButtonName = getString(R.string.sentence__edit_neutral_btn);
 
-                String ko = mEditTextKo.getText().toString();
-                String en = mEditTextEn.getText().toString();
-                mActionListener.modifySentence(ko, en);
-            }
-        });
-        mDialogModify.show();
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle(getString(R.string.sentence__edit_title));
+        dialog.setEditText(editTextKo, editTextEN);
+        dialog.setNeutralButton(neutralButtonName, new View.OnClickListener() {
+                                    public void onClick(View arg0) {
+                                        String ko = editTextKo.getText().toString();
+                                        String en = editTextEN.getText().toString();
+                                        mActionListener.modifySentence(ko, en);
+                                        dialog.dismiss();
+                                    }
+                                });
+        dialog.setNegativeButton();
+        dialog.showUp();
     }
 
     @Override
     public void onSuccessUpdateSentence() {
-        String msg = "문장이 수정되었습니다.";
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__edit_succ),
+                Toast.LENGTH_SHORT).show();
 
         // re-flesh UI
         mActionListener.getSentences(mScriptId);
@@ -202,11 +234,40 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
 
     @Override
     public void onFailUpdateSentence() {
-        String msg = "문장 수정에 실패했습니다." +
-                    "\n잠시 후 다시 시도해 주세요.";
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__edit_fail),
+                Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void showDeleteDialog(){
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle(getString(R.string.sentence__del_confirm));
+        dialog.setPositiveButton(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                mActionListener.deleteSentence();
+                dialog.dismiss();
+            }
+        });
+        dialog.setNegativeButton();
+        dialog.showUp();
+    }
 
+    @Override
+    public void onSuccessDeleteSentence() {
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__del_succ),
+                Toast.LENGTH_SHORT).show();
+
+        // re-flesh UI
+        mActionListener.getSentences(mScriptId);
+    }
+
+    @Override
+    public void onFailDeleteSentence() {
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__del_fail),
+                Toast.LENGTH_SHORT).show();
+    }
 }
 

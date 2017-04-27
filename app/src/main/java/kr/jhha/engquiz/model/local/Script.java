@@ -10,6 +10,7 @@ import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.Parsor;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.system.MyIllegalArgumentException;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 
 /**
@@ -26,6 +27,8 @@ public class Script
     public final static String Field_SCRIPT_TITLE = "SCRIPT_TITLE";
     public final static String Field_SENTENCES = "SENTENCES";
 
+    public final static int SCRIPT_ID_MIN = 10000;
+
     public Script() {}
     public Script( String filename, Integer index,
                   List<Sentence> sentences )
@@ -38,13 +41,13 @@ public class Script
     public Script( String textScript )
     {
         if( textScript == null || textScript.isEmpty() ) {
-            System.out.println("ERROR invalied param. param script is null");
+            MyLog.e("invalied param. param script is null");
             return;
         }
 
         String rows[] = textScript.split(Parsor.MainSeperator);
         if(rows.length <= 2) {
-            System.out.println("ERROR invalied param. invalid param format: "+textScript);
+            MyLog.e("invalied param. invalid param format: "+textScript);
             return;
         }
 
@@ -104,9 +107,16 @@ public class Script
     }
 
     public String makeScriptFileName() {
+        if( StringHelper.isNull(this.title) ){
+            MyLog.e("cannot make script file name. script title is null");
+            return null;
+        }
+
+        String title_pdf_removed = Parsor.removeExtensionFromScriptTitle(title, ".pdf");
+
         StringBuffer filename = new StringBuffer();
         filename.append(this.scriptId + Parsor.MainSeperator);
-        filename.append(this.title + ".txt");
+        filename.append(title_pdf_removed + ".txt");
         return filename.toString();
     }
 
@@ -117,7 +127,7 @@ public class Script
 
         StringBuffer filename = new StringBuffer();
         filename.append(scriptId + Parsor.MainSeperator);
-        filename.append(scriptTitle);
+        filename.append(scriptTitle+ ".txt");
         return filename.toString();
     }
 
@@ -166,7 +176,7 @@ public class Script
             return script;
 
         } catch ( Exception e ) {
-            Log.e("AppContent", "ERROR invalid param. " +
+            MyLog.e("ERROR invalid param. " +
                     "map[" + script.toString() + "]");
             e.printStackTrace();
             return null;

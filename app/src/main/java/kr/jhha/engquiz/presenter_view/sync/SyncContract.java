@@ -7,10 +7,9 @@ package kr.jhha.engquiz.presenter_view.sync;
 public class SyncContract {
 
     interface View {
-        void onSuccessSync();
+        void onSyncReady(float sizeMB);
+        void onSynced();
         void onFailedSync(String msg);
-
-        void showView(String msg);
     }
 
     interface UserActionsListener {

@@ -2,80 +2,25 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="25dp"
-    android:paddingRight="25dp"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    style="@style/MyFragment"
     android:orientation="vertical"
     tools:context=".presenter_view.quizfolder.AddQuizFolderFragment">
-    <!--
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_weight="70">
 
-            input title of quizfolder
-              # hint: edittext창 내부에 기본셋팅글.
-              # maxLines:최대 몇 줄까지 입력가능.
-              # maxLength: 최대 입력가능 글자수
-
-            <EditText
-                android:sentenceId="@+sentenceId/add_quizfolder_subject"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="제목을 입력해주세요"
-                android:textColorHint="@color/colorTextDark"
-                android:maxLines="1"
-                android:maxLength="30"
-                android:textColor="@color/colorTextWhite"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:imeOptions="actionNext"
-                android:layout_weight="1"/>
-
-
-            <Button
-                android:sentenceId="@+sentenceId/add_quizfolder_set_title_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="OK"
-                android:layout_weight="4"/>
-        </LinearLayout>
-        -->
     <!-- explain how to use -->
     <TextView
         android:id="@+id/add_quizfolder_howtouse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
-        android:textColor="@color/colorTextDark"
-        android:text="새 퀴즈에 담고 싶은 스크립트들을 체크해주세요." />
+        style="@style/MyText.MediumTitle" />
 
-    <!-- all quizfolder : chackable listview
-         # 리스트뷰 라인 색: row간 간격 벌리고 그 틈에 색을 입힘.
-            android:dividerHeight - row간격. android:divider - 간격 틈 색
-         # 리스트뷰 텍스트 색: content_textstyle_listview_checked_multiple.xml
-    -->
     <ListView
+        style="@style/MyListView.SimpleText"
         android:id="@+id/add_quizfolder_listview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
-        android:paddingBottom="8dp"
-        android:divider="@color/colorPrimary"
-        android:dividerHeight="0.25dp"
-        android:layout_weight="20"/>
+        android:layout_weight="1"/>
 
     <!-- complate button  -->
     <Button
+        style="@style/MyButton.WideBig"
         android:id="@+id/add_quizfolder_complate_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginTop="16dp"
-        android:text="OK"
-        android:layout_weight="1"/>
+        android:layout_marginTop="20dip" />
 
 </LinearLayout>

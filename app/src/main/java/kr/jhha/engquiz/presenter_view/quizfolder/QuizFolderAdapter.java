@@ -17,6 +17,7 @@ import java.util.List;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -38,8 +39,6 @@ public class QuizFolderAdapter extends BaseAdapter {
         mQuizFolderModel = quizFolderRepository;
         mListView = new ArrayList<>(quizFolders);
         mListView.add( makeNewButton() );
-
-        Log.e("AppContent", "new QuizFolderAdapter() mListView:"+ mListView.toString());
     }
 
     private QuizFolder makeNewButton()
@@ -77,34 +76,30 @@ public class QuizFolderAdapter extends BaseAdapter {
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
-        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.imageView1);
-        TextView titleTextView = (TextView) convertView.findViewById(R.id.textView1);
+        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.quizfolder_listview_icon);
+        TextView titleTextView = (TextView) convertView.findViewById(R.id.quizfolder_listview_text);
 
         // 아이템 내 각 위젯에 데이터 반영
         iconImageView.setImageDrawable(getIcon(item.getState()));
         titleTextView.setText(item.getTitle());
-        Log.i("AppContent", "QuizFolderAdapter.getView() " +
-                "quizFolderItem:"+ item.toString()
-        +", titleTextView:"+titleTextView.getText());
-
 
         return convertView;
     }
 
     private Drawable getIcon(Integer state){
-        int resourceID = R.drawable.ic_content__folder_normal_gray;
+        int resourceID = R.drawable.ic_folder__normal_gray;
         switch (state){
             case QuizFolder.STATE_NEW:
-                resourceID = R.drawable.ic_content__new_red;
+                resourceID = R.drawable.ic_folder__new_red;
                 break;
             case QuizFolder.STATE_PLAYING:
-                resourceID = R.drawable.ic_content__folder_playing_gray;
+                resourceID = R.drawable.ic_folder__playing_gray;
                 break;
             case QuizFolder.STATE_OTHER:
-                resourceID = R.drawable.ic_content__folder_normal_gray;
+                resourceID = R.drawable.ic_folder__normal_gray;
                 break;
             case QuizFolder.STATE_NEWBUTTON:
-                resourceID = R.drawable.ic_content__folder_add_gray;
+                resourceID = R.drawable.ic_folder__add_gray;
                 break;
         }
         Drawable icon = ContextCompat.getDrawable(mContext, resourceID);

@@ -12,7 +12,11 @@
     </br></br><font color=red>스크립트는 클라우드 서버를 통해 분석 및 추가됩니다.
     클라우드 서버에 없는 스크립트면, 앱을 사용하는 모든 수강생에게 공유됩니다</font>]]></string>
 
-
+    <string name="common__finish_app">앱을 종료합니다</string>
+    <string name="common__warning">Warning</string>
+    <string name="common__del_comfirm"> 을(를) 삭제하시겠습니까?</string>
+    <string name="common__network_err">네트웍이 불안정하거나, 서버로부터 응답이 느립니다. \n 잠시 후 다시 시도해주세요.</string>
+    <string name="common__failed_loading">오류가 발생하여 앱 로딩에 실패했어요. \n 앱을 종료합니다. 잠시 후 다시 시도해주세요. \n여러번 같은 증상이 반복되면 개발자(Joy)에게 문의해주세요 ㅜ_ㅜ</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_menu__play_quiz">Play Quiz</string>
@@ -23,6 +27,96 @@
     <string name="nav_menu__report">Report</string>
     <string name="tools_text_account_information_username">Sotti</string>
     <string name="tools_text_account_information_email">sotti@sottocorp.com</string>
-    <!-- /////////////////////////////////////////////////////////// -->
 
+    <!-- folders -->
+    <string name="show_folders__get_folders__fail_defaut">폴더 리스트를 가져오는데 실패했습니다. \n잠시 후 다시 시도해 주세요.</string>
+
+    <string name="show_folders__change_folder_for_playing__title">게임용 폴더 변경 하기</string>
+    <string name="show_folders__change_folder_for_playing__confirm">을(를) 게임용으로 선택하시겠어요?</string>
+    <string name="show_folders__change_folder_for_playing__success">게임 플레이용 폴더 변경에 성공했어요 ^0^/</string>
+    <string name="show_folders__change_folder_for_playing__fail_default">이 폴더를 게임플레이용으로 변경하는데 실패했어요.. \n앱 재 시작 후 다시 시도해주세요 ㅜ_ㅜ</string>
+    <string name="show_folders__change_folder_for_playing__fail_new_folder">폴더 만들기 버튼은 게임플레이용으로 지정할 수 없어요~</string>
+    <string name="show_folders__change_folder_for_playing__fail_no_script">스크립트가 들어있는 폴더만 게임플레이용으로 지정할 수 있어요 :) \n폴더에 스크립트를 먼저 추가해주세용~!</string>
+
+    <string name="del_folder__title">폴더 삭제 하기</string>
+    <string name="del_folder__success">폴더가 삭제되었어요</string>
+    <string name="del_folder__fail">폴더 삭제에 실패했어요..</string>
+    <string name="del_folder__fail_noexist_folder">삭제할 폴더가 없네용?</string>
+    <string name="del_folder__fail_new_btn">폴더 만들기 버튼은 삭제할 수 없어용~ </string>
+    <string name="del_folder__fail_playing_folder">플레이중인 폴더는 삭제할 수 없어요:) \n다른 폴더를 플레이용으로 지정한 후 삭제해주세요 ^^ </string>
+
+    <string name="add_folder__title">새 폴더의 제목을 입력해주세요 </string>
+    <string name="add_folder__title_guide">* 제목은 최소 1자 이상, 30자 이하로 제한되어요.</string>
+    <string name="add_folder__success">새 폴더가 추가되었어요 (^0^)/</string>
+    <string name="add_folder__fail">일시적으로 폴더를 생성할 수 없어요.. \n잠시후 다시 시도해주세요 ㅜ_ㅜ</string>
+    <string name="add_folder__fail_title_re_input">제목을 다시 입력해주시겠어용 ?.? </string>
+    <string name="add_folder__fail_no_scripts_choice">선택된 스크립트가 없어용~</string>
+    <string name="add_folder__fail_no_scripts_title">폴더에 들어갈 스크립트가 하나도 없어요..ㅜ_ㅜ</string>
+    <string name="add_folder__fail_no_has_scripts">\n\n\n\n\t폴더에 넣을 스크립트가 아직 없어요 \n\n \t왼쪽 슬라이딩 메뉴 -> Add Script 에서 \t스크립트를 추가해서 폴더에 넣으세요 :) </string>
+
+    <string name="del_script__title">스크립트 삭제</string>
+    <string name="del_script__confirm">을(를) 폴더에서 빼시겠어요?</string>
+    <string name="del_script__permenantly_del_btn">스크립트 파일 영구제거</string>
+    <string name="del_script__succ">스크립트가 삭제되었어요.</string>
+    <string name="del_script__fail">스크립트 삭제에 실패했어요..ㅜ_ㅜ</string>
+    <string name="del_script__fail_get_list">스크립트 리스트를 가져오는데 실패했어요 \n 잠시 후 다시 시도해 주세요 ㅠ_ㅠ</string>
+    <string name="del_script__fail_no_exist_script">삭제할 스크립트가 없어요a</string>
+    <string name="del_script__fail_cannot_del_teacher_script">선생님이 작성한 파일은 삭제할 수 없어요. \n직접 만든 스크립트만 영구삭제가 가능해요 :)</string>
+
+    <string name="add_script_into_folder__succ">스크립트 추가에 성공했어요~!</string>
+    <string name="add_script_into_folder__fail">스크립트 추가에 실패했어요.. \n 잠시 후 다시 시도해주세요..ㅠ_ㅠ</string>
+    <string name="add_script_into_folder__fail_already_added">이미 추가된 스크립트인데용? 0.0a</string>
+    <string name="add_script_into_folder__fail_noexist_script">추가할 스크립트가 없어요 +. +a \nAdd Script 메뉴에서 스크립트를 추가(원본을 게임용으로 변환)하세요 :)</string>
+
+    <string name="sentence__edit_neutral_btn">수정 완료</string>
+    <string name="sentence__edit_title">문장을 수정합니다아~</string>
+    <string name="sentence__edit_succ">문장이 수정되었어요~!</string>
+    <string name="sentence__edit_fail">문장 수정에 실패했어요.. \n 잠시 후 다시 시도해주세요..OTL</string>
+    <string name="sentence__del_confirm">문장을 삭제합니다.. \n 진행하시겠어요?</string>
+    <string name="sentence__del_succ">문장이 삭제되었어요 :)</string>
+    <string name="sentence__del_fail">문장 삭제에 실패했어요..\n 잠시 후 다시 시도해주세요 ㅠ_ㅠ</string>
+    <string name="sentence__fail_get_list">문장 리스트를 가져오는데 실패했어요.. \n 잠시 후 다시 시도해주세요ㅠ_ㅠ</string>
+
+    <!-- add pdf script -->
+    <string name="add_pdf_script__cur_folder_path"> - 현재 폴더 위치: </string>
+    <string name="add_pdf_script__succ">스크립트 추가에 성공했어요 ~(^0 ^)~</string>
+    <string name="add_pdf_script__fail">오류가 발생했어요.. \n 잠시후에 다시 시도해 주세요 ㅠ_ㅠ</string>
+    <string name="add_pdf_script__fail_only_allow_pdf_format"> [pdf] 형식의 파일만 가능합니다 :) </string>
+    <string name="add_pdf_script__make_new_folder_btn">새 폴더 만들기</string>
+    <string name="add_pdf_script__choice_folder">스크립트를 넣을 폴더를 선택해주세요.</string>
+    <string name="add_pdf_script__fail_only_has_en_or_kn">선생님이 올려주시는 정규 스크립트만 가능하며, \n\n 1. 한달 한번 Sytom, idom 모음 스크립트 \n2. 제목에 [..(with answer).pdf]가 포함된 것 \n\n외 에는 추가할 수 없어요 :)</string>
+    <string name="add_pdf_script__no_exist_folder">스크립트를 넣을 폴더가 없어요. \n [새 폴더 만들기] 버튼을 눌러 새 폴더를 만드세요.</string>
+    <string name="add_pdf_script__input_folder_name">새 퀴즈폴더의 이름을 기입해주세요..</string>
+    <string name="add_pdf_script__folder_name_guide">최소 1글자 ~ 최대 30글자까지 가능합니다.</string>
+    <string name="add_pdf_script__loading_dialog_title">Add Script</string>
+    <string name="add_pdf_script__loading_dialog_text">서버에서 스크립트 분석중입니다.. *.*</string>
+    <string name="add_pdf_script__succ_dialog_title">스크립트 추가 완료!</string>
+
+
+    <!-- sign in -->
+    <string name="signin__title">계정 생성 하기</string>
+    <string name="signin__guide">수업에서 사용하는 영어이름을 입력해주세요. \n (영어,숫자만 가능. 최대 20자. \n 공백 및 특수문자 불가) \n\n계정은 게임데이터를 서버에 저장할 때 사용자를 구분하는 용도로만 사용합니다 :) </string>
+    <string name="signin__neutral_btn">계정이 있어요!</string>
+    <string name="signin__positive_btn">계정 생성</string>
+    <string name="signin__fail">오류가 발생하여 앱을 종료합니다..OTL \n 잠시후에 다시 시도해 주세요 ㅜ_ㅜ</string>
+    <string name="signin__fail_invalid_name">계정은 영어,숫자이름으로 최대 20자까지 가능해요. (공백 및 특수문자 불가) \n\n 다시 입력해주세요 ;) </string>
+    <string name="signin__fail_duplicated_name">이미 다른 사람이 사용중인 이름이에요 ㅜ_ㅜ \n 아쉽지만 다른 영어이름으로 만들어야 할 것 같아요.</string>
+
+    <!-- log in -->
+    <string name="login__title">로그인</string>
+    <string name="login__guide">계정 영어 이름을 입력해주세요~!</string>
+    <string name="login__cancel">게임 진입은 로그인을 해야 가능해요..lol \n아쉽지만 곧 뵈길 바라며..!!</string>
+    <string name="login__fail_no_exist_user">등록된 이름이 아니에요.. ㅜ_ㅜ \n계정생성시 사용했던 영어이름을 다시 입력해주세요.</string>
+    <string name="login__fail_invalid_name">등록된 이름이 아니에요.. ㅜ_ㅜ \n계정생성시 사용했던 영어이름을 다시 입력해주세요.</string>
+    <string name="login__fail_network_err">네트웍이 불안정하여 게임데이터를 서버로부터 받아올 수 없어요..OTL  \n앱을 종료합니다.. 잠시 후 재 시작해 주세요 ㅠ_ㅠ</string>
+    <string name="login__fail">알 수 없는 오류로 로그인에 실패했어요..OTL \n앱을 종료합니다.. 잠시 후 재 시작해 주세요 ㅠ_ㅠ</string>
+
+    <!-- play quiz -->
+    <string name="play__no_exist_sentence">스크립트를 추가하여 영어 퀴즈 게임을 즐기세요 :D \n (스크립트 추가 : 왼쪽 메뉴의 Add Script 클릭)</string>
+
+    <string name="report__send_title">문장 수정 요청 하기</string>
+    <string name="report__send_guide">현재 퀴즈 문장이 이상한가요? \n [수정요청] 버튼을 눌러 개발자에게 수정요청을 할 수 있어요. \n 수정 된 문장은 [Sync] 메뉴에서 업데이트 받을 수 있어요.</string>
+    <string name="report__send_succ">문장 수정 요청을 보냈어요. \n 수정 된 문장은 [Sync] 메뉴를 통해 업데이트 받을 수 있어요.</string>
+    <string name="report__send_fail_custom_sentence">직접 만든 문장은 직접 바로 수정하실 수 있어요. \n수정한 문장은 게임에 바로 적용되고요. \n수정은 문장이 소속된 스크립트에서 하실 수 있어요.</string>
+    <string name="report__send_fali">일시적인 오류로 문장 수정 요청에 실패했어요 ㅜ_ㅜ</string>
 </resources>

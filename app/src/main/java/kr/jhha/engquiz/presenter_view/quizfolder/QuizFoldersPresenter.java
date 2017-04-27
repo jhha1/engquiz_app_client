@@ -4,11 +4,13 @@ import android.util.Log;
 
 import java.util.List;
 
+import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.UserRepository;
 import kr.jhha.engquiz.util.exception.EResultCode;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.model.local.QuizFolder.STATE_NEWBUTTON;
 
@@ -21,13 +23,19 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
     private final QuizFoldersContract.View mView;
     private final QuizFolderRepository mQuizFolderModel;
 
+    public final static int ERR_DEAULT = 1;
+    public final static int ERR_NEWBUTTON = 2;
+    public final static int ERR_NOEXSITED_SCRIPT = 3;
+    public final static int ERR_NOEXSITED_FOLDER = 4;
+    public final static int NOALLOWED_DELETE_PLAYING = 5;
+    public final static int ERR_NET = 6;
+
     public QuizFoldersPresenter(QuizFoldersContract.View view, QuizFolderRepository model ) {
         mQuizFolderModel = model;
         mView = view;
     }
 
     public void getQuizFolderList() {
-        Log.i("AppContent", "ReportPresenter getQuizFolders() called");
         mQuizFolderModel.getQuizFolders( onGetQuizFolderList() );
     }
 
@@ -49,7 +57,6 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
     @Override
     public void listViewItemClicked(QuizFolder quizFolder) {
         String title = quizFolder.getTitle();
-        Log.d("%%%%%%%%%%%%%%%", "ReportFragment.listViewItemClicked. title:" + title);
 
         if( QuizFolder.TEXT_NEW_FOLDER.equals(title) ) {
             // 새 커스텀 퀴즈 리스트 만들기 화면 전환
@@ -69,14 +76,13 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
     @Override
     // 이 퀴즈폴더를 게임 플레이용으로 설정
     public void changePlayingQuizFolder(QuizFolder item) {
-        Log.i("AppContent", "ReportPresenter changePlayingQuizFolder() called. item:"+((item!=null)?item.toString():null));
         if( QuizFolder.isNull(item)){
-            mView.onFailChangePlayingQuizFolder(1);
+            mView.onFailChangePlayingQuizFolder(ERR_DEAULT);
             return;
         }
 
         if( item.getState() == STATE_NEWBUTTON ){
-            mView.onFailChangePlayingQuizFolder(2);
+            mView.onFailChangePlayingQuizFolder(ERR_NEWBUTTON);
             return;
         }
 
@@ -90,36 +96,36 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
         if( bQuizFolderDetailNotLoaded ){
             loadQuizFolderScriptIdsAndChangePlayingQuizFolder(item);
         } else {
-            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
+            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder(item) );
         }
     }
 
-    private QuizFolderRepository.ChangePlayingQuizFolderCallback onChangePlayingQuizFolder() {
+    private QuizFolderRepository.ChangePlayingQuizFolderCallback onChangePlayingQuizFolder(final QuizFolder playingQuizFolder) {
         return new QuizFolderRepository.ChangePlayingQuizFolderCallback(){
 
             @Override
-            public void onSuccess(QuizFolder playingQuizFolder) {
+            public void onSuccess( List<QuizFolder> uiSortedQuizFolders ) {
                 // change folder of Memory
                 final QuizPlayRepository quizPlayRepo = QuizPlayRepository.getInstance();
                 EResultCode code = quizPlayRepo.changePlayingQuizFolder( playingQuizFolder.getId(),
                                                                             playingQuizFolder.getTitle(),
                                                                             playingQuizFolder.getScriptIds() );
                 if(code != EResultCode.SUCCESS){
-                    mView.onFailChangePlayingQuizFolder(1);
+                    mView.onFailChangePlayingQuizFolder(ERR_DEAULT);
                     return;
                 }
-                mView.onSucessChangePlayingQuizFolder();
+                mView.onSucessChangePlayingQuizFolder(uiSortedQuizFolders);
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
                 switch (resultCode){
-                    case NOEXSITED_SCRIPT:
-                        mView.onFailChangePlayingQuizFolder(3);
+                    case QUIZFOLDER__NOEXIST_SCRIPTS:
+                        mView.onFailChangePlayingQuizFolder(ERR_NOEXSITED_SCRIPT);
                         break;
                     case QUIZFOLDER__NOEXIST_QUIZFOLDERID:
                     default:
-                        mView.onFailChangePlayingQuizFolder(1);
+                        mView.onFailChangePlayingQuizFolder(ERR_DEAULT);
                         break;
                 }
             }
@@ -129,29 +135,31 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
     private void loadQuizFolderScriptIdsAndChangePlayingQuizFolder(final QuizFolder item )
     {
         final Integer userId = UserRepository.getInstance().getUserID();
-        mQuizFolderModel.getQuizFolderScriptList(
+        mQuizFolderModel.getScriptsInFolder(
                 userId,
                 item.getId(),
                 new QuizFolderRepository.GetQuizFolderScriptListCallback() {
                         @Override
                         public void onSuccess(List<Integer> quizFolderScripts) {
-                            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder() );
+                            mQuizFolderModel.changePlayingQuizFolder( item, onChangePlayingQuizFolder(item) );
                         }
 
                         @Override
                         public void onFail(EResultCode resultCode) {
-                            mView.onFailChangePlayingQuizFolder(3);
+                            mView.onFailChangePlayingQuizFolder(ERR_NOEXSITED_SCRIPT);
                         }
                 });
     }
 
     @Override
     public void delQuizFolder( QuizFolder item ){
-        Log.i("AppContent", "ReportPresenter delQuizFolderScript() called");
-
         if( item == null ) {
-            String msg = "삭제할 퀴즈폴더가 없습니다";
-            mView.onFailDelQuizFolder( msg );
+            mView.onFailDelQuizFolder( ERR_NOEXSITED_FOLDER );
+            return;
+        }
+
+        if( item.getState() == STATE_NEWBUTTON ){
+            mView.onFailDelQuizFolder(ERR_NEWBUTTON);
             return;
         }
 
@@ -170,16 +178,20 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
 
             @Override
             public void onFail(EResultCode resultCode) {
-                String msg = "퀴즈폴더 삭제에 실패했습니다";
                 switch (resultCode){
                     case QUIZFOLDER__NOALLOWED_DELETE_NEWBUTTON:
-                        msg = "퀴즈폴더 만들기 버튼은 삭제할 수 없습니다.";
+                        mView.onFailDelQuizFolder(ERR_NEWBUTTON);
                         break;
                     case quizFolder__NOALLOWED_DELETE_PLAYING:
-                        msg = "플레이중인 퀴즈폴더는 삭제할 수 없습니다. 다른 퀴즈폴더를 플레이용으로 지정한 후 삭제해주세요.";
+                        mView.onFailDelQuizFolder(NOALLOWED_DELETE_PLAYING);
+                        break;
+                    case NETWORK_ERR:
+                        mView.onFailDelQuizFolder(ERR_NET);
+                        break;
+                    default:
+                        mView.onFailDelQuizFolder(ERR_DEAULT);
                         break;
                 }
-                mView.onFailDelQuizFolder(msg);
             }
         };
     }

@@ -1,10 +1,8 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts;
 
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -21,6 +18,9 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
+import kr.jhha.engquiz.util.ui.MyDialog;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_INTO_QUIZFOLDER;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -29,39 +29,32 @@ import kr.jhha.engquiz.presenter_view.MyToolbar;
 public class AddScriptIntoFolderFragment extends Fragment implements  AddScriptIntoFolderContract.View {
 
     private AddScriptIntoFolderContract.ActionsListener mActionListener;
-    private ArrayAdapter mScriptListViewAdapter;
+
     private ListView mItemListView = null;
 
     private Integer mQuizFolderId = -1;
-    private String mSelectedScriptTitle;
     private Button mButtonConfirmTitle;
-
-    private final String mTITLE = "Add a Script in a Quiz Folder";
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mActionListener = new AddScriptIntoFolderPresenter( this, QuizFolderRepository.getInstance() );
+        mActionListener = new AddScriptIntoFolderPresenter( getActivity(), this, QuizFolderRepository.getInstance() );
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.content_quizfolder_add, container, false);
+        View view = inflater.inflate(R.layout.content_quizfolder_script_add, container, false);
 
         setUpToolBar();
 
-        TextView textView = (TextView) view.findViewById(R.id.add_quizfolder_howtouse);
-        textView.setText("추가할 스크립트를 선택하세요.");
-
         // 플레이리스트 제목입력/추가완료 버튼: 클릭 이벤트 핸들러 정의
-        mButtonConfirmTitle = (Button) view.findViewById(R.id.add_quizfolder_complate_btn);
+        mButtonConfirmTitle = (Button) view.findViewById(R.id.add_quizfolder_script_complate_btn);
         mButtonConfirmTitle.setOnClickListener(mClickListener);
-        view.findViewById(R.id.add_quizfolder_complate_btn).setOnClickListener(mClickListener);
 
         // 플레이 리스트뷰
-        mItemListView = (ListView) view.findViewById(R.id.add_quizfolder_listview);
+        mItemListView = (ListView) view.findViewById(R.id.add_quizfolder_script_listview);
         mItemListView.setOnItemClickListener(mListItemClickListener);
 
         // 퀴즈폴더에 추가할 파싱된스크립트 리스트 가져오기
@@ -77,36 +70,27 @@ public class AddScriptIntoFolderFragment extends Fragment implements  AddScriptI
     }
 
     private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        toolbar.setToolBarTitle( mTITLE );
-        toolbar.switchBackground("image");
+        MyToolbar.getInstance().setToolBar(ADD_SCRIPT_INTO_QUIZFOLDER);
     }
 
     @Override
-    public void showScriptList(String[] scriptTitleAll) {
-        // 플레이 리스트 아답터 연결
-        int resourceID = R.layout.content_textstyle_listview_checked_multiple;
-        //int resourceID = android.R.layout.simple_list_item_multiple_choice;
-        mScriptListViewAdapter = new ArrayAdapter<String>(getActivity(), resourceID, scriptTitleAll);
-        mItemListView.setAdapter(mScriptListViewAdapter);
-        mScriptListViewAdapter.notifyDataSetChanged();
+    public void setAdapter(ArrayAdapter<String> adapter) {
+        mItemListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void showEmptyScriptDialog() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder( getActivity() );
-        dialog.setIcon(android.R.drawable.alert_dark_frame);
-        dialog.setTitle("추가할 스크립트가 없습니다.");
-        dialog.setCancelable(false); //  Back키 눌렀을 경우 Dialog Cancle 여부 설정
-        // 버튼 클릭 이벤트.
-        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setMessage(getString(R.string.add_script_into_folder__fail_noexist_script));
+        dialog.setPositiveButton( new View.OnClickListener() {
+            public void onClick(View arg0)
+            {
                 // 다이알로그와 이 프레그먼트를 닫고, quiz folder fragment로 돌아간다.
-                d.dismiss();
+                dialog.dismiss();
                 mActionListener.emptyScriptDialogOkButtonClicked();
-            }
-        });
-        dialog.show();
+            }});
+        dialog.showUp();
     }
 
     // 리스트뷰 클릭 이벤트 리스너
@@ -115,7 +99,6 @@ public class AddScriptIntoFolderFragment extends Fragment implements  AddScriptI
     {
         @Override
         public void onItemClick(AdapterView parent, View v, int position, long id) {
-            mSelectedScriptTitle = (String) mScriptListViewAdapter.getItem(position);
         }
     };
 
@@ -124,8 +107,8 @@ public class AddScriptIntoFolderFragment extends Fragment implements  AddScriptI
         public void onClick(View v) {
             switch(v.getId())
             {
-                case R.id.add_quizfolder_complate_btn:
-                    mActionListener.addScriptIntoQuizFolder( mQuizFolderId, mSelectedScriptTitle );
+                case R.id.add_quizfolder_script_complate_btn:
+                    mActionListener.scriptsSelected(mQuizFolderId, mItemListView);
                     break;
             }
         }
@@ -139,12 +122,14 @@ public class AddScriptIntoFolderFragment extends Fragment implements  AddScriptI
                 = new FolderScriptsAdapter( ScriptRepository.getInstance(), mQuizFolderId, updatedScriptIds );
         quizFolderAdapter.notifyDataSetChanged();
 
-        Toast.makeText(getActivity(), "새 퀴즈가 추가되었습니다", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.add_script_into_folder__succ),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onFailAddScriptIntoQuizFolder(String msg ) {
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+    public void onFailAddScriptIntoQuizFolder(int msgId ) {
+        Toast.makeText(getActivity(), getString(msgId), Toast.LENGTH_SHORT).show();
     }
 
     /*

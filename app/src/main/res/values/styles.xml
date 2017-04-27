@@ -3,10 +3,8 @@
     <!-- Base application theme.
     Theme.AppCompat.NoActionBar: 툴바를 v7.widget.Toolbar로 사용하려면 기존버전의 액션바 안사용설정
     -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
@@ -15,83 +13,126 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
-    <!-- 툴바  -->
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!--툴바 옵션열면,,,옵션 내 텍스트 색 -->
-        <item name="android:textColor">#0000ff</item>
-        <!-- 툴바 버튼?(옵션,드로어열기) 색 -->
-        <item name="colorControlNormal">#CBCBCB</item>
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
-        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
-    </style>
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="textForQuizPlaying">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    <item name="android:textColor">#CBCBCB</item>
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
-    </style>
-
-
-
-
-
-    <style name="MyFragment">
-        <item name="android:background">@color/white</item>
+    <!--
+        프레그먼트 Style
+        # padding 으로 해야, background 색이 꽉 채워진다. margin은 여백만큼 background 색이 안채워짐.
+     -->
+    <style name="MyFragment" parente="AppTheme" >
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
         <item name="android:paddingBottom">16dp</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:background">@color/gray_10</item>
     </style>
 
     <!--
-        # 리스트뷰 line color: row간 간격 벌리고 그 틈에 색을 입힘.
-          android:dividerHeight - row간격. android:divider - 간격 틈 색
-        # 리스트뷰 text color: content_textstyle_listview.xml
-   -->
-    <style name="MyListView">
-        <item name="android:divider">#bbbbbb</item>
-        <item name="android:dividerHeight">1px</item>
-        <item name="android:background">@color/white</item>
+        리스트뷰로 꽉채워지는 프레그먼트는 padding top을 0으로 줘서
+        리스트뷰가 아래로 안쳐지게 한다
+     -->
+    <style name="MyFragment.MatchListView" >
+        <item name="android:paddingTop">0dp</item>
     </style>
 
-    <style name="MyListViewText">
+
+    <!--
+        ListView Style
+
+        # android:dividerHeight - row간격 / android:divider - 간격 틈 색
+        # 리스트뷰 text color: content_textstyle_listview.xml
+        # Icon과 text 길이 비율
+            : layout_width를 match_parent로 하고 layout_weight로 비율조정해야함
+               layout_width를 wrap_content로 하면, text길이가 길어길경우, 비율 틀어짐! <- 들쭉날쭉
+
+        # scaleType: 이미지뷰 안에서 이미지(icon) 크기조정 옵션.  / centerInside: 이미지 축소
+        <item name="android:scaleType">centerInside</item>
+        # 이미지(icon) 최대크기 제한
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:maxHeight">24dp</item>
+        <item name="android:maxWidth">24dp</item>
+
+         # listSelector: 선택시 item 백그라운드 컬러
+   -->
+    <style name="MyListView" parente="AppTheme">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:divider">@color/gray_50</item>
+        <item name="android:dividerHeight">1px</item>
+    </style>
+    <style name="MyListView.Item"/>
+    <style name="MyListView.Item.Text">
         <item name="android:layout_gravity">left|center_vertical</item>
-        <item name="android:layout_marginLeft">20dp</item>
-        <item name="android:layout_marginRight">20dp</item>
-        <item name="android:layout_marginTop">20dp</item>
-        <item name="android:layout_marginBottom">20dp</item>
-        <item name="android:textColor">#555555</item>
+        <item name="android:textColor">@color/black_alpha_70</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:text">New Text</item>
+    </style>
+    <style name="MyListView.Item.Icon">
+        <item name="android:layout_gravity">left|center_vertical</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="MyListView.Folder"/>
+    <style name="MyListView.Folder.Item"/>
+    <style name="MyListView.Folder.Item.Text" parent="MyListView.Item.Text">
         <item name="android:textSize">16sp</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+    <style name="MyListView.Folder.Item.Icon" parent="MyListView.Item.Icon">
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:layout_weight">7</item>
     </style>
 
-    <style name="MyEditListView" parent="MyListView">
+    <style name="MyListView.SimpleText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:divider">@color/gray_30</item>
+        <item name="android:dividerHeight">0.25dp</item>
+    </style>
+    <style name="MyListView.SimpleText.Item"/>
+    <style name="MyListView.SimpleText.Item.Text" parent="MyListView.Item.Text">
+        <item name="android:layout_height">?android:attr/listPreferredItemHeightSmall</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="MyListView.SimpleText.Item.Text.ForDialog">
+        <item name="android:layout_height">?android:attr/listPreferredItemHeightSmall</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/black_alpha_60</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="MyListView.EditText">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">10dp</item>
     </style>
-
-    <style name="MyEditListViewItem">
+    <style name="MyListView.EditText.Item">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
     </style>
-
-    <style name="MyEditListViewText">
-        <item name="android:layout_gravity">left|center_vertical</item>
-        <item name="android:textColor">#555555</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
-    </style>
-
-    <style name="MyListViewTextIcon">
+    <style name="MyListView.EditText.Item.TextIcon">
         <item name="android:layout_width">32sp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:text">Num</item>
-        <item name="android:textColor">#555555</item>
+        <item name="android:textColor">@color/PlayQuizDark</item>
         <item name="android:textSize">32sp</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
     </style>
+    <style name="MyListView.EditText.Item.Text" parent="MyListView.Item.Text">
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginTop">1dp</item>
+        <item name="android:layout_marginBottom">1dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+    </style>
+
+
 
     <!--
         Navigation View
@@ -99,45 +140,109 @@
         다른 값들은 style로 가져와 셋팅하면, 정상동작안해서 직접 navigation view에 셋팅.
     -->
    <style name="MyNavigationView" >
-       <item name="android:listDivider">@color/lite_gray</item>
-       <item name="android:textColorSecondary">@color/lite_gray</item>
+       <item name="android:listDivider">@color/gray_30</item>
+       <item name="android:textColorSecondary">@color/colorAccent</item>
    </style>
-
-
-
-
-
-
-
-
-    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
-        <item name="android:minWidth">20dip</item>
-        <item name="android:paddingLeft">0dip</item>
-        <item name="android:paddingRight">0dip</item>
-    </style>
-
-   <!-- Navigation Drawer -->
-    <!-- Text -->
-    <style name="Body1" parent="TextAppearance.AppCompat.Body1">
+    <style name="MyNavigationView.Header"/>
+    <style name="MyNavigationView.Header.Text" parent="TextAppearance.AppCompat.Headline">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
-    <style name="Body2" parent="TextAppearance.AppCompat.Body2">
+
+    <!--
+       Text Style
+       listDivider, textColorSecondary: menu의 분리선 색상.
+       다른 값들은 style로 가져와 셋팅하면, 정상동작안해서 직접 navigation view에 셋팅.
+   -->
+    <style name="MyText"/>
+    <style name="MyText.MediumTitle" >
+        <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">left|center_vertical</item>
+        <item name="android:paddingTop">5dip</item>
+        <item name="android:paddingBottom">8dip</item>
+        <item name="android:text">* 폴더에 넣을 스크립트들을 선택해주세요.</item>
+        <item name="android:textColor">@color/black_alpha_70</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+    <!-- 게임 플레이 화면  -->
+    <style name="MyText.QuizPlaying">
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/PlayQuizLight</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
+    </style>
+    <style name="MyText.EditText"/>
+    <!--
+    android:background">@android:color/transparent : edittext underline 제거
+    lineSpacingExtra : 줄간격
+    -->
+    <style name="MyText.EditText.MultiLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">top|left</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:lines">6</item>
+        <item name="android:minLines">3</item>
+        <item name="android:maxLines">6</item>
+        <item name="android:hint">문장 입력..</item>
+        <item name="android:textColorHint">@color/black_alpha_50</item>
+        <item name="android:textColor">@color/black_alpha_50</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:lineSpacingExtra">10dp</item>
     </style>
 
-    <style name="Body1.White"/>
-    <style name="Body2.White"/>
-    <style name="Body2.Black"/>
-
-    <style name="Body1.White.Primary">
-        <item name="android:textColor">@color/text_white_primary</item>
+    <!--
+       Button Style
+    -->
+    <style name="MyButton"/>
+    <style name="MyButton.WideBig">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/img_btn_blue50</item>
+        <item name="android:text">OK</item>
+        <item name="android:textColor">@color/black_alpha_40</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="MyButton.Small"/>
+    <style name="MyButton.Small.Yellow">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/img_btn_blue50</item>
+        <item name="android:text">OK</item>
+        <item name="android:textColor">@color/black_alpha_60</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Body2.White.Primary">
-        <item name="android:textColor">@color/text_white_primary</item>
+    <style name="MyLine1">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/gray_15</item>
+        <item name="android:layout_marginTop">30dp</item>
+    </style>
+
+    <!-- 다이알로그  Style -->
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTitleStyle">@style/dialog_title_style</item>
+    </style>
+    <style name="dialog_title_style" parent="android:Widget.TextView">
+        <item name="android:textAppearance">@style/TextAppearance_DialogWindowTitle</item>
+        <item name="android:padding">30dp</item>
+    </style>
+    <style name="TextAppearance_DialogWindowTitle" parent="@android:style/TextAppearance.Holo.DialogWindowTitle">
+        <item name="android:textColor">@android:color/holo_red_light</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

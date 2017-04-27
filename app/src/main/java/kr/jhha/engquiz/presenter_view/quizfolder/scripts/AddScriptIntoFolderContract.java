@@ -1,5 +1,9 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts;
 
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import java.util.List;
 
 /**
@@ -9,10 +13,10 @@ import java.util.List;
 public class AddScriptIntoFolderContract {
 
     interface View {
-        void showScriptList( String[] scriptTitleAll );
+        void setAdapter(ArrayAdapter<String> adapter);
         void showEmptyScriptDialog();
         void onSuccessAddScriptIntoQuizFolder(List<Integer> updatedScriptIds);
-        void onFailAddScriptIntoQuizFolder(String msg);
+        void onFailAddScriptIntoQuizFolder(int msgId);
 
         void clearUI();
         void returnToQuizFolderFragment();
@@ -20,7 +24,7 @@ public class AddScriptIntoFolderContract {
 
     interface ActionsListener {
         void initScriptList();
-        void addScriptIntoQuizFolder(Integer quizFolderId, String scriptTitle );
+        void scriptsSelected(Integer quizFolderId, ListView listView);
         void emptyScriptDialogOkButtonClicked();
     }
 }

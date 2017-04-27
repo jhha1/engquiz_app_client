@@ -53,7 +53,7 @@ public class Report {
             this.state = STATE_REPORTED;
             return this;
         } catch (Exception e){
-            String msg = "Failed Deserialize Report Object. " + e.getMessage();
+            String msg = "Failed Deserialize REPORT Object. " + e.getMessage();
             throw new MyIllegalStateException(msg);
         }
     }

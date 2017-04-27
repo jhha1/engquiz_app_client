@@ -18,10 +18,8 @@ public class AddQuizFolderContract {
 
         void showEmptyScriptDialog();
         void showQuizFolderTitleDialog();
-        void showAddQuizFolderConfirmDialog();
-
         void onSuccessAddQuizFolder( List<QuizFolder> updatedQuizFolders );
-        void onFailAddQuizFolder( String msg );
+        void onFailAddQuizFolder( int msgID );
 
         void clearUI();
         void returnToQuizFolderFragment();
@@ -31,8 +29,7 @@ public class AddQuizFolderContract {
         void initScriptList();
 
         Integer checkInputtedTitle(String title );
-        void scriptsSelected();
-        void addQuizFolder( String title, ListView listView);
+        void scriptsSelected( String title, ListView mItemListView );
 
         void emptyScriptDialogOkButtonClicked();
     }

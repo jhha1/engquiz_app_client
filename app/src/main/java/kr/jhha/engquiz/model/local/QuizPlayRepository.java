@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import kr.jhha.engquiz.util.exception.EResultCode;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by jhha on 2016-10-14.
@@ -38,6 +39,10 @@ public class QuizPlayRepository
         return mCurrentQuizFolerTitle;
     }
 
+    public Integer getSentencesCount() {
+        return mSelectedQuizs.size();
+    }
+
     public Sentence getQuiz() {
         if(mSelectedQuizs.isEmpty())
             return null;
@@ -60,9 +65,9 @@ public class QuizPlayRepository
         List<Integer> scriptIds = quizFolderScriptIds;
         if( scriptIds == null ) {
             final QuizFolderRepository quizFolderRepo = QuizFolderRepository.getInstance();
-            scriptIds = quizFolderRepo.getQuizFolderScriptIDs(quizFolderId);
+            scriptIds = quizFolderRepo.getScriptIDsInFolder(quizFolderId);
             if (scriptIds == null || scriptIds.isEmpty()) {
-                return EResultCode.NOEXSITED_SCRIPT;
+                return EResultCode.QUIZFOLDER__NOEXIST_SCRIPTS;
             }
         }
 
@@ -73,21 +78,20 @@ public class QuizPlayRepository
         for(Integer scriptId : scriptIds) {
             Script script = scriptRepo.getScript( scriptId );
             if( Script.isNull(script) ) {
-                Log.e("######", "Script is null. scriptId("+scriptId+")");
+                MyLog.e("Script is null. scriptId("+scriptId+")");
                 return EResultCode.SYSTEM_ERR;
             }
-            Log.i("######", "QuizPlayRepository changePlayingQuizFolder() script title:"+script.title);
+            MyLog.d("script title:"+script.title);
             for( Sentence sentence : script.sentences ) {
                 if( Sentence.isNull(sentence) ){
-                    Log.e("######", "Sentence is null. scriptId("+scriptId+")");
+                    MyLog.e("Sentence is null. scriptId("+scriptId+")");
                     return EResultCode.SYSTEM_ERR;
                 }
                 this.mSelectedQuizs.add( sentence );
             }
         }
 
-        Log.i("######", "QuizPlayRepository changePlayingQuizFolder() " +
-                "result mSelectedQuizs:"+ mSelectedQuizs.toString());
+        MyLog.i("result mSelectedQuizs:"+ mSelectedQuizs.toString());
 
         return EResultCode.SUCCESS;
     }

@@ -3,14 +3,12 @@ package kr.jhha.engquiz.presenter_view.admin.report;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +19,12 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.Report;
 import kr.jhha.engquiz.model.local.ReportRepository;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
+import kr.jhha.engquiz.util.ui.Etc;
+import kr.jhha.engquiz.util.ui.MyDialog;
+import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REPORT;
+
 
 /**
  * Created by jhha on 2016-12-16.
@@ -29,10 +33,8 @@ import kr.jhha.engquiz.presenter_view.MyToolbar;
 public class ReportFragment extends Fragment implements  ReportContract.View
 {
     private ReportContract.ActionsListener mActionListener;
-    ReportAdapter mAdapter;
+    private ReportAdapter mAdapter;
 
-    // 다이알로그
-    private AlertDialog.Builder mDialogModify = null;
     private EditText mEditTextKo = null;
     private EditText mEditTextEn = null;
 
@@ -42,8 +44,6 @@ public class ReportFragment extends Fragment implements  ReportContract.View
 
     TextView mReportCount ;
 
-    private final String mTITLE = "Reports";
-
     public ReportFragment() {}
 
     @Override
@@ -51,33 +51,13 @@ public class ReportFragment extends Fragment implements  ReportContract.View
     {
         super.onCreate(savedInstanceState);
         mActionListener = new ReportPresenter( this, ReportRepository.getInstance() );
-        initDialog();
-    }
-
-    private void initDialog()
-    {
-        mDialogModify = new AlertDialog.Builder( getActivity() );
-        mDialogModify.setTitle("Modify");
-        mDialogModify.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                d.dismiss();
-            }
-        });
-
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        mEditTextKo = new EditText(getActivity());
-        mEditTextEn = new EditText(getActivity());
-        layout.addView(mEditTextKo);
-        layout.addView(mEditTextEn);
-        mDialogModify.setView(layout);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d("################","ReportFragment onCreateView() called");
+        MyLog.d("ReportFragment onCreateView() called");
         setUpToolBar();
 
         View view = inflater.inflate(R.layout.content_report, null);
@@ -98,9 +78,7 @@ public class ReportFragment extends Fragment implements  ReportContract.View
     }
 
     private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        toolbar.setToolBarTitle( mTITLE );
-        toolbar.switchBackground("image");
+        MyToolbar.getInstance().setToolBar(REPORT);
     }
 
     @Override
@@ -129,26 +107,32 @@ public class ReportFragment extends Fragment implements  ReportContract.View
     };
 
     @Override
-    public void showModifyDialog(final Report report){
-        mEditTextKo.setText(report.getTextKo());
-        mEditTextEn.setText(report.getTextEn());
-        mDialogModify.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-
+    public void showModifyDialog(final Report report)
+    {
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle("Modify");
+        mEditTextKo = Etc.makeEditText(getActivity(), report.getTextKo());
+        mEditTextEn = Etc.makeEditText(getActivity(), report.getTextEn());
+        dialog.setEditText(mEditTextKo, mEditTextEn);
+        dialog.setPositiveButton( new View.OnClickListener() {
+            public void onClick(View arg0)
+            {
                 Report modifiedSentence = new Report();
                 modifiedSentence.setSentenceId(report.getSentenceId());
                 modifiedSentence.setTextKo(mEditTextKo.getText().toString());
                 modifiedSentence.setTextEn(mEditTextEn.getText().toString());
                 mActionListener.modifySentence(modifiedSentence);
-            }
-        });
-        mDialogModify.show();
+                dialog.dismiss();
+            }});
+        dialog.setNegativeButton();
+        dialog.showUp();
     }
 
     @Override
-    public void onSuccessModifyReport() {
+    public void onSuccessModifyReport( String modifiedKo, String modifiedEn ) {
         Toast.makeText(getActivity(), "Success Modify.", Toast.LENGTH_SHORT).show();
         mAdapter.updateIcon(mSelectedListViewItemPosition, Report.STATE_MODIFILED);
+        mAdapter.updateSentence(mSelectedListViewItemPosition, modifiedKo, modifiedEn );
         mAdapter.notifyDataSetChanged();
     }
 

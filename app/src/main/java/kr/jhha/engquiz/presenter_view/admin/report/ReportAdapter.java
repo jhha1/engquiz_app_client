@@ -16,6 +16,7 @@ import java.util.List;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.Report;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -28,7 +29,6 @@ public class ReportAdapter extends BaseAdapter {
 
     public ReportAdapter(List<Report> reports) {
         mListView = new ArrayList<>(reports);
-        Log.e("AppContent", "new QuizFolderAdapter() mListView:"+ mListView.toString());
     }
     /*
         Adapter에 사용되는 데이터의 개수를 리턴
@@ -49,7 +49,7 @@ public class ReportAdapter extends BaseAdapter {
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
         Report item = mListView.get(position);
 
-        Log.i("####################", item.toString());
+        MyLog.d(item.toString());
 
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
@@ -66,9 +66,6 @@ public class ReportAdapter extends BaseAdapter {
         numView.setText(getText(item.getState()));
         textView1.setText(item.getTextKo());
         textView2.setText(item.getTextEn());
-        Log.i("AppContent", "ReportAdapter.getView() " +
-                "Item:"+ item.toString()
-        +", textView1:"+textView1.getText());
         return convertView;
     }
 
@@ -105,6 +102,14 @@ public class ReportAdapter extends BaseAdapter {
         Report report = (Report)getItem(position);
         if( report != null ){
             report.setState(state);
+        }
+    }
+
+    public void updateSentence(int position, String modifiedKo, String modifiedEn ){
+        Report report = (Report)getItem(position);
+        if( report != null ){
+            report.setTextKo(modifiedKo);
+            report.setTextEn(modifiedEn);
         }
     }
 }

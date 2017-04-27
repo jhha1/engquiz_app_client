@@ -22,12 +22,12 @@ public class QuizFoldersContract {
 
         // 이 퀴즈폴더를 퀴즈플레이용으로 설정 관련
         void showDialogChangePlayingQuizFolder(QuizFolder mListviewSelectedItem );
-        void onSucessChangePlayingQuizFolder();
+        void onSucessChangePlayingQuizFolder( List<QuizFolder> uiSortedQuizFolders );
         void onFailChangePlayingQuizFolder(int reason);
 
         // 퀴즈 폴더 삭제 결과
         void onSuccessDelQuizFolder(List<QuizFolder> updatedQuizFolders);
-        void onFailDelQuizFolder(String msg );
+        void onFailDelQuizFolder(int reasonCode );
     }
 
     interface ActionsListener {

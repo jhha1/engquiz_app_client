@@ -15,7 +15,7 @@ public class ReportContract {
         void onFailGetReportList(String msg);
 
         void showModifyDialog(Report report);
-        void onSuccessModifyReport();
+        void onSuccessModifyReport(String modifiedKo, String modifiedEn);
         void onFailModifyReport(String msg);
     }
 

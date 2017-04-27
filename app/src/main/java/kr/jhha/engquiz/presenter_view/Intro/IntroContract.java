@@ -7,8 +7,8 @@ package kr.jhha.engquiz.presenter_view.intro;
 public class IntroContract {
 
     interface View {
-        void showLoginDialog();
-        void showSignInDialog(String msg);
+        void showLoginDialog(int msgId);
+        void showSignInDialog(int msgId);
         void onLoginSuccess(String username);
         void onLoginFail(int what);
         void onSignInSuccess(Integer userId);

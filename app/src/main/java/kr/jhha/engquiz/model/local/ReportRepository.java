@@ -12,6 +12,7 @@ import kr.jhha.engquiz.model.remote.EProtocol2;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.model.remote.Request;
 import kr.jhha.engquiz.model.remote.Response;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 
 /**
@@ -27,6 +28,11 @@ public class ReportRepository {
 
     public interface ReportCallback {
         void onSuccess();
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface ReportModifyCallback {
+        void onSuccess(String modifiedKo, String modifiedEn);
         void onFail(EResultCode resultCode);
     }
 
@@ -53,6 +59,7 @@ public class ReportRepository {
                 {
                     List<String> reportBundles = (List) response.get(EProtocol.ReportList);
                     if(reportBundles != null) {
+                        mReports.clear();
                         for (String bundle : reportBundles) {
                             Report report = new Report(bundle);
                             mReports.add(report);
@@ -60,7 +67,7 @@ public class ReportRepository {
                     }
                     callback.onSuccess( new ArrayList<>(mReports) );
                 } else {
-                    Log.e("AppContent", "onSendReport() UnkownERROR : "+ response.getResultCodeString());
+                    MyLog.e("onSendReport() UnkownERROR : "+ response.getResultCodeString());
                     callback.onFail( response.getResultCode() );
                 }
             }
@@ -89,7 +96,7 @@ public class ReportRepository {
                 if (response.isSuccess()) {
                     callback.onSuccess();
                 } else {
-                    Log.e("AppContent", "onSendReport() UnkownERROR : "+ response.getResultCodeString());
+                    MyLog.e("onSendReport() UnkownERROR : "+ response.getResultCodeString());
                     callback.onFail( response.getResultCode() );
                 }
             }
@@ -97,7 +104,7 @@ public class ReportRepository {
     }
 
     public void sendModifiedSentence( Report report,
-                                      final ReportCallback callback )
+                                      final ReportModifyCallback callback )
     {
         Request request = new Request( EProtocol2.PID.Report_Modify );
         request.set( EProtocol.SentenceId, report.getSentenceId());
@@ -107,14 +114,16 @@ public class ReportRepository {
         net.execute();
     }
 
-    private AsyncNet.Callback onModifiedSentence(final ReportCallback callback ) {
+    private AsyncNet.Callback onModifiedSentence(final ReportModifyCallback callback ) {
         return new AsyncNet.Callback() {
             @Override
             public void onResponse(Response response) {
                 if (response.isSuccess()) {
-                    callback.onSuccess();
+                    String ko = (String)response.get(EProtocol.SentenceKo);
+                    String en = (String)response.get(EProtocol.SentenceEn);
+                    callback.onSuccess(ko, en);
                 } else {
-                    Log.e("AppContent", "onSendReport() UnkownERROR : "+ response.getResultCodeString());
+                    MyLog.e("onSendReport() Server Error: "+ response.getResultCodeString());
                     callback.onFail( response.getResultCode() );
                 }
             }

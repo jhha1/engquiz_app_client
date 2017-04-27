@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#424242</color>
-    <color name="colorPrimaryDark">#424242</color>
-    <color name="colorAccent">#FE642E</color>
-    <color name="colorBackground">#e0e0e0</color>
-    <color name="lite_gray">#eeeeee</color>
-    <color name="colorSlidingDrawerMenuIconText">#494704</color>
-    <color name="colorGamePlayBackground">@color/colorPrimary</color>
-    <color name="colorTextWhite">#dddddd</color>
-    <color name="colorTextDark">@color/colorPrimary</color>
+    <color name="colorPrimary">@color/primary_material_light</color>
+    <color name="colorPrimaryDark">@color/primary_dark_material_light</color>
+    <color name="colorAccent">@color/orange</color>
 
+    <!-- For Quiz Play -->
+    <color name="PlayQuizDark">#424242</color>
+    <color name="PlayQuizLight">@color/gray</color>
+    <color name="PlayQuizYellow">#BDA649</color>
+    <color name="PlayQuizGreen">#7fa87f</color>
+    <color name="PlayQuizYellowGreen">@android:color/holo_green_light</color>
 
-    <!-- Navigation Drawer -->
-    <!-- App Main Palette -->
-    <color name="primary">@color/blue_500</color>
-    <color name="primaryDark">@color/blue_700</color>
-    <color name="textPrimary">@color/text_black_primary</color>
-
-    <!-- Text -->
-    <color name="text_black_primary">@color/black_87</color>
-
-    <color name="text_white_primary">@color/white</color>
+    <!-- Red -->
+    <color name="yellow_10">#f0f0e9</color>
+    <color name="yellow50">#f2c771</color>
+    <color name="yellow100">@android:color/holo_orange_light</color>
+    <color name="orange">#e27e6a</color>
 
     <!-- Blue -->
+    <color name="mint">#B8EBBE</color>
+    <color name="sky">@color/accent_material_dark</color>
+    <color name="blue_50">#a3cacb</color>
     <color name="blue_500">#2196f3</color>
     <color name="blue_700">#1976D2</color>
 
     <!-- Black and White -->
     <color name="white">#FFF</color>
+    <color name="gray_10">#fffafafa</color>
+    <color name="gray_15">#f1f1f1</color>
+    <color name="gray_30">#eeeeee</color>
+    <color name="gray_50">#dddddd</color>
+    <color name="gray_80">#888888</color>
+    <color name="gray">#CBCBCB</color>
+    <color name="black_alpha_20">#22000000</color>
+    <color name="black_alpha_30">#44000000</color>
     <color name="black_alpha_40">#66000000</color>
+    <color name="black_alpha_50">#88000000</color>
     <color name="black_alpha_60">#99000000</color>
-
+    <color name="black_alpha_70">#aa000000</color>
+    <color name="black_alpha_80">#bb000000</color>
     <color name="black_87">#DE000000</color>
     <!-- /////////////////////////////////////////////////////////// -->
 

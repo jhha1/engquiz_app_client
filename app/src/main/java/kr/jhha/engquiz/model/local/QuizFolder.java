@@ -38,7 +38,7 @@ public class QuizFolder
     public static final String Field_TITLE = "TITLE";
     public static final String Field_SCRIPT_ID_LIST = "SCRIPT_ID_LIST";
 
-
+    public static final int TITLE_MAX_LEN = 30;
 
     public QuizFolder()
     {

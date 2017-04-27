@@ -1,80 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    style="@style/MyFragment"
+    android:orientation="vertical"
     tools:context=".presenter_view.sync.SyncFragment">
 
-    <TextView
-        android:id="@+id/update_text_description1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="퀴즈를 최신으로 유지하세요!"
-        android:textColor="@color/colorTextDark"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-    <TextView
-        android:id="@+id/update_text_description2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@id/update_text_description1"
-        android:layout_marginTop="20dp"
-        android:text="업데이트 된 퀴즈들은 게임에 바로 적용되어요."
-        android:textColor="@color/colorTextDark"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
     <LinearLayout
-        android:id="@+id/update_layout_check_download"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/update_text_description2"
-        android:layout_marginTop="50dp">
-
+        android:layout_weight="2">
         <TextView
-            android:id="@+id/update_text_datadownload_warning"
+            android:id="@+id/update_text_description1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_weight="1"
-            android:text="총 %nMB의 데이터를 다운로드 합니다.
-                          \n Wifi 접속이 아닐경우 데이터 요금이 부과됩니다.
-                          \n 계속하시겠습니까?"
-            android:textColor="@color/colorTextDark"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <Button
-            android:id="@+id/update_btn_download"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="download"
-            android:layout_marginTop="30dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/update_layout_complate_download"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@id/update_text_description2"
-        android:layout_marginTop="50dp"
-        android:visibility="invisible">
+            android:layout_marginTop="15dp"
+            android:text="스크립트 문장을 최신으로 유지하세요!"
+            android:textColor="@color/sky"
+            android:textSize="20dp"/>
 
         <TextView
+            android:id="@+id/update_text_description2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginTop ="15dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="18dp"
             android:gravity="center"
-            android:text="퀴즈가 최신입니다."
-            android:textColor="@color/colorTextDark"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:text="수강생 분들이 요청하신 이상한 문장 수정이 완료 되어 동기화를 기다리고 있어요. \nSYNC 버튼을 클릭하면, \n수정된 문장들을 받을 수 있어요."
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"
+            android:lineSpacingExtra="6dp"/>
+
+        <TextView
+            android:id="@+id/update_text_description3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:gravity="center"
+            android:text="(문장 수정요청법: 'Quiz Play' 메뉴의 오른쪽 상단 아이콘 클릭)"
+            android:textColor="@color/black_alpha_30"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/sync_textview"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:padding="30dp"
+        android:gravity="center"
+        android:layout_weight="5"
+        android:textColor="@color/black_alpha_40"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:lineSpacingExtra="8dp"
+        android:background="@drawable/img_shape_stroke_2dp_gray30"/>
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/sync_btn_download"
+        style="@style/MyButton.WideBig"
+        android:text="Sync"
+        android:textColor="@color/gray_10"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
+        android:padding="15dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+</LinearLayout>

@@ -46,17 +46,8 @@ public enum EProtocol {
 	// Sync
 	SyncResult("SyncResult"),
 
-	// Report
+	// REPORT
 	ReportList("ReportList"),
-
-	
-	// for test
-	TEST("test"),
-	TEST_TIME("time"),
-	TEST_FLOAT("-float"),
-	TEST_INTMAX("intmax"),
-	TEST_LIST("list"),
-	TEST_COMPLEXMAP("complexMap"),
 	
 	NULL("null");
 	

@@ -7,6 +7,7 @@ import java.util.List;
 import kr.jhha.engquiz.model.local.Report;
 import kr.jhha.engquiz.model.local.ReportRepository;
 import kr.jhha.engquiz.util.exception.EResultCode;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -23,7 +24,7 @@ public class ReportPresenter implements ReportContract.ActionsListener {
     }
 
     public void getReportList() {
-        Log.i("AppContent", "ReportPresenter onGetReportList() called");
+        MyLog.i("ReportPresenter onGetReportList() called");
         mReportModel.getReportList( onGetReportList() );
     }
 
@@ -52,12 +53,12 @@ public class ReportPresenter implements ReportContract.ActionsListener {
         mReportModel.sendModifiedSentence( modifiedSentence, onModifySentence() );
     }
 
-    private ReportRepository.ReportCallback onModifySentence() {
-        return new ReportRepository.ReportCallback(){
+    private ReportRepository.ReportModifyCallback onModifySentence() {
+        return new ReportRepository.ReportModifyCallback(){
 
             @Override
-            public void onSuccess() {
-                mView.onSuccessModifyReport();
+            public void onSuccess(String modifiedKo, String modifiedEn) {
+                mView.onSuccessModifyReport(modifiedKo, modifiedEn) ;
             }
 
             @Override

@@ -2,10 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:orientation="vertical"
-    style="@style/MyFragment"
+    style="@style/MyFragment.MatchListView"
     tools:context=".presenter_view.quizfolder.scripts.sentences.SentenceFragment">
 
     <TextView
@@ -14,13 +12,11 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:layout_marginBottom="6dp"
-        android:textColor="@color/colorTextDark"
+        android:textColor="@color/colorPrimaryDark"
         android:text="sentences" />
 
-    <ListView style="@style/MyEditListView"
+    <ListView style="@style/MyListView.EditText"
         android:id="@+id/sentence_listview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
         android:layout_weight="20"/>
 

@@ -71,8 +71,8 @@ public class FolderScriptsAdapter extends BaseAdapter {
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
-        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.imageView1);
-        TextView titleTextView = (TextView) convertView.findViewById(R.id.textView1);
+        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.quizfolder_listview_icon);
+        TextView titleTextView = (TextView) convertView.findViewById(R.id.quizfolder_listview_text);
 
         // 아이템 내 각 위젯에 데이터 반영
         iconImageView.setImageDrawable(getIcon(script.state));
@@ -84,16 +84,16 @@ public class FolderScriptsAdapter extends BaseAdapter {
         int resourceID;
         switch (state){
             case QuizFolder.STATE_NEW:
-                resourceID = R.drawable.ic_content__folder_normal_gray;
+                resourceID = R.drawable.ic_script__normal_gray;
                 break;
             case QuizFolder.STATE_OTHER:
-                resourceID = R.drawable.ic_content__folder_normal_gray;
+                resourceID = R.drawable.ic_script__normal_gray;
                 break;
             case QuizFolder.STATE_NEWBUTTON:
-                resourceID = R.drawable.ic_content__folder_add_gray;
+                resourceID = R.drawable.ic_script__add_gray;
                 break;
             default:
-                resourceID = R.drawable.ic_content__folder_normal_gray;
+                resourceID = R.drawable.ic_script__normal_gray;
                 break;
         }
         Drawable icon = ContextCompat.getDrawable(mContext, resourceID);

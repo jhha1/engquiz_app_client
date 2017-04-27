@@ -9,27 +9,24 @@
     android:paddingLeft="50dp"
     android:paddingRight="50dp"
     android:paddingTop="100dp"
-    android:background="@color/colorGamePlayBackground"
+    android:background="@color/PlayQuizDark"
     tools:context=".presenter_view.intro.IntroFragment">
 
-    <Button
-        android:id="@+id/intro_game_play_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="130dp"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="180dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/btn_next_question"
-        android:text="^_^"
-        android:textColor="#BDA649"
-        android:textSize="50dp"/>
+        android:layout_marginTop="10dp"
+        android:src="@drawable/img_intro__thumbs_up_yellow"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="70dp"
-        android:text="English \nQuizGame"
-        android:textColor="@color/colorTextWhite"
-        android:textSize="45dp"/>
+        android:layout_marginTop="30dp"
+        android:text="ENGLISH \nSENTENCE \nQUIZ!"
+        android:textColor="@color/gray_50"
+        android:textSize="30dp"/>
 
 </LinearLayout>

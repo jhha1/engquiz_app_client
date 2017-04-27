@@ -19,10 +19,7 @@ public class StringHelper {
         return (str == null) || str.isEmpty();
     }
 
-    private static final String EMPTY_STRING = new String();
-    public static String EMPTY_STRING() {
-        return EMPTY_STRING;
-    }
+    public static final String EMPTY_STRING = new String();
 
     public static Map<String, Object> json2map(String jsonString )
     {

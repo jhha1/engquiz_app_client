@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MyFragment"
+    android:orientation="vertical"
+    tools:context=".presenter_view.quizfolder.AddQuizFolderFragment">
+
+    <!-- explain how to use -->
+    <TextView
+        android:id="@+id/add_quizfolder_script_howtouse"
+        style="@style/MyText.MediumTitle" />
+
+    <ListView
+        style="@style/MyListView.SimpleText"
+        android:id="@+id/add_quizfolder_script_listview"
+        android:choiceMode="multipleChoice"
+        android:layout_weight="1"/>
+
+    <!-- complate button  -->
+    <Button
+        style="@style/MyButton.WideBig"
+        android:id="@+id/add_quizfolder_script_complate_btn"
+        android:layout_marginTop="20dip" />
+
+</LinearLayout>

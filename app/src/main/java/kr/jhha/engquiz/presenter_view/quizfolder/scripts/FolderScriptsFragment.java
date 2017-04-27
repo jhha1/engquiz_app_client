@@ -1,9 +1,7 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +11,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import kr.jhha.engquiz.presenter_view.MainActivity;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
@@ -21,6 +19,12 @@ import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.presenter_view.quizfolder.scripts.FolderScriptsAdapter.ScriptSummary;
 import kr.jhha.engquiz.presenter_view.quizfolder.scripts.sentences.SentenceFragment;
 import kr.jhha.engquiz.util.StringHelper;
+import kr.jhha.engquiz.util.ui.MyDialog;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_INTO_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS_IN_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -31,16 +35,11 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
     private FolderScriptsContract.ActionsListener mActionListener;
     private FolderScriptsAdapter mAdapter;
 
-    // 다이알로그
-    private AlertDialog.Builder mDialogDeleteItem = null;
-
     // 리스트뷰UI
     private ListView mItemListView;
     // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
     private ScriptSummary mListviewSelectedItem = null;
     private Integer mQuizFolderId = -1;
-
-    private String mTITLE = "Quiz ScriptSummary Folders";
 
     public FolderScriptsFragment() {}
 
@@ -49,26 +48,12 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
     {
         super.onCreate(savedInstanceState);
         mActionListener = new FolderScriptsPresenter( this, QuizFolderRepository.getInstance() );
-        initDialog();
-    }
-
-    private void initDialog()
-    {
-        mDialogDeleteItem = new AlertDialog.Builder( getActivity() );
-        mDialogDeleteItem.setTitle("스크립트 삭제");
-        mDialogDeleteItem.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                d.dismiss();
-            }
-        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         setUpToolBar();
-
         View view = inflater.inflate(R.layout.content_quizfolder, null);
         mItemListView = (ListView) view.findViewById(R.id.quizfolderview);
         // 클릭 이벤트 핸들러 정의: 원클릭-내 퀴즈 디테일 보기, 더블클릭-게임용으로 퀴즈폴더설정
@@ -88,9 +73,18 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
     }
 
     private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        toolbar.setToolBarTitle( mTITLE );
-        toolbar.switchBackground("image");
+        MyToolbar.getInstance().setToolBar(SHOW_SCRIPTS_IN_QUIZFOLDER);
+
+        // 툴바에 현 프래그먼트 제목 출력
+        mActionListener.initToolbarTitle(mQuizFolderId);
+    }
+
+    @Override
+    public void showTitle(String title) {
+        if(StringHelper.isNull(title)){
+            title = "Script Lists";
+        }
+        MyToolbar.getInstance().setToolbarTitle( title );
     }
 
     // 리스트뷰 클릭 이벤트 리스너
@@ -117,16 +111,28 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
 
             final ScriptSummary item = (ScriptSummary) parent.getItemAtPosition(position) ;
 
-            // 아이템 삭제 확인 다이알로그 띄우기
-            String msg = item.scriptTitle + " 을 삭제하시겠습니까?";
-            mDialogDeleteItem.setMessage( msg );
-            mDialogDeleteItem.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int which) {
+            final MyDialog dialog = new MyDialog(getActivity());
+            dialog.setTitle(getString(R.string.del_script__title));
+            dialog.setMessage( item.scriptTitle + getString(R.string.del_script__confirm) );
+            dialog.setPositiveButton( new View.OnClickListener() {
+                public void onClick(View arg0)
+                {
                     // 스크립트삭제
-                    mActionListener.delQuizFolderScript( item );
-                }
-            });
-            mDialogDeleteItem.show();
+                    boolean bDeletePermenantly = false;
+                    mActionListener.detachScript( item, bDeletePermenantly );
+                    dialog.dismiss();
+                }});
+            dialog.setNeutralButton(
+                    getString(R.string.del_script__permenantly_del_btn),
+                    new View.OnClickListener() {
+                        public void onClick(View arg0) {
+                            // 스크립트 영구 삭제
+                            boolean bDeletePermenantly = true;
+                            mActionListener.detachScript( item, bDeletePermenantly );
+                            dialog.dismiss();
+                }});
+            dialog.setNegativeButton();
+            dialog.showUp();
             return true;
         }
     };
@@ -141,43 +147,45 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
 
     @Override
     public void onFailGetScripts() {
-        String msg = "스크립트 리스트를 가져오는데 실패했습니다." +
-                "\n잠시 후 다시 시도해 주세요.";
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.del_script__fail_get_list),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onSuccessDelScript(List<Integer> updatedQuizFolderScriptIds) {
+    public void onSuccessDetachScript(List<Integer> updatedQuizFolderScriptIds) {
         // 데이터 변경에 대한 ui 리프레시 요청
         mAdapter.updateItems( mQuizFolderId, updatedQuizFolderScriptIds );
         mAdapter.notifyDataSetChanged();
-        Toast.makeText(getActivity(), "스크립트가 삭제되었습니다", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.del_script__succ),
+                Toast.LENGTH_SHORT).show();
     }
     @Override
-    public void onFailDelScript(String msg ) {
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+    public void onFailDetachScript(int msgId ) {
+        Toast.makeText(getActivity(), getString(msgId), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onChangeFragmetNew(){
-        final MainActivity context = ((MainActivity)getActivity());
-        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_SCRIPT_ADD;
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        final FragmentHandler.EFRAGMENT fragmentID = ADD_SCRIPT_INTO_QUIZFOLDER;
 
         // 인자값을 넘겨야함.
-        AddScriptIntoFolderFragment detailFragment = (AddScriptIntoFolderFragment) context.getFragment(fragmentID);
+        AddScriptIntoFolderFragment detailFragment = (AddScriptIntoFolderFragment) fragmentHandler.getFragment(fragmentID);
         detailFragment.setSelectedQuizGroupId(mQuizFolderId);
-        context.changeViewFragment( fragmentID );
+        fragmentHandler.changeViewFragment( fragmentID );
     }
 
     @Override
     public void onChangeFragmetShowSentenceList(Integer scriptId, String scriptTitle ) {
-        final MainActivity context = ((MainActivity)getActivity());
-        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_SENTENCE_LIST_SHOW;
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        final FragmentHandler.EFRAGMENT fragmentID = SHOW_SENTENCES_IN_SCRIPT;
 
         // 스크립트 문장 디테일보기 프래그먼트는 인자값을 넘겨야함.
-        SentenceFragment fragment = (SentenceFragment) context.getFragment(fragmentID);
+        SentenceFragment fragment = (SentenceFragment) fragmentHandler.getFragment(fragmentID);
         fragment.setScriptInfo(scriptId, scriptTitle);
-        context.changeViewFragment( fragmentID );
+        fragmentHandler.changeViewFragment( fragmentID );
     }
 
     /*
@@ -192,9 +200,6 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
 
     public void setSelectedQuizGroupId(Integer quizFolderId, String quizFolderTitle){
         mQuizFolderId = quizFolderId;
-
-        if(false == StringHelper.isNull(quizFolderTitle))
-            mTITLE = quizFolderTitle;
     }
 }
 

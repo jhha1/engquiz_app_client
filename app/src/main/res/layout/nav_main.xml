@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+        # layout_gravity: 왼쪽에서 슬라이딩.
+        # app:itemTextColor: 메뉴글씨색, itemIconTint:메뉴아이콘색, itemBackground: 메뉴(each item) 배경색
+        # background: drawer 배경색. background 위에 itemBackground가 올라간다.
+
+        # style 로 넣었을 때 사이드 정상동작하지 않는 필드들은 이곳에 직접셋팅
+     -->
+<android.support.design.widget.NavigationView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_view"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:maxWidth="@dimen/navigation_drawer_max_width"
+    app:elevation="@dimen/elevation_nav_drawer"
+    android:background="@color/colorPrimary"
+    app:itemTextColor="@color/PlayQuizDark"
+    app:itemIconTint="@color/PlayQuizDark"
+    app:itemBackground="@color/colorPrimary"
+    android:theme="@style/MyNavigationView"
+    app:headerLayout="@layout/nav_header"
+    app:menu="@menu/nav_body_menu"
+    />

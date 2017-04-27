@@ -9,6 +9,8 @@ import java.util.List;
 public class FolderScriptsContract {
 
     interface View {
+        void showTitle(String title);
+
         // 퀴즈폴더 스크립트 리스트 가져오기 결과
         void onSuccessGetScrpits(List<Integer> quizFolderScriptIds);
         void onFailGetScripts();
@@ -18,17 +20,19 @@ public class FolderScriptsContract {
         void onChangeFragmetShowSentenceList(Integer scriptId, String scriptTitle );
 
         // 스크립트 삭제 결과
-        void onSuccessDelScript(List<Integer> updatedQuizFolderScriptIds);
-        void onFailDelScript(String msg);
+        void onSuccessDetachScript(List<Integer> updatedQuizFolderScriptIds);
+        void onFailDetachScript(int msgId);
     }
 
     interface ActionsListener {
+        void initToolbarTitle(Integer quizFolderID);
+
         void getQuizFolderScripts(Integer quizfolderId);
 
         // 스크립트 클릭에 따른 로직 타기
         void listViewItemClicked(Integer scriptID, String scriptTitle);
 
         // 스크립트 삭제
-        void delQuizFolderScript(FolderScriptsAdapter.ScriptSummary item);
+        void detachScript(FolderScriptsAdapter.ScriptSummary item, boolean deleteScriptFile);
     }
 }

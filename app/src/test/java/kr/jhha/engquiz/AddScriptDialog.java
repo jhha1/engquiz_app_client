@@ -19,9 +19,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.util.FileHelper;
 import kr.jhha.engquiz.model.local.ScriptRepository;
-
+import kr.jhha.engquiz.util.ui.MyDialog;
+import kr.jhha.engquiz.util.ui.MyLog;
 /**
  * Created by thyone on 2016-12-29.
  */
@@ -127,7 +129,7 @@ public class AddScriptDialog extends Dialog
                     }*/
 
                     showDoubleCheckDialog( filename, v );
-                    //showDialog(DIALOG_YES_NO_LONG_MESSAGE);
+                    //showUp(DIALOG_YES_NO_LONG_MESSAGE);
                     break;
                // case R.quizFolderId.add_script_btn_cancel:
                     //dismiss();
@@ -176,13 +178,13 @@ public class AddScriptDialog extends Dialog
     }
 
     private void showCurrentPath( String path ) {
-        mFileLocationView.setText( "Current Location: " + path );
+        mFileLocationView.setText( " - 현재 폴더 위치: " + path );
     }
 
     private void showCurrentDirectory(String dirName ) {
         File files[] = FileHelper.getInstance().listFiles(dirName);
         if (files == null) {
-            Log.e("Tag", "Directory is null. mFilepath:" + dirName);
+            MyLog.e("Directory is null. mFilepath:" + dirName);
             return;
         }
 

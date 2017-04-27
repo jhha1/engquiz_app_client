@@ -6,6 +6,7 @@ import android.util.Log;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
 import kr.jhha.engquiz.util.exception.system.SystemException;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 public class AsyncNet extends AsyncTask<Void, Void, Void>
 {
@@ -50,9 +51,9 @@ public class AsyncNet extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if( exception != null ){
-            Log.e("###########","Net Exception. code:" + exception.getErrorCode() + ", msg:"+exception.getMessage());
+            MyLog.e("Net Exception. code:" + exception.getErrorCode() + ", msg:"+exception.getMessage());
             this.responseString = response.makeErrResponseString(exception);
-            Log.e("###########","ResponseString by Client:" + responseString);
+            MyLog.e("ResponseString by Client:" + responseString);
         }
         response.unserialize(responseString);
         callback.onResponse( response );

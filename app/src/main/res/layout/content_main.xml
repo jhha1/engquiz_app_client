@@ -6,90 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/colorTextWhite"
     tools:showIn="@layout/activity_main">
 
+    <include
+        layout="@layout/toolbar_main"/>
+
     <!--
-        kr.jhha.engquiz.presenter_view.MyToolbarar
-        android:background = 툴바에 배경 이미지 넣기
-        app:contentInsetEnd="0dp"  배경 이미지 넣을때 같이 긁어온 설정.
-        app:contentInsetStart="0dp"
+        Content Container
     -->
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:contentInsetEnd="0dp"
-        app:contentInsetStart="0dp"
-        android:background="@drawable/image_toolbar__background">
-        </android.support.v7.widget.Toolbar>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <!-- Content Container -->
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         tools:context="kr.jhha.engquiz.presenter_view.MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>
-
-
-
-<!--
-
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@color/colorBackground"
-    tools:showIn="@layout/activity_main">
-
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <android.support.v7.widget.kr.jhha.engquiz.presenter_view.MyToolbarar
-            android:quizFolderId="@+quizFolderId/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorBackground"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-            app:theme="@style/AppTheme.AppBarOverlay"
-            android:visibility="invisible"/>
-    </android.support.design.widget.AppBarLayout>
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:quizFolderId="@+quizFolderId/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context="kr.jhha.engquiz.view.MainActivity"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    </LinearLayout>
-
-</android.support.design.widget.CoordinatorLayout>
-
-<include
-layout="@layout/content_main"
-android:layout_width="match_parent"
-android:layout_height="match_parent" />
-
--->

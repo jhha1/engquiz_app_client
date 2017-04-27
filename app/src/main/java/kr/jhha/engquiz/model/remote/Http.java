@@ -19,6 +19,7 @@ import java.util.List;
 
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 public class Http
 {
@@ -49,7 +50,7 @@ public class Http
             UrlEncodedFormEntity requestEntity = new UrlEncodedFormEntity(params, "UTF_8");
             post.setEntity( requestEntity );
 
-            System.out.println("[HTTP REQUEST:URL{" + post.getURI() + "},DATA{" + requestString + "}");
+            MyLog.i("[HTTP REQUEST:URL{" + post.getURI() + "},DATA{" + requestString + "}");
             HttpResponse responsePost = client.execute(post);
 
             HttpEntity responseEntity = responsePost.getEntity();
@@ -58,12 +59,12 @@ public class Http
                 return null;
             }
             String responseString = EntityUtils.toString( responseEntity );
-            System.out.println("[HTTP RESPONSE:URL{" + post.getURI() + "},DATA{" + responseString +"}");
+            MyLog.i("[HTTP RESPONSE:URL{" + post.getURI() + "},DATA{" + responseString +"}");
 
             return responseString;
 
         } catch (UnsupportedEncodingException e ) {
-            throw new MyIllegalStateException(EResultCode.INVALID_DATA, e);
+            throw new MyIllegalStateException(EResultCode.ENCODING_ERR, e);
         } catch (IOException e){
             throw new MyIllegalStateException(EResultCode.NETWORK_ERR, e);
         } catch (Exception e){

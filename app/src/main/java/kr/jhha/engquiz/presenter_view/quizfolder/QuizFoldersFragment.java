@@ -1,10 +1,7 @@
 package kr.jhha.engquiz.presenter_view.quizfolder;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +12,24 @@ import android.widget.Toast;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.presenter_view.MainActivity;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.presenter_view.quizfolder.scripts.FolderScriptsFragment;
-import kr.jhha.engquiz.util.detact_click.ClickDetector;
-import kr.jhha.engquiz.util.detact_click.ListViewClickDetector;
+import kr.jhha.engquiz.util.ui.MyDialog;
+import kr.jhha.engquiz.util.ui.MyLog;
+import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
+import kr.jhha.engquiz.util.ui.click_detector.ListViewClickDetector;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.NEW_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS_IN_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_QUIZFOLDERS;
+import static kr.jhha.engquiz.presenter_view.quizfolder.QuizFoldersPresenter.ERR_NET;
+import static kr.jhha.engquiz.presenter_view.quizfolder.QuizFoldersPresenter.ERR_NEWBUTTON;
+import static kr.jhha.engquiz.presenter_view.quizfolder.QuizFoldersPresenter.ERR_NOEXSITED_FOLDER;
+import static kr.jhha.engquiz.presenter_view.quizfolder.QuizFoldersPresenter.ERR_NOEXSITED_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.quizfolder.QuizFoldersPresenter.NOALLOWED_DELETE_PLAYING;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -32,9 +40,6 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
     private QuizFoldersContract.ActionsListener mActionListener;
     QuizFolderAdapter mAdapter;
 
-    // 다이알로그
-    private AlertDialog.Builder mDialogChangePlayingQuizFolder = null;
-    private AlertDialog.Builder mDialogDeleteItem = null;
     // 리스트 뷰 UI
     private ListView mItemListView;
     // 리스트뷰에서 클릭한 아이템. 흐름이 중간에 끊겨서 어떤 아이템 클릭했는지 알려고 클래스변수로 저장해 둠.
@@ -42,8 +47,6 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
 
     // 클릭 or 더블클릭 감지자. 안드로이드 더블클릭 감지해 알려주는 지원없어 직접 만듬.
     private ClickDetector mClickDetector = null;
-
-    private final String mTITLE = "Quiz Folders";
 
     public QuizFoldersFragment() {}
 
@@ -54,34 +57,11 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
 
         mActionListener = new QuizFoldersPresenter( this, QuizFolderRepository.getInstance() );
         mClickDetector = new ListViewClickDetector( this );
-        initDialog();
-    }
-
-    private void initDialog()
-    {
-        mDialogDeleteItem = new AlertDialog.Builder( getActivity() );
-        mDialogDeleteItem.setTitle("내 퀴즈 삭제");
-        mDialogDeleteItem.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                d.dismiss();
-            }
-        });
-
-        mDialogChangePlayingQuizFolder = new AlertDialog.Builder( getActivity() );
-        mDialogChangePlayingQuizFolder.setTitle("플레이 그룹 변경");
-        mDialogChangePlayingQuizFolder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                d.dismiss();
-            }
-        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        Log.d("################","ReportFragment onCreateView() called");
-
         setUpToolBar();
 
         View view = inflater.inflate(R.layout.content_quizfolder, null);
@@ -103,9 +83,7 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
     }
 
     private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        toolbar.setToolBarTitle( mTITLE );
-        toolbar.switchBackground("image");
+        MyToolbar.getInstance().setToolBar(SHOW_QUIZFOLDERS);
     }
 
     // 리스트뷰 클릭 이벤트 리스너
@@ -144,104 +122,127 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
 
             final QuizFolder item = (QuizFolder) parent.getItemAtPosition(position) ;
 
-            // 아이템 삭제 확인 다이알로그 띄우기
-            String msg = item.getTitle() + " 을 삭제하시겠습니까?";
-            mDialogDeleteItem.setMessage( msg );
-            mDialogDeleteItem.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int which) {
+            final MyDialog dialog = new MyDialog(getActivity());
+            dialog.setTitle(getString(R.string.del_folder__title));
+            dialog.setMessage( item.getTitle() + getString(R.string.common__del_comfirm) );
+            dialog.setPositiveButton( new View.OnClickListener() {
+                public void onClick(View arg0)
+                {
                     // 퀴즈폴더삭제
                     mActionListener.delQuizFolder( item );
-                }
-            });
-            mDialogDeleteItem.show();
+                    dialog.dismiss();
+                }});
+            dialog.setNegativeButton();
+            dialog.showUp();
             return true;
         }
     };
 
     @Override
     public void onSuccessGetQuizFolderList(List<QuizFolder> quizFolders) {
-        Log.e("AppContent", "Fragment.onSuccessGetQuizFolderList(): "+ quizFolders.toString());
+        MyLog.d(quizFolders.toString());
         mAdapter = new QuizFolderAdapter( QuizFolderRepository.getInstance(), quizFolders );
         mItemListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
     @Override
     public void onFailGetQuizFolderList() {
-        String msg = "퀴즈 폴더 리스트를 가져오는데 실패했습니다." +
-                "\n잠시 후 다시 시도해 주세요.";
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.show_folders__get_folders__fail_defaut),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSuccessDelQuizFolder(List<QuizFolder> updatedQuizFolders) {
         mAdapter.updateItems( updatedQuizFolders );
         mAdapter.notifyDataSetChanged();
-        Toast.makeText(getActivity(), "퀴즈 폴더가 삭제되었습니다", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.del_folder__success),
+                Toast.LENGTH_SHORT).show();
     }
     @Override
-    public void onFailDelQuizFolder(String msg ) {
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+    public void onFailDelQuizFolder(int reasonCode ) {
+        int stringID = 0;
+        switch (reasonCode){
+            case ERR_NEWBUTTON:
+                stringID = R.string.del_folder__fail_new_btn;
+                break;
+            case NOALLOWED_DELETE_PLAYING:
+                stringID = R.string.del_folder__fail_playing_folder;
+                break;
+            case ERR_NOEXSITED_FOLDER:
+                stringID = R.string.del_folder__fail_noexist_folder;
+                break;
+            default:
+                stringID = R.string.del_folder__fail;
+                break;
+        }
+
+        Toast.makeText(getActivity(), getString(stringID), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     // 플레이용 퀴즈 변경 확인 다이알로그
     public void showDialogChangePlayingQuizFolder(final QuizFolder listviewSelectedItem ) {
-        String msg = listviewSelectedItem.getTitle() + " 을 게임용으로 선택하시겠습니까?";
-        mDialogChangePlayingQuizFolder.setMessage( msg );
-        // 플레이용 퀴즈 변경 OK 클릭 이벤트
-        mDialogChangePlayingQuizFolder.setPositiveButton( "OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int which) {
-                mActionListener.changePlayingQuizFolder( listviewSelectedItem );
-            }
-        });
-        mDialogChangePlayingQuizFolder.show();
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle(getString(R.string.show_folders__change_folder_for_playing__title));
+        dialog.setMessage( "'"+listviewSelectedItem.getTitle() + "'"
+                        + getString(R.string.show_folders__change_folder_for_playing__confirm));
+        dialog.setPositiveButton( new View.OnClickListener() {
+                                        public void onClick(View arg0)
+                                        {
+                                            mActionListener.changePlayingQuizFolder( listviewSelectedItem );
+                                            dialog.dismiss();
+                                        }});
+        dialog.setNegativeButton();
+        dialog.showUp();
     }
 
     @Override
-    public void onSucessChangePlayingQuizFolder() {
+    public void onSucessChangePlayingQuizFolder(List<QuizFolder> uiSortedQuizFolders) {
+        mAdapter.updateItems( uiSortedQuizFolders );
         mAdapter.notifyDataSetChanged();
-        Toast.makeText(getActivity(), "게임 플레이용 퀴즈 폴더 변경에 성공했습니다", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),
+                getString(R.string.show_folders__change_folder_for_playing__success),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onFailChangePlayingQuizFolder(int reason) {
-        String msg = "";
+        int stringID = 0;
         switch (reason){
-            case 1:
-                msg = "이 퀴즈폴더를 게임플레이용으로 변경하는데 실패했습니다." +
-                        "\n앱 재 시작 후 다시 시도해주세요.";
+            case ERR_NEWBUTTON:
+                stringID = R.string.show_folders__change_folder_for_playing__fail_new_folder;
                 break;
-            case 2:
-                msg = "New 버튼은 게임플레이용으로 지정할 수 없습니다.";
+            case ERR_NOEXSITED_SCRIPT:
+                stringID = R.string.show_folders__change_folder_for_playing__fail_no_script;
                 break;
-            case 3:
-                msg = "퀴즈폴더에 스크립트가 없어서 게임용 전환이 불가합니다. " +
-                        "\n퀴즈폴더에 스크립트를 먼저 추가해주세요.";
+            case ERR_NET:
+                stringID = R.string.common__network_err;
                 break;
             default:
-                msg = "이 퀴즈폴더를 게임플레이용으로 변경하는데 실패했습니다." +
-                        "\n앱 재 시작 후 다시 시도해주세요.";
+                stringID = R.string.show_folders__change_folder_for_playing__fail_default;
                 break;
         }
 
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), getString(stringID), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onChangeFragmetNew(){
-        final MainActivity context = ((MainActivity)getActivity());
-        context.changeViewFragment(MainActivity.EFRAGMENT.QUIZFOLDER_NEW);
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        fragmentHandler.changeViewFragment(NEW_QUIZFOLDER);
     }
 
     @Override
     public void onChangeFragmetFolderDetail( Integer quizFolderId, String quizFolderTitle ) {
-        final MainActivity context = ((MainActivity)getActivity());
-        final MainActivity.EFRAGMENT fragmentID = MainActivity.EFRAGMENT.QUIZFOLDER_SCRIPT_LIST_SHOW;
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        final FragmentHandler.EFRAGMENT fragmentID = SHOW_SCRIPTS_IN_QUIZFOLDER;
 
         // 퀴즈폴더 디테일보기 프래그먼트는 인자값을 넘겨야함.
-        FolderScriptsFragment detailFragment = (FolderScriptsFragment) context.getFragment(fragmentID);
+        FolderScriptsFragment detailFragment = (FolderScriptsFragment) fragmentHandler.getFragment(fragmentID);
         detailFragment.setSelectedQuizGroupId(quizFolderId, quizFolderTitle);
-        context.changeViewFragment( fragmentID );
+        fragmentHandler.changeViewFragment( fragmentID );
     }
 }
 

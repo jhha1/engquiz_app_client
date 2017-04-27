@@ -6,8 +6,9 @@ import java.util.Map;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.exception.system.SystemException;
+import kr.jhha.engquiz.util.ui.MyLog;
 
-import static kr.jhha.engquiz.util.exception.EResultCode.INVALID_DATA;
+import static kr.jhha.engquiz.util.exception.EResultCode.ENCODING_ERR;
 import static kr.jhha.engquiz.util.exception.EResultCode.NETWORK_ERR;
 
 /**
@@ -30,7 +31,7 @@ public class Response {
 
     public boolean set( EProtocol key, Object value ) {
         if( key == null || value == null ) {
-            System.out.println("ERROR Respse.set() param is null or empty. key[" +key+"], value["+value+"]");
+            MyLog.e("Respse.set() param is null or empty. key[" +key+"], value["+value+"]");
             return false;
         }
         responseMap.put(key, value);
@@ -63,8 +64,8 @@ public class Response {
     public String makeErrResponseString(SystemException e){
         StringBuilder builder = new StringBuilder("JSON={\"CODE\":\"");
         switch (e.getErrorCode()){
-            case INVALID_DATA:
-                builder.append(INVALID_DATA.intCode());
+            case ENCODING_ERR:
+                builder.append(ENCODING_ERR.intCode());
                 break;
             case NETWORK_ERR:
                 builder.append(NETWORK_ERR.intCode());
@@ -80,7 +81,7 @@ public class Response {
     public void unserialize( String responseString )
     {
         if( responseString == null || responseString.isEmpty() ) {
-            System.out.println("ERROR responseString is null or empty[" +responseString+"]");
+            MyLog.e("responseString is null or empty[" +responseString+"]");
             return;
         }
         this.responseString = responseString;
@@ -90,7 +91,7 @@ public class Response {
         int jsonBodyStartIndex = responseString.indexOf( "=" ) + 1;
         int jsonHeadEndIndex = "JSON=".length();
         if( jsonBodyStartIndex != jsonHeadEndIndex ) {
-            System.out.println("ERROR invalid responseString:" + responseString);
+            MyLog.e("invalid responseString:" + responseString);
             return;
         }
         String responseJson = responseString.substring(jsonBodyStartIndex);
@@ -98,7 +99,7 @@ public class Response {
         // json to map
         Map<String, Object> map = StringHelper.json2map( responseJson );
         if( map == null ) {
-            System.out.println("ERROR resmap is null. responseString:" + responseJson);
+            MyLog.e("resmap is null. responseString:" + responseJson);
             return;
         }
 
@@ -110,22 +111,21 @@ public class Response {
             EResultCode code = EResultCode.findBy( codeValueString );
             responseMap.put(EProtocol.CODE, code);
         }
-        System.out.println("[RES MAP] " + responseMap.toString());
     }
 
     private static Map<EProtocol, Object> string2enumOfMapKeys( Map<String, Object> map )
     {
         if( map == null || map.isEmpty() )
-            System.out.println("EResultCode.INVALID_ARGUMENT, RequestMap is null or empty (map:"+map+")");
+            MyLog.e("EResultCode.INVALID_ARGUMENT, RequestMap is null or empty (map:"+map+")");
 
         Map<EProtocol, Object> dst = new HashMap<EProtocol, Object>();
         for( Map.Entry<String, Object> e : map.entrySet() )
         {
             if( e.getKey() == null )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
+                MyLog.e("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
             EProtocol enumKey = EProtocol.toEnum( e.getKey() );
             if( EProtocol.NULL == enumKey )
-                System.out.println("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
+                MyLog.e("EResultCode.INVALID_ARGUMENT, Invalid Network Field:" + e.getKey());
 
             dst.put( enumKey, e.getValue() );
         }

@@ -9,7 +9,7 @@
     android:paddingRight="25dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".presenter_view.quizfolder.DeleteQuizFolderFragment">
+    tools:context=".presenter_view.quizfolder.QuizFoldersFragment">
 
     <!-- explain how to use -->
     <TextView
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="삭제할 리스트에 체크해주세요."
-        android:textColor="@color/colorTextWhite"
+        android:textColor="@color/colorPrimaryDark"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <!-- my quizfolders : chackable listview -->
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
-        android:background="@color/colorTextWhite"
+        android:background="@color/gray_50"
         android:paddingBottom="16dp"
         android:layout_weight="20"/>
 
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginTop="16dp"
-        android:background="@drawable/btn_next_question"
+        android:background="@drawable/img_playgame__btn_next_question"
         android:text="Delete"/>
 
 </LinearLayout>

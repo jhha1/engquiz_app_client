@@ -2,6 +2,7 @@ package kr.jhha.engquiz.presenter_view.addsentence;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.Sentence;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.StringHelper;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -171,8 +173,10 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
             // make new user's script Id
             Integer largestScriptID = 10000;
             Integer[] scriptIds = mScriptModel.getScriptIdAll();
-            for(Integer id : scriptIds){
-                largestScriptID = (largestScriptID < id)?id:largestScriptID;
+            if( scriptIds != null ) {
+                for (Integer id : scriptIds) {
+                    largestScriptID = (largestScriptID < id) ? id : largestScriptID;
+                }
             }
             Integer newScriptID = largestScriptID + 1;
             ///////////////////////////////////////////
@@ -183,27 +187,23 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
         } else {
             Integer scriptId = mScriptModel.getScriptIdByTitle(mScriptName);
             script = mScriptModel.getScript(scriptId);
-            Log.i("############### ", "call by ref or value TEST script:" +script.toString());
         }
         newSentence.scriptId = script.scriptId;
-        newSentence.sentenceId = 0;
+        newSentence.sentenceId = Sentence.makeSenetenceId( script.scriptId, script.sentences );
         script.sentences.add( newSentence );
         mScriptModel.addUserCustomScript(script);
-        Log.i("############### ", "call by ref or value TEST. after sentencec ADD..  :" +mScriptModel.getScript(script.scriptId).toString());
-        mView.showAddSentenceSuccessDialog("스크립트가 소속된", mScriptName);
 
         if( mIsNewScript ) {
             // Add Script Into Quiz Folder
             if (mIsNewQuizFolder) {
                 addQuizFolder(mSelectedQuizFolderName, script.scriptId);
             } else {
-                addQuizFolderDetail(mSelectedQuizFolderName, script.scriptId);
+                addScriptIntoQuizFolder(mSelectedQuizFolderName, script.scriptId);
             }
         }
     }
 
     private void addQuizFolder( String quizFolderName, Integer scriptId ) {
-        Log.i("AppContent", "AddSentencePresenter addScriptIntoQuizFolder() called");
         List<Integer> scriptIds = new LinkedList<>();
         scriptIds.add(scriptId);
         mQuizFolderModel.addQuizFolder( quizFolderName, scriptIds, onAddQuizFolder(quizFolderName) );
@@ -222,10 +222,9 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
         };
     }
 
-    private void addQuizFolderDetail( String quizFolderName, Integer scriptId ) {
-        Log.i("AppContent", "AddSentencePresenter addScriptIntoQuizFolder() called");
+    private void addScriptIntoQuizFolder(String quizFolderName, Integer scriptId ) {
         Integer quizFolderId = mQuizFolderModel.getQuizFolderIdByName(quizFolderName);
-        mQuizFolderModel.addScriptIntoQuizFolder( quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
+        mQuizFolderModel.attachScript( quizFolderId, scriptId, onAddQuizFolderDetail(quizFolderId) );
     }
 
     private QuizFolderRepository.AddScriptIntoQuizFolderCallback onAddQuizFolderDetail(final Integer quizFolderId ) {

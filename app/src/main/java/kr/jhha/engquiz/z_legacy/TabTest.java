@@ -1,10 +1,17 @@
 package kr.jhha.engquiz.z_legacy;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.presenter_view.MainActivity;
@@ -87,7 +94,7 @@ public class TabTest extends Fragment implements SyncContract.View
     @Override
     public void onResume() {
         // 툴바에 현 프래그먼트 제목 출력
-        ((MainActivity)getActivity()).setToolBarTitle( mTITLE );
+        ((MainActivity)getActivity()).setToolBar( mTITLE );
         super.onResume();
     }
 
@@ -153,3 +160,5 @@ public class TabTest extends Fragment implements SyncContract.View
     }
 }
 */
+
+

@@ -17,6 +17,7 @@ import java.util.List;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.Report;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -29,7 +30,7 @@ public class SentenceAdapter extends BaseAdapter {
 
     public SentenceAdapter(List<Sentence> sentences) {
         mListView = new ArrayList<>(sentences);
-        Log.e("AppContent", "new SentenceAdapter() mListView:"+ mListView.toString());
+        MyLog.e("new SentenceAdapter() mListView:"+ mListView.toString());
     }
     /*
         Adapter에 사용되는 데이터의 개수를 리턴
@@ -50,8 +51,6 @@ public class SentenceAdapter extends BaseAdapter {
         // Data Set(listViewItemList)에서 position에 위치한 데이터 참조 획득
         Sentence item = mListView.get(position);
 
-        Log.i("####################", item.toString());
-
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -67,7 +66,7 @@ public class SentenceAdapter extends BaseAdapter {
         numView.setText(getText(position));
         textViewKo.setText(item.textKo);
         textViewEn.setText(item.textEn);
-        Log.i("AppContent", "ReportAdapter.getView() " +
+        MyLog.d( "ReportAdapter.getView() " +
                 "Item:"+ item.toString()
         +", textViewKo:"+textViewKo.getText());
         return convertView;

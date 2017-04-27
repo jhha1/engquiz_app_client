@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 액션 바 버튼:이상한 스크립트 문장 개발자에게 수정요청 보내기  -->
+    <item android:id="@+id/action_bar__send_report"
+        android:icon="@drawable/ic_report__send"
+        android:title="@string/action_bar__send_report"
+        app:showAsAction="always" />
+
+    <!-- 오버플로우 공간 안에 있는 "셋팅" 액션 아이템
+    <item
+        android:sentenceId="@+sentenceId/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+        -->
+
+</menu>

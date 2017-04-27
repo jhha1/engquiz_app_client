@@ -14,6 +14,8 @@ import kr.jhha.engquiz.util.exception.EResultCode;
 
 import kr.jhha.engquiz.model.remote.Request;
 import kr.jhha.engquiz.model.remote.Response;
+import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by jhha on 2017-03-15.
@@ -21,9 +23,11 @@ import kr.jhha.engquiz.model.remote.Response;
 
 public class UserRepository {
 
+    private final static String TAG = "UserRepository";
+
     public interface CheckUserCallback {
-        void onCheckUserSuccess( boolean bExistUser, Integer userId, String userKey );
-        void onCheckUserFail( EResultCode resultCode );
+        void onSuccess(boolean bExistUser, Integer userId, String userKey );
+        void onFail(EResultCode resultCode );
     }
 
     public interface SignInCallback {
@@ -68,6 +72,13 @@ public class UserRepository {
         return -1;
     }
 
+    public String getUserName() {
+        if( isExistUser() ){
+            return user.getUserName();
+        }
+        return "User";
+    }
+
     // 서버에서 존재하는 유저인지 확인
     private Integer checkExistUser( String nickname, final UserRepository.CheckUserCallback callback ) {
         Request request = new Request( EProtocol2.PID.CheckExistUser );
@@ -87,14 +98,14 @@ public class UserRepository {
                         // 서버에 존재하면 userid가져옴
                         Integer userID = (Integer)response.get(EProtocol.UserID);
                         String nickname = (String)response.get(EProtocol.UserName);
-                        callback.onCheckUserSuccess( bExistUser, userID, nickname );
+                        callback.onSuccess( bExistUser, userID, nickname );
                     } else {
-                        callback.onCheckUserFail( EResultCode.ACCOUNT_NONEXIST );
+                        callback.onSuccess( bExistUser, 0, StringHelper.EMPTY_STRING );
                     }
                 } else {
                     // 서버 응답 에러
-                    Log.e("AppContent", "CheckExistUserProtocol() UnkownERROR : "+ response.getResultCodeString());
-                    callback.onCheckUserFail( response.getResultCode() );
+                    MyLog.d( "CheckExistUserProtocol() UnkownERROR : "+ response.getResultCodeString());
+                    callback.onFail( response.getResultCode() );
                 }
             }
         };
@@ -117,7 +128,7 @@ public class UserRepository {
         return new AsyncNet.Callback() {
             @Override
             public void onResponse(Response response) {
-                Log.i("AppContent", "userModel onSignIn() called  response: " + response.toString());
+                MyLog.i("userModel onSignIn() called  response: " + response.toString());
                 if (response.isSuccess()) {
                     Integer userID = (Integer) response.get(EProtocol.UserID);
                     String userName = (String) response.get(EProtocol.UserName);
@@ -136,26 +147,23 @@ public class UserRepository {
         checkExistUser( username, new UserRepository.CheckUserCallback(){
 
             @Override
-            public void onCheckUserSuccess(boolean bExistUser, Integer userId, String username) {
-                // 유저정보 저장. 데이터초기화로 클라에는 유저정보가 없는 상태이므로.
-                // checkExistUser 프로토콜로 서버에서 userId, nickname, userKey 검증 완료됨.
-                // 이 후 login 결과에 상관없이, 해당유저정보는 검증된 것이므로 저장.
-                saveUserInfo( userId, username );
+            public void onSuccess(boolean bExistUser, Integer userId, String username) {
+                if( bExistUser ) {
+                    // 유저정보 저장. 데이터초기화로 클라에는 유저정보가 없는 상태이므로.
+                    // checkExistUser 프로토콜로 서버에서 userId, nickname, userKey 검증 완료됨.
+                    // 이 후 login 결과에 상관없이, 해당유저정보는 검증된 것이므로 저장.
+                    saveUserInfo(userId, username);
 
-                logIn( userId, callback ); // TODO 서버로부터 리턴코드
+                    logIn(userId, callback); // TODO 서버로부터 리턴코드
+
+                } else {
+                    callback.onLogInFail( EResultCode.NONEXIST_USER );
+                }
             }
 
             @Override
-            public void onCheckUserFail(EResultCode resultCode) {
-                switch ( resultCode ){
-                    case ACCOUNT_NONEXIST:
-                        // TODO 실패 메세지. 존재하지 않는 이름. 이름을 다시 확인
-                        callback.onLogInFail( EResultCode.INVALID_NICKNAME );
-                        break;
-                    default:
-                        callback.onLogInFail( resultCode );
-                        break;
-                }
+            public void onFail(EResultCode resultCode) {
+                callback.onLogInFail( resultCode );
             }
         } );
     }
@@ -163,7 +171,7 @@ public class UserRepository {
     // 일반적인 login.
     // 현재 빌드 버전의 앱을 사용 후 종료한 유저의 로긴. 앱 파일에서 유저정보 로드 해서 로긴.
     public Integer logIn( Integer userID, final UserRepository.LogInCallback callback ) {
-        Log.d("$$$$$$$$$$$$$$$$$", "login() called");
+        MyLog.d("login() called");
 
         Request request = new Request(EProtocol2.PID.LOGIN);
         request.set(EProtocol.UserID, userID);
@@ -184,8 +192,7 @@ public class UserRepository {
                     callback.onLogInSuccess( quizFolder, quizFolderScriptIds, syncNeededSentenceIds );
 
                 } else {
-                    // TODO 실패 메세지. 존재하지 않는 이름. 이름을 다시 확인
-                    Log.e("AppContent", "checkUserExist() UnkownERROR : "+ response.getResultCodeString());
+                    MyLog.e("checkUserExist() UnkownERROR : "+ response.getResultCodeString());
                     callback.onLogInFail( response.getResultCode() );
                 }
             }
@@ -194,22 +201,20 @@ public class UserRepository {
 
     // load from FILE.
     public User loadUserInfo() {
-        final FileHelper file = FileHelper.getInstance();
-        String dirPath = file.getAndroidAbsolutePath( FileHelper.UserInfoFolderPath );
-        String fileName = FileHelper.UserInfoFileName;
-        String userInfo = null;
-        try {
-            userInfo = file.readFile( dirPath, fileName );
-        } catch (FileNotFoundException e) {
-            Log.i("##################", "FileNotFoundException !!!!!~!! " + dirPath);
-            // 유저 데이터가 없다. 새로 생성된 앱인 경우.
-            return null;
-        } catch ( Exception e ){
-            Log.i("##################", "Exception !!!!!~!! " + dirPath);
-            // TODO 입셉션처리
-            e.printStackTrace();
-            return null;
+        String userInfo = StringHelper.EMPTY_STRING;
+        boolean bUserFileOK = checkUserInfoFile();
+        if( ! bUserFileOK ){
+            throw new IllegalStateException("Create User File Error");
         }
+        try {
+            final FileHelper file = FileHelper.getInstance();
+            String fileName = FileHelper.UserInfoFileName;
+            userInfo = file.readFile( FileHelper.UserInfoFolderPath, fileName );
+        } catch (MyIllegalStateException e){
+            throw e;
+        }
+
+        // userInfo 파일이 없는 경우. 파일을 만들었으므로 내용물을 채운다
         if(StringHelper.isNull(userInfo)) {
             User emptyUser = new User();
             return emptyUser; // nickname 입력 창으로 전환
@@ -224,6 +229,36 @@ public class UserRepository {
         }
     }
 
+    private boolean checkUserInfoFile(){
+        final FileHelper file = FileHelper.getInstance();
+        boolean bOK = file.makeDirectoryIfNotExist(FileHelper.AppRoot_AndroidPath);
+        if( bOK == false ){
+            MyLog.e("Failed checkUserInfo. Make Directory is failed. dir["+FileHelper.AppRoot_AndroidPath+"]");
+            return false;
+        }
+        bOK = file.makeDirectoryIfNotExist(FileHelper.UserInfoFolderPath);
+        if( bOK == false ){
+            MyLog.e("Failed checkUserInfo. Make Directory is failed. dir["+FileHelper.UserInfoFolderPath+"]");
+            return false;
+        }
+
+        String dir = FileHelper.UserInfoFolderPath;
+        String fileName = FileHelper.UserInfoFileName;
+        boolean bExist = file.isExist(dir, fileName);
+        if( !bExist ){
+            // userInfo 파일이 없는 경우. userInfo 파일을 만든다.
+            // 앱 처음 깔면 없음.
+            bOK = file.createFile( dir, fileName);
+            if( !bOK ){
+                MyLog.e("Failed createFile. " +
+                        "dir["+dir+"], " +
+                        "name["+fileName+"]");
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void saveUserInfo( Integer userID, String userName ){
         // 1. save into memory map
         this.user = new User( userID, userName );
@@ -235,12 +270,5 @@ public class UserRepository {
         String userInfoText = this.user.serialize();
         file.overwrite( dirPath, fileName, userInfoText );
     }
-
-
-
-
-
-
-
 }
 

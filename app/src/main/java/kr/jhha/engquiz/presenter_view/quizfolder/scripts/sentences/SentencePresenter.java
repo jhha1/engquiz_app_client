@@ -6,7 +6,9 @@ import java.util.List;
 
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
+import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -18,8 +20,7 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     private final ScriptRepository mScriptModel;
 
     private Integer mScriptId;
-
-    private Sentence mSelectedSentenceToModify;
+    private Sentence mSelectedSentence;
 
     public SentencePresenter(SentenceContract.View view, ScriptRepository model ) {
         mScriptModel = model;
@@ -27,8 +28,17 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     }
 
     @Override
+    public void initToolbarTitle(Integer scriptID) {
+        String title = mScriptModel.getScriptTitleById(scriptID);
+        if(StringHelper.isNull(title)){
+            title = "Sentences";
+        }
+        mView.showTitle(title);
+    }
+
+    @Override
     public void getSentences(Integer scriptId) {
-        Log.i("AppContent", "SentencePresenter getSentences() called. scriptId:"+scriptId);
+        MyLog.d( "scriptId:"+scriptId);
         mScriptId = scriptId;
         mScriptModel.getSentencesByScriptId(scriptId, onGetSentence());
     }
@@ -66,9 +76,15 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     }
 
     @Override
-    public void sentenceLongClicked(Sentence item) {
-        mSelectedSentenceToModify = item;
+    public void sentenceDoubleClicked(Sentence item) {
+        mSelectedSentence = item;
         mView.showModifyDialog(item);
+    }
+
+    @Override
+    public void sentenceLongClicked(Sentence item) {
+        mSelectedSentence = item;
+        mView.showDeleteDialog();
     }
 
     @Override
@@ -76,9 +92,9 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
         final ScriptRepository scriptRepo = ScriptRepository.getInstance();
 
         Sentence sentence = new Sentence();
-        sentence.scriptId = mSelectedSentenceToModify.scriptId;
-        sentence.sentenceId = mSelectedSentenceToModify.sentenceId;
-        sentence.src = mSelectedSentenceToModify.src;
+        sentence.scriptId = mSelectedSentence.scriptId;
+        sentence.sentenceId = mSelectedSentence.sentenceId;
+        sentence.src = mSelectedSentence.src;
         sentence.textKo = ko;
         sentence.textEn = en;
         scriptRepo.updateSentence(sentence, onUpdateSentence());
@@ -95,6 +111,27 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
             @Override
             public void onFail(EResultCode resultCode) {
                 mView.onFailUpdateSentence();
+            }
+        };
+    }
+
+    @Override
+    public void deleteSentence() {
+        final ScriptRepository scriptRepo = ScriptRepository.getInstance();
+        scriptRepo.deleteSentence(mSelectedSentence, onDeleteSentence());
+    }
+
+    private ScriptRepository.DeleteSenteceCallback onDeleteSentence() {
+        return new ScriptRepository.DeleteSenteceCallback(){
+
+            @Override
+            public void onSuccess() {
+                mView.onSuccessDeleteSentence();
+            }
+
+            @Override
+            public void onFail(EResultCode resultCode) {
+                mView.onFailDeleteSentence();
             }
         };
     }
