@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts;
 
-import android.util.Log;
-
 import java.util.List;
 
 import kr.jhha.engquiz.R;
@@ -31,14 +29,13 @@ public class FolderScriptsPresenter implements FolderScriptsContract.ActionsList
     public void initToolbarTitle(Integer quizFolderID) {
         String title = mQuizFolderModel.getQuizFolderNameById(quizFolderID);
         if(StringHelper.isNull(title)){
-            title = "Script Lists";
+            title = "Scripts";
         }
         mView.showTitle(title);
     }
 
     public void getQuizFolderScripts( Integer quizFolderID ){
-        final Integer userId = UserRepository.getInstance().getUserID();
-        mQuizFolderModel.getScriptsInFolder( userId, quizFolderID, onGetQuizFolderScriptList() );
+        mQuizFolderModel.getScriptsInFolder( quizFolderID, onGetQuizFolderScriptList() );
     }
 
     private QuizFolderRepository.GetQuizFolderScriptListCallback onGetQuizFolderScriptList() {
@@ -70,28 +67,11 @@ public class FolderScriptsPresenter implements FolderScriptsContract.ActionsList
     }
 
     @Override
-    public void detachScript(FolderScriptsAdapter.ScriptSummary item, boolean deleteScriptFile )
+    public void detachScript( FolderScriptsAdapter.ScriptSummary item )
     {
         if( item == null ) {
-            mView.onFailDetachScript( R.string.del_script__fail_no_exist_script );
+            mView.onFailDetachScript( R.string.del_script_from_folder__fail_no_exist_script );
             return;
-        }
-
-        // file 영구 제거
-        if( deleteScriptFile ) {
-            final ScriptRepository scriptRepository = ScriptRepository.getInstance();
-            // 선생님이 작성한 파일은 영구제거 불가
-            if (! scriptRepository.isUserMadeScript(item.scriptId)){
-                mView.onFailDetachScript(R.string.del_script__fail_cannot_del_teacher_script );
-                return;
-            }
-
-            // 영구제거 실패
-            boolean bOK = scriptRepository.deleteUserCustomScriptPermenantly(item.scriptId);
-            if( ! bOK ){
-                mView.onFailDetachScript(R.string.del_script__fail );
-                return;
-            }
         }
 
         Integer userId = UserRepository.getInstance().getUserID();

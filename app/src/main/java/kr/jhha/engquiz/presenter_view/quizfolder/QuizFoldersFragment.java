@@ -80,6 +80,7 @@ public class QuizFoldersFragment extends Fragment implements  QuizFoldersContrac
     @Override
     public void onResume() {
         super.onResume();
+
     }
 
     private void setUpToolBar(){

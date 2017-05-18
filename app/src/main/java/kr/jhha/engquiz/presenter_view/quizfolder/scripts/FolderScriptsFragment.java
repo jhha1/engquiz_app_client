@@ -17,12 +17,11 @@ import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.presenter_view.quizfolder.scripts.FolderScriptsAdapter.ScriptSummary;
-import kr.jhha.engquiz.presenter_view.quizfolder.scripts.sentences.SentenceFragment;
+import kr.jhha.engquiz.presenter_view.sentences.SentenceFragment;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_INTO_QUIZFOLDER;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS_IN_QUIZFOLDER;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
 
@@ -112,24 +111,15 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
             final ScriptSummary item = (ScriptSummary) parent.getItemAtPosition(position) ;
 
             final MyDialog dialog = new MyDialog(getActivity());
-            dialog.setTitle(getString(R.string.del_script__title));
-            dialog.setMessage( item.scriptTitle + getString(R.string.del_script__confirm) );
+            dialog.setTitle(getString(R.string.del_script_from_folder__title));
+            dialog.setMessage( item.scriptTitle + getString(R.string.del_script_from_folder__confirm) );
             dialog.setPositiveButton( new View.OnClickListener() {
                 public void onClick(View arg0)
                 {
                     // 스크립트삭제
                     boolean bDeletePermenantly = false;
-                    mActionListener.detachScript( item, bDeletePermenantly );
+                    mActionListener.detachScript( item );
                     dialog.dismiss();
-                }});
-            dialog.setNeutralButton(
-                    getString(R.string.del_script__permenantly_del_btn),
-                    new View.OnClickListener() {
-                        public void onClick(View arg0) {
-                            // 스크립트 영구 삭제
-                            boolean bDeletePermenantly = true;
-                            mActionListener.detachScript( item, bDeletePermenantly );
-                            dialog.dismiss();
                 }});
             dialog.setNegativeButton();
             dialog.showUp();
@@ -158,7 +148,7 @@ public class FolderScriptsFragment extends Fragment implements FolderScriptsCont
         mAdapter.updateItems( mQuizFolderId, updatedQuizFolderScriptIds );
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(),
-                getString(R.string.del_script__succ),
+                getString(R.string.del_script__from_folder_succ),
                 Toast.LENGTH_SHORT).show();
     }
     @Override

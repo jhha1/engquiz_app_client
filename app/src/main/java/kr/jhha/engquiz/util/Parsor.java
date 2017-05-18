@@ -59,17 +59,53 @@ public class Parsor
           ID@@@Title
           ex) 16@@@Unit 5 ....
      */
-    public static String[] splitParsedScriptTitleAndId( String before ) {
-        String[] divideStr = before.split( Parsor.MainSeperator);
+    public static Integer extractScriptId( String fileName ){
+        if( StringHelper.isNull(fileName)){
+            MyLog.e("Failed extractScriptId. fileName is null");
+            return -1;
+        }
+
+        String[] divideStr = fileName.split(Parsor.MainSeperator);
         if( divideStr == null || divideStr.length != 2 ) {
-            MyLog.e("Failed scplit with ParseSciprt's Title and Id (" + before + ")");
+            MyLog.e("Failed extractScriptId. invalid filename (" + fileName + ")");
+            return -1;
+        }
+        String scriptIdString = divideStr[0];
+        if( StringHelper.isNull(scriptIdString)){
+            MyLog.e("Failed extractScriptId. scriptIdString is null. filename("+fileName+")");
+            return -1;
+        }
+        return Integer.parseInt(scriptIdString);
+    }
+
+    /*
+          ID@@@Title
+          ex) 16@@@Unit 5 ....
+     */
+    public static String extractScriptTitle( String fileName ){
+        if( StringHelper.isNull(fileName)){
+            MyLog.e("Failed extractScriptTitle. fileName is null");
             return null;
         }
-        divideStr[1] = removeExtensionFromScriptTitle(divideStr[1], ".txt");
-        return divideStr;
+
+        String[] divideStr = fileName.split(Parsor.MainSeperator);
+        if( divideStr == null || divideStr.length != 2 ) {
+            MyLog.e("Failed extractScriptTitle. invalid filename (" + fileName + ")");
+            return null;
+        }
+
+        String scriptTitle = divideStr[1];
+        if( StringHelper.isNull(scriptTitle)){
+            MyLog.e("Failed extractScriptTitle. scriptTitle is null. filename("+fileName+")");
+            return null;
+        }
+        return removeExtensionFromScriptTitle(scriptTitle, ".txt");
     }
 
     public static String removeExtensionFromScriptTitle( String title, String extension ) {
+        if( false == title.contains(extension) )
+            return title;
+
         String[] divideStr = title.split(extension);
         if( divideStr == null) {
             MyLog.e("Failed remove extension from title. " +

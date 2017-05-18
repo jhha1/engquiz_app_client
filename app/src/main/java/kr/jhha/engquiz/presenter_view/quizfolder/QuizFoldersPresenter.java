@@ -1,16 +1,12 @@
 package kr.jhha.engquiz.presenter_view.quizfolder;
 
-import android.util.Log;
-
 import java.util.List;
 
-import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.UserRepository;
 import kr.jhha.engquiz.util.exception.EResultCode;
-import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.model.local.QuizFolder.STATE_NEWBUTTON;
 
@@ -107,7 +103,7 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
             public void onSuccess( List<QuizFolder> uiSortedQuizFolders ) {
                 // change folder of Memory
                 final QuizPlayRepository quizPlayRepo = QuizPlayRepository.getInstance();
-                EResultCode code = quizPlayRepo.changePlayingQuizFolder( playingQuizFolder.getId(),
+                EResultCode code = quizPlayRepo.initialize( playingQuizFolder.getId(),
                                                                             playingQuizFolder.getTitle(),
                                                                             playingQuizFolder.getScriptIds() );
                 if(code != EResultCode.SUCCESS){
@@ -134,9 +130,7 @@ public class QuizFoldersPresenter implements QuizFoldersContract.ActionsListener
 
     private void loadQuizFolderScriptIdsAndChangePlayingQuizFolder(final QuizFolder item )
     {
-        final Integer userId = UserRepository.getInstance().getUserID();
         mQuizFolderModel.getScriptsInFolder(
-                userId,
                 item.getId(),
                 new QuizFolderRepository.GetQuizFolderScriptListCallback() {
                         @Override

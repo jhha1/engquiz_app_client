@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.model.local;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +21,19 @@ public class Script
     public String title = "";
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
+    public static final int STATE_NONE = 0;
+    public static final int STATE_NORMAL_SCRIPT = 2;
+    public static final int STATE_NON_PARSED_SCRIPT = 3;
+    public static final int STATE_NEWBUTTON = 4;
+    public static final int STATE_DESCRIPTION = 5;
+
     public final static String Field_SCRIPT_ID = "SCRIPT_ID";
     public final static String Field_SCRIPT_TITLE = "SCRIPT_TITLE";
     public final static String Field_SENTENCES = "SENTENCES";
 
-    public final static int SCRIPT_ID_MIN = 10000;
+    public static final String TEXT_ADD_SCRIPT = "Add Script";
+
+    public final static int CUSTOM_SCRIPT_ID_MIN = 10000;
 
     public Script() {}
     public Script( String filename, Integer index,
@@ -106,21 +112,55 @@ public class Script
         return true;
     }
 
-    public String makeScriptFileName() {
+    public static Integer createCustomScriptID()
+    {
+        Integer lastCustomScriptID = CUSTOM_SCRIPT_ID_MIN;
+        final ScriptRepository scriptRepo = ScriptRepository.getInstance();
+        Integer[] scriptIds = scriptRepo.getScriptIdAll();
+        if( scriptIds != null ) {
+            for (Integer id : scriptIds) {
+                lastCustomScriptID = (CUSTOM_SCRIPT_ID_MIN < id) ? id : CUSTOM_SCRIPT_ID_MIN;
+            }
+        }
+        return lastCustomScriptID + 1;
+    }
+
+    public static String fileName2ScriptTitle( String filename ) {
+        String objectScriptName = StringHelper.EMPTY_STRING;
+        if( filename.contains(".pdf"))
+            objectScriptName = Parsor.removeExtensionFromScriptTitle(filename, ".pdf");
+        if( filename.contains(".txt"))
+            objectScriptName = Parsor.removeExtensionFromScriptTitle(filename, ".txt");
+        return objectScriptName;
+    }
+
+    public static String scriptTitle2FileName( String scriptTitle ) {
+        return scriptTitle2FileName(scriptTitle, ".pdf");
+    }
+
+    public static String scriptTitle2FileName( String scriptTitle, String extension ) {
+        if( StringHelper.isNull(scriptTitle)) {
+            return StringHelper.EMPTY_STRING;
+        }
+
+        if( StringHelper.isNull(extension)){
+            return scriptTitle + ".pdf";
+        } else {
+            return scriptTitle + extension;
+        }
+    }
+
+    public String makeScriptFileHeader() {
         if( StringHelper.isNull(this.title) ){
             MyLog.e("cannot make script file name. script title is null");
             return null;
         }
 
         String title_pdf_removed = Parsor.removeExtensionFromScriptTitle(title, ".pdf");
-
-        StringBuffer filename = new StringBuffer();
-        filename.append(this.scriptId + Parsor.MainSeperator);
-        filename.append(title_pdf_removed + ".txt");
-        return filename.toString();
+        return makeScriptFileHeader(this.scriptId, title_pdf_removed);
     }
 
-    public static String makeScriptFileName(Integer scriptId, String scriptTitle) {
+    public static String makeScriptFileHeader(Integer scriptId, String scriptTitle) {
         if( scriptId <= 0 || StringHelper.isNull(scriptTitle)){
             return new String();
         }
@@ -131,7 +171,7 @@ public class Script
         return filename.toString();
     }
 
-    public String makeScriptFileText() {
+    public String makeScriptFileBody() {
         StringBuffer fileText = new StringBuffer();
         for(Sentence unit : sentences)
         {
@@ -165,6 +205,11 @@ public class Script
             List<Sentence> unserializedSentences = new LinkedList<Sentence>();
             for( Map<String, Object> sentence : sentencesMap ) {
                 Sentence unserializedSentence = Sentence.deserialize(sentence);
+                if( Sentence.isNull(unserializedSentence) ) {
+                    MyLog.e("Failed To UnSerialize a Sentence. " +
+                            "this sentence is not adding into the Script.");
+                    continue;
+                }
                 unserializedSentences.add( unserializedSentence );
             }
             if( unserializedSentences == null || unserializedSentences.size() == 0 )

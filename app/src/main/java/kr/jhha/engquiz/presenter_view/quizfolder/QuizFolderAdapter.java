@@ -3,7 +3,6 @@ package kr.jhha.engquiz.presenter_view.quizfolder;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import java.util.List;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizFolderRepository;
-import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -89,7 +87,7 @@ public class QuizFolderAdapter extends BaseAdapter {
     private Drawable getIcon(Integer state){
         int resourceID = R.drawable.ic_folder__normal_gray;
         switch (state){
-            case QuizFolder.STATE_NEW:
+            case QuizFolder.STATE_NEW_ADDED:
                 resourceID = R.drawable.ic_folder__new_red;
                 break;
             case QuizFolder.STATE_PLAYING:

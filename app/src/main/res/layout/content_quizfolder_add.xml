@@ -9,6 +9,7 @@
     <!-- explain how to use -->
     <TextView
         android:id="@+id/add_quizfolder_howtouse"
+        android:text="폴더에 추가할 스크립트를 선택하세요."
         style="@style/MyText.MediumTitle" />
 
     <ListView

@@ -7,11 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.ui.click_detector.BackPressedCloseHandler;
 import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.INTRO;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.NONE;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -103,7 +105,13 @@ public class MainActivity extends AppCompatActivity {
             drawer.closeDrawer(GravityCompat.START);
         }
         mBackPressedCloseHandler.onClick(0);
-        super.onBackPressed();
+
+        WebViewFragment webView = (WebViewFragment)mFragmentHandler.getFragment(WEB_VIEW);
+        if( webView.canGoBack() ){
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     // 강제 종료

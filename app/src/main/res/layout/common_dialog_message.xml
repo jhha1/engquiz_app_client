@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scrollView"
     android:layout_width="fill_parent"
@@ -7,7 +8,8 @@
     android:paddingBottom="12dip"
     android:paddingLeft="14dip"
     android:paddingRight="10dip"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimary">
 
     <View android:id="@+id/titleDivider"
         android:visibility="invisible"
@@ -25,11 +27,13 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
 
+
     <LinearLayout android:id="@+id/customPanel1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:orientation="vertical"/>
+
+
 
     <!--
         Buttons
@@ -45,7 +49,7 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/mydialog_button_cancel"
-            style="@style/MyButton.Small.Yellow"
+            style="@style/MyButton.Small"
             android:text="Cancel"
             android:padding="5dp"
             android:layout_marginLeft="10dp"
@@ -55,7 +59,7 @@
             android:visibility="gone"/>
         <Button
             android:id="@+id/mydialog_button_neutral"
-            style="@style/MyButton.Small.Yellow"
+            style="@style/MyButton.Small"
             android:text="Neutral"
             android:padding="5dp"
             android:layout_marginLeft="10dp"
@@ -65,7 +69,7 @@
             android:visibility="gone"/>
         <Button
             android:id="@+id/mydialog_button_ok"
-            style="@style/MyButton.Small.Yellow"
+            style="@style/MyButton.Small"
             android:text="OK"
             android:padding="5dp"
             android:layout_marginLeft="10dp"

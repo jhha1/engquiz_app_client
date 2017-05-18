@@ -1,6 +1,7 @@
 package kr.jhha.engquiz.util.ui;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -150,7 +152,11 @@ public class MyDialog extends AlertDialog.Builder
      */
     public MyDialog setCustomView(int resId, Context context) {
         View customView = View.inflate(context, resId, null);
-       ((LinearLayout)mDialogBody.findViewById(R.id.customPanel1)).addView(customView);
+        return setCustomView(customView, context);
+    }
+
+    public MyDialog setCustomView(View customView, Context context) {
+        ((LinearLayout)mDialogBody.findViewById(R.id.customPanel1)).addView(customView);
         return this;
     }
 
@@ -282,6 +288,23 @@ public class MyDialog extends AlertDialog.Builder
 
     public void dismiss(){
         mRealDialog.dismiss();
+    }
+
+    // 동글뱅이 로딩 중 다이알로그.
+    public static ProgressDialog createLoadingDialog(Context context) {
+        ProgressDialog mDialogLoadingSpinner = new ProgressDialog(context);
+        mDialogLoadingSpinner.setTitle(context.getString(R.string.add_pdf_script__loading_dialog_title));
+        mDialogLoadingSpinner.setCancelable(false);
+        mDialogLoadingSpinner.setMax(1);
+        mDialogLoadingSpinner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        // Set the progress dialog background color
+        //mDialogLoadingSpinner.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFD4D9D0")));
+        // 다이얼로그에 돌아가는 원이 , 무한진행상태를 표시하게 됩니다.
+        mDialogLoadingSpinner.setIndeterminate(true);
+        // 로딩스피너 다이알로그 보이기.
+        mDialogLoadingSpinner.setMessage(context.getString(R.string.add_pdf_script__loading_dialog_text));
+       // mDialogLoadingSpinner.show();
+        return mDialogLoadingSpinner;
     }
 
     /*

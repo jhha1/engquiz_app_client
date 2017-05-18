@@ -1,6 +1,5 @@
 package kr.jhha.engquiz.model.local;
 
-import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -22,6 +21,7 @@ import kr.jhha.engquiz.model.remote.Response;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyLog;
 
+import static kr.jhha.engquiz.presenter_view.scripts.ParseScriptPresenter.TEXT_ALREADY_ADDED;
 import static kr.jhha.engquiz.util.FileHelper.ParsedFile_AndroidPath;
 
 
@@ -48,6 +48,11 @@ public class ScriptRepository {
 
     public interface ParseScriptCallback {
         void onSuccess(Script parsedScript);
+        void onFail(EResultCode resultCode);
+    }
+
+    public interface DeleteScriptCallback {
+        void onSuccess();
         void onFail(EResultCode resultCode);
     }
 
@@ -88,7 +93,17 @@ public class ScriptRepository {
 
     public boolean initailize()
     {
-        // 1.  유저가 서버로부터 파싱받은 '전체 스크립트'의 sentenceId, title 만 업로드.
+        /*
+         파일 업로드 (scriptId, scriptTitle 만)
+            - 실제 문장은 onDemand 하게 가져온다
+                -- 로드 부하 줄이고, 실행시 점유메모리크기 줄이려고
+                ---- (수강일이 누적되어 스크립트가 누적되면 전체 문장 크기가 점점 커짐)
+             - 실제 문장 가져오는 시점
+                -- 유저가 폰에서 스크립트 문장 리스트를 볼때
+                ---- ux: folders -> 아무폴더클릭-> 스크립트 중 하나 클릭 -> 문장 업로드
+          */
+
+        // 1-1. 파싱된 파일이 저장된 디렉토리 찾기
         final FileHelper file = FileHelper.getInstance();
         boolean bOK = file.makeDirectoryIfNotExist(ParsedFile_AndroidPath);
         if( !bOK ){
@@ -98,6 +113,7 @@ public class ScriptRepository {
             return false;
         }
 
+        // 1-2.  유저가 서버로부터 파싱받은 '전체 스크립트'의 scriptId, scriptTitle만 업로드.
         List<String> fileNames = file.listFileNames(ParsedFile_AndroidPath);
         if( fileNames == null ){
             // 첨 앱 설치시 등. 저장된 파일이 없는 경우는 에러가 아님.
@@ -105,20 +121,23 @@ public class ScriptRepository {
         }
 
         for (String filename : fileNames) {
-            String[] splitTitle = Parsor.splitParsedScriptTitleAndId(filename);
-            if (splitTitle == null) {
-                MyLog.e("Failed split script title. " +
+            // 2. 파일 이름에서 scriptId, scriptTitle 추출.
+            // scriptTitle은 확장자를(.txt) 제거.
+            Integer scriptId =  Parsor.extractScriptId(filename);
+            String scriptTitle = Parsor.extractScriptTitle(filename);
+            if (scriptId < 0 || scriptTitle == null) {
+                MyLog.e("Failed Extract scriptId or title. " +
                         "but, CONTINUE Upload script titles without this.  " +
-                        "title before split(" + filename + ")");
+                        "filename(" + filename + "), id("+scriptId+"), title("+scriptTitle+")");
                 continue;
             }
-            Integer scriptId = Integer.parseInt(splitTitle[0]);
-            String scriptTitle = splitTitle[1];
-            bOK = putScriptIntoMemory(UPDATE__ONLY_TITLE_ID_MAP, scriptId, scriptTitle, null);
+
+            // 3. 메모리 맵에 저장
+            bOK = saveScriptOnMemory(UPDATE__ONLY_TITLE_ID_MAP, scriptId, scriptTitle, null);
             if( !bOK ){
-                MyLog.e("Failed putScriptIntoMemory. " +
+                MyLog.e("Failed saveScriptOnMemory. " +
                         "but, CONTINUE Upload script titles without this.  " +
-                        "title (" + filename + ")");
+                        "filename(" + filename + "), id("+scriptId+"), title("+scriptTitle+")");
             }
         }
         return true;
@@ -141,6 +160,15 @@ public class ScriptRepository {
             return mAllParsedScriptIdsAndTitles_ReMap.get(title);
         }
         return -1;
+    }
+
+    // 파싱된 스크립트 가지고 있는지 확인
+    public boolean hasParsedScript(String filename) {
+        if(StringHelper.isNull(filename)) {
+            MyLog.e("filename is null or empty");
+            return false;
+        }
+        return getScriptIdByTitle(filename) > 0;
     }
 
     public String[] getScriptTitleAll() {
@@ -168,6 +196,13 @@ public class ScriptRepository {
         return false;
     }
 
+    // 파싱된 스크립트가 메모리로 올라와있는지 확인
+    private boolean isCached(Integer scriptId) {
+        return mCachedScriptMap.containsKey(scriptId);
+    }
+
+
+
     public List<String> getUserMadeScriptTitleAll() {
         List<String> titles = new LinkedList<>();
         Integer[] scriptIdAll= getScriptIdAll();
@@ -185,7 +220,7 @@ public class ScriptRepository {
     }
 
     public Script getScript(Integer scriptId) {
-        if (hasCachedParsedScript(scriptId)) {
+        if (isCached(scriptId)) {
             // 스크립트가 메모리캐시에 있으면 리턴.
             return this.mCachedScriptMap.get(scriptId);
         } else {
@@ -197,7 +232,7 @@ public class ScriptRepository {
             }
 
             // 메모리캐시에 추가 (title and id map은 추가안해도됨. 앱 로드시 전체 추가되어있음)
-            boolean bOK = putScriptIntoMemory(UPDATE__ONLY_CACHED_SCRIPT_MAP, scriptId, script.title, script);
+            boolean bOK = saveScriptOnMemory(UPDATE__ONLY_CACHED_SCRIPT_MAP, scriptId, script.title, script);
             if( ! bOK ){
                 MyLog.e("Failed loadScriptFile. scriptId:" + scriptId);
                 return null;
@@ -211,9 +246,10 @@ public class ScriptRepository {
         // TODO check if is pdf by filename.
 
         byte[] pdfFile = FileHelper.getInstance().readBinary(filepath, filename);
-
-        MyLog.e("[Load PDF] filename:" + filename + ", filepath:" + filepath
-                + ", pdfsize:" + pdfFile.length + ", pdf:" + pdfFile);
+        if( pdfFile == null ){
+            MyLog.e("Failed Load PDF. filename:" + filename + ", filepath:" + filepath);
+            return null;
+        }
         return pdfFile;
     }
 
@@ -221,9 +257,9 @@ public class ScriptRepository {
         String scriptTitle = this.mAllParsedScriptIdsAndTitles.get(scriptId);
 
         // load from file
-        String scriptFileName = Script.makeScriptFileName(scriptId, scriptTitle);
+        String scriptFileName = Script.makeScriptFileHeader(scriptId, scriptTitle);
         if (StringHelper.isNull(scriptFileName)) {
-            MyLog.e("makeScriptFileName is null. filename("+scriptFileName+")");
+            MyLog.e("makeScriptFileHeader is null. filename("+scriptFileName+")");
             return null;
         }
 
@@ -248,7 +284,7 @@ public class ScriptRepository {
         // 파싱되어 메모리에 저장된 스크립트가 있다면, 그것을 리턴
         Integer scriptId = getScriptIdByTitle(pdfFileName);
         if (scriptId > 0) {
-            if (hasCachedParsedScript(scriptId)) {
+            if (isCached(scriptId)) {
                 Script script = getScript(scriptId);
                 callback.onSuccess(script);
                 return;
@@ -257,6 +293,12 @@ public class ScriptRepository {
 
         // 없다면, PDF원본을 APP에서 로드해 서버로부터 파싱받아 메모리&파일에 저장.
         byte[] pdfFile = loadPDF(pdfFilePath, pdfFileName);
+        if( pdfFile == null ){
+            MyLog.e("Failed addPDFScript. pdf is null. " +
+                    "filePath("+pdfFilePath+"), fileName("+pdfFileName+")");
+            callback.onFail(EResultCode.NULL_VALUE);
+            return;
+        }
 
         Request request = new Request(EProtocol2.PID.ParseSciprt);
         request.set(EProtocol.UserID, userId);
@@ -278,7 +320,7 @@ public class ScriptRepository {
                         callback.onFail(EResultCode.SYSTEM_ERR);
                         return;
                     }
-                    boolean bOK = saveScriptInLocal(newScript);
+                    boolean bOK = saveScriptOnLocal(newScript);
                     if( false == bOK ){
                         callback.onFail(EResultCode.SYSTEM_ERR);
                         return;
@@ -293,28 +335,67 @@ public class ScriptRepository {
         };
     }
 
-    private boolean saveScriptInLocal(Script script) {
+    public void deleteScript( Integer scriptId, final DeleteScriptCallback callback ){
+        Request request = new Request( EProtocol2.PID.DeleteScript);
+        request.set(EProtocol.ScriptId, scriptId);
+        AsyncNet net = new AsyncNet( request, onDeleteScript(scriptId, callback) );
+        net.execute();
+    }
+
+    private AsyncNet.Callback onDeleteScript(final Integer scriptId, final DeleteScriptCallback callback ) {
+        return new AsyncNet.Callback() {
+            @Override
+            public void onResponse(Response response) {
+                if (response.isSuccess()) {
+                    boolean bOK = removeScriptFromLocal(scriptId);
+                    if( bOK ) {
+                        callback.onSuccess();
+                    } else {
+                        callback.onFail(EResultCode.SYSTEM_ERR);
+                    }
+                } else {
+                    // 서버 응답 에러
+                    MyLog.e("Server respond ERROR : "+ response.getResultCodeString());
+                    callback.onFail( response.getResultCode() );
+                }
+            }
+        };
+    }
+
+    private boolean saveScriptOnLocal(Script script)
+    {
         Script.checkScriptID(script.scriptId);
 
         // 오프라인 파일에 저장
-        String fileName = script.makeScriptFileName();
+        boolean bOK = saveScriptOnFile(script);
+        if( bOK ){
+            // 메모리 맵에 저장
+            return saveScriptOnMemory(UPDATE__ALL, script.scriptId, script.title, script);
+        }
+        return false;
+    }
+
+    // 오프라인 파일에 저장
+    private boolean saveScriptOnFile(Script script) {
+        Script.checkScriptID(script.scriptId);
+
+        // 오프라인 파일에 저장
+        String fileName = script.makeScriptFileHeader();
         if(StringHelper.isNull(fileName)) {
-            MyLog.e("Failed saveScriptInLocal[" + script.title + "]");
+            MyLog.e("Failed saveScriptOnLocal[" + script.title + "]");
             return false;
         }
-        String fileText = script.makeScriptFileText();
+        String fileText = script.makeScriptFileBody();
         boolean bOK = FileHelper.getInstance().overwrite(
                 ParsedFile_AndroidPath, fileName, fileText);
         if (false == bOK) {
             MyLog.e("Failed overwrite script into file [" + script.title + "]");
             return false;
         }
-
-        // 메모리 맵에 저장
-        return putScriptIntoMemory(UPDATE__ALL, script.scriptId, script.title, script);
+        return true;
     }
 
-    private boolean putScriptIntoMemory(int addType, Integer scriptId, String title, Script script)
+    private boolean saveScriptOnMemory(int addType, Integer scriptId, String title, Script script)
     {
         if(addType == UPDATE__ALL || addType == UPDATE__ONLY_CACHED_SCRIPT_MAP){
             if(Script.isNull(script)){
@@ -324,15 +405,14 @@ public class ScriptRepository {
         }
         Integer checkedScriptID = (scriptId==null || scriptId<0)?script.scriptId:scriptId;
         if( checkedScriptID == null || checkedScriptID < 0){
-            MyLog.e("Failed putScriptIntoMemory. scriptId null");
+            MyLog.e("Failed saveScriptOnMemory. scriptId null");
             return false;
         }
         String checkedScriptTitle = StringHelper.isNull(title)?script.title:title;
         if(StringHelper.isNull(checkedScriptTitle)){
-            MyLog.e("Failed putScriptIntoMemory. ScriptTitle null");
+            MyLog.e("Failed saveScriptOnMemory. ScriptTitle null");
             return false;
         }
-
 
         switch (addType){
             case UPDATE__ONLY_TITLE_ID_MAP:
@@ -350,6 +430,41 @@ public class ScriptRepository {
             default:
                 return false;
         }
+        return true;
+    }
+
+    public boolean removeScriptFromLocal(Integer scriptId)
+    {
+        Script script = getScript(scriptId);
+        if( script == null){
+            MyLog.e("Failed deleteFile[ Script is null]");
+            return true;
+        }
+        boolean bOK = removeScriptFile(scriptId);
+        if( bOK ){
+            return removeScriptFromMemory(UPDATE__ALL, scriptId, script.title);
+        }
+        return false;
+    }
+
+    public boolean removeScriptFile(Integer scriptId){
+        Script script = getScript(scriptId);
+        if( script == null){
+            MyLog.e("Failed deleteFile[ Script is null]");
+            return true;
+        }
+        String fileName = script.makeScriptFileHeader();
+        if(StringHelper.isNull(fileName)) {
+            MyLog.e("Failed deleteFile[" + script.title + "]");
+            return false;
+        }
+        final FileHelper fileHelper = FileHelper.getInstance();
+        boolean bOK = fileHelper.deleteFile(ParsedFile_AndroidPath, fileName);
+        if (false == bOK) {
+            MyLog.e("Failed deleteFile[" + script.title + "]");
+            return false;
+        }
+
         return true;
     }
 
@@ -386,46 +501,58 @@ public class ScriptRepository {
     }
 
     public void addUserCustomScript(Script script){
-        saveScriptInLocal(script);
-    }
-
-    public boolean deleteUserCustomScriptPermenantly(Integer scriptId){
-        Script script = getScript(scriptId);
-        if( script == null){
-            MyLog.e("Failed deleteFile[ Script is null]");
-            return true;
-        }
-        String fileName = script.makeScriptFileName();
-        if(StringHelper.isNull(fileName)) {
-            MyLog.e("Failed deleteFile[" + script.title + "]");
-            return false;
-        }
-        final FileHelper fileHelper = FileHelper.getInstance();
-        boolean bOK = fileHelper.deleteFile(ParsedFile_AndroidPath, fileName);
-        if (false == bOK) {
-            MyLog.e("Failed deleteFile[" + script.title + "]");
-            return false;
-        }
-
-        return removeScriptFromMemory(UPDATE__ALL, scriptId, script.title);
-    }
-
-    // 캐시된 스크립트 중에서 존재여부 체크
-    private boolean hasCachedParsedScript(Integer scriptId) {
-        return mCachedScriptMap.containsKey(scriptId);
+        saveScriptOnLocal(script);
     }
 
     public boolean checkFileFormat(String filename) {
         if( StringHelper.isNull(filename) ){
             MyLog.e("checkFileFormat() filename is null");
-            return false;
+            return false ;
         }
         // 옛날 pdf는 (with answers)가 없으므로 체크안함.
         String PDF = ".pdf";
         return filename.contains(PDF);
     }
 
+    /*
+       중복추가 체크
 
+       중복 추가일경우, 유저에게 선택하도록 한다.
+       추가(파싱)된 스크립트가 기존 스크립트를 over write 함.
+       이 추가(파싱)된 스크립트는 문장수정이 최신임. 서버에 있는 최신 버전 내려받으므로.
+
+       같은 스크립트인데, 아래와 같이 카톡방에서 중복 다운받아 파일이름이 다른 케이스는
+       ex) UNIT 58-1 title.pdf <- normal
+       ex) UNIT 58-1 title-1.pdf <- 중복 다운
+       서버에서 동일한 스크립트로 판단함.
+    */
+    /* 중복 다운로드 파일 이름 추출 regex
+            : 카톡에서 파일 중복 다운로드 시, 파일이름 뒤에 -1 .. 붙는다
+            : ex) UNIT 58-1 title.pdf <- normal
+            : ex) UNIT 58-1 title-1.pdf <- 중복 다운
+
+            파일 이름 뒤에서 부터 검색. 위 예제의 58-1의 -1은 추출되면 안되므로.
+
+        */
+    private static final String REGEX_DOUBLE_DOWNLOAD_TAG = "(?s)(.*)-([0-9]{1,2}).pdf";
+    public boolean checkDoubleAdd( String filename ){
+        if( StringHelper.isNull(filename))
+            return false;
+
+        if( filename.contains(TEXT_ALREADY_ADDED) )
+            return true;
+
+        // 검사에 걸리면, 파일이름의 .pdf 까지 지우고 리턴한다.
+        String extractedFileName = getFileNameRemovedDoubleDownloadTagAndPDFExtension(filename);
+        if( hasParsedScript(extractedFileName) )
+            return true;
+
+        return false;
+    }
+
+    public String getFileNameRemovedDoubleDownloadTagAndPDFExtension(String filename ){
+        return filename.replaceFirst(REGEX_DOUBLE_DOWNLOAD_TAG, "$1");
+    }
 
     /*
         Sentence
@@ -446,6 +573,27 @@ public class ScriptRepository {
         }
 
         callback.onSuccess(sentences);
+    }
+
+    public Sentence getSentence ( Integer scriptId, Integer sentenceId ) {
+        if( false == Script.checkScriptID(scriptId)
+             || false == Sentence.checkSentenceID(sentenceId)){
+            MyLog.e("invalid args. scriptId:"+scriptId +", sentenceId:"+sentenceId );
+            return null;
+        }
+
+        Script script = getScript(scriptId);
+        List<Sentence> sentences = (script==null)? null : script.sentences;
+        if( sentences == null ){
+            MyLog.e("sentences null. scriptId:"+scriptId +", sentenceId:"+sentenceId );
+            return null;
+        }
+
+        for(Sentence s: sentences){
+            if(s.sentenceId.equals(sentenceId))
+                return s;
+        }
+        return null;
     }
 
     public void updateSentence(final Sentence newSentence, final UpdateSenteceCallback callback)
@@ -485,7 +633,7 @@ public class ScriptRepository {
 
         sentences.remove(oldSentence);
         sentences.add(newSentence);
-        saveScriptInLocal(script);
+        saveScriptOnLocal(script);
 
         callback.onSuccess();
     }
@@ -526,7 +674,7 @@ public class ScriptRepository {
         }
 
         sentences.remove(targetSentence);
-        saveScriptInLocal(script);
+        saveScriptOnLocal(script);
         callback.onSuccess();
     }
 

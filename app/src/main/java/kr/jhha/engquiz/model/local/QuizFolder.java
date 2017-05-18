@@ -23,7 +23,7 @@ public class QuizFolder
     private List<Integer> scriptIds = new LinkedList<>();
 
     public static final int STATE_PLAYING = 0;
-    public static final int STATE_NEW = 1;
+    public static final int STATE_NEW_ADDED = 1;
     public static final int STATE_OTHER = 2;
     public static final int STATE_NEWBUTTON = 3;
 

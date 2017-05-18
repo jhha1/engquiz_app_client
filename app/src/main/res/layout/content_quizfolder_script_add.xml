@@ -9,6 +9,8 @@
     <!-- explain how to use -->
     <TextView
         android:id="@+id/add_quizfolder_script_howtouse"
+        android:text = "@string/add_script_into_folder__desc"
+        android:textColor="@color/black_alpha_70"
         style="@style/MyText.MediumTitle" />
 
     <ListView

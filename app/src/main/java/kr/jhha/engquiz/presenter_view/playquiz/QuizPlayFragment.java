@@ -1,11 +1,8 @@
 package kr.jhha.engquiz.presenter_view.playquiz;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,12 +15,14 @@ import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
-import kr.jhha.engquiz.presenter_view.MainActivity;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
+import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -40,6 +39,7 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     private Button mNextQuestionButton;
     private NestedScrollView mScrollView;
 
+    private Button mShowAddScriptFragmentBtn;
     private MyToolbar mToolbar;
 
     @Override
@@ -67,19 +67,12 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         mAnswerView = (TextView) mView.findViewById(R.id.answer);
 
         mShowAnswerBtn = (Button) mView.findViewById(R.id.showAnswerBtn);
-        mShowAnswerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mActionListener.getAnswer();
-            }
-        });
+        mShowAnswerBtn.setOnClickListener(mClickListener);
         mNextQuestionButton = (Button) mView.findViewById(R.id.nextQuestionBtn);
-        mNextQuestionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mActionListener.doNextQuestion();
-            }
-        });
+        mNextQuestionButton.setOnClickListener(mClickListener);
+        // 스크립트 추가 바로가기 버튼: 스크립트가 없을때
+        mShowAddScriptFragmentBtn = (Button) mView.findViewById(R.id.showAddScriptFragment);
+        mShowAddScriptFragmentBtn.setOnClickListener(mClickListener);
 
         mActionListener.initToolbarTitle();
         mActionListener.doNextQuestion();
@@ -99,6 +92,11 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     @Override
     public void onResume() {
         super.onResume();
+
+        // 화면이 올라올때마다 호출됨
+        // 문장 수정/삭제/추가, 스크립트 삭제/추가에 따른
+        // 퀴즈 데이터 다시 셋업.
+        mActionListener.resetQuizData();
     }
 
     private void setUpToolBar(){
@@ -128,8 +126,28 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     @Override
     public void showNotAvailableQuiz(){
         mQuestionView.setText(getString(R.string.play__no_exist_sentence));
+        // 스크립트 추가하러 바로가기 버튼 활성화
+        mShowAddScriptFragmentBtn.setVisibility(View.VISIBLE);
         mShowAnswerBtn.setVisibility(View.INVISIBLE);
     }
+
+    View.OnClickListener mClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.nextQuestionBtn:
+                    mActionListener.doNextQuestion();
+                    break;
+                case R.id.showAnswerBtn:
+                    mActionListener.getAnswer();
+                    break;
+                case R.id.showAddScriptFragment:
+                    final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+                    fragmentHandler.changeViewFragment( FragmentHandler.EFRAGMENT.SHOW_SCRIPTS );
+                    break;
+            }
+        }
+    };
 
     @Override
     public void showAnswer(String answer) {
@@ -150,6 +168,9 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         switch (item.getItemId()){
             case R.id.action_bar__send_report:
                 mActionListener.sendReportBtnClicked();
+                return true;
+            case R.id.action_bar__help_quizplay:
+                mActionListener.helpBtnClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -183,5 +204,20 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         Toast.makeText(getActivity(),
                 getString(msgId),
                 Toast.LENGTH_SHORT).show();
+    }
+
+   // @Override
+    public void showMoveSentenceDialog(){
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle(getString(R.string.report__send_title));
+        dialog.setMessage(getString(R.string.report__send_guide));
+        dialog.setNeutralButton( "수정 요청", new View.OnClickListener() {
+            public void onClick(View arg0)
+            {
+                mActionListener.sendReport();
+                dialog.dismiss();
+            }});
+        dialog.setNegativeButton();
+        dialog.showUp();
     }
 }

@@ -19,10 +19,14 @@ public class QuizPlayContract {
 
     interface UserActionsListener {
         void initToolbarTitle();
+        void resetQuizData();
+
         void doNextQuestion();
         void getAnswer();
 
         void sendReportBtnClicked();
         void sendReport();
+
+        void helpBtnClicked();
     }
 }

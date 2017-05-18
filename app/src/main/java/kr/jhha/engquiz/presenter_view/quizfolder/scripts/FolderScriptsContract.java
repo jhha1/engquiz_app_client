@@ -33,6 +33,6 @@ public class FolderScriptsContract {
         void listViewItemClicked(Integer scriptID, String scriptTitle);
 
         // 스크립트 삭제
-        void detachScript(FolderScriptsAdapter.ScriptSummary item, boolean deleteScriptFile);
+        void detachScript(FolderScriptsAdapter.ScriptSummary item);
     }
 }

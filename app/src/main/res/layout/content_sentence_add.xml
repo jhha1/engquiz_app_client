@@ -1,92 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MyFragment"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
     android:orientation="vertical"
-    android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp"
+    android:padding="10dp"
+    android:scrollbarStyle="outsideOverlay"
     tools:context=".presenter_view.addsentence.AddSentenceFragment">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1">
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <RelativeLayout
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/img_shape_stroke_2dp_gray30"
-            android:layout_weight="1">
+            android:layout_height="192dp"
+            android:background="@drawable/img_shape_stroke_2dp_gray30">
 
-            <View style="@style/MyLine1"
-                android:id="@+id/hr1"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr2"
-                android:layout_below="@+id/hr1"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr3"
-                android:layout_below="@+id/hr2"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr4"
-                android:layout_below="@+id/hr3"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr5"
-                android:layout_below="@+id/hr4"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr6"
-                android:layout_below="@+id/hr5"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+            </LinearLayout>
 
             <EditText style="@style/MyText.EditText.MultiLine"
                 android:id="@+id/sentence_add_ko"
                 android:hint="한글 문장 입력.."/>
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/sentence_add_next_btn"
-            style="@style/MyButton.WideBig"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:text="입력\n완료"
-            android:textSize="16sp"
-            android:textColor="@color/gray_10"
-            android:layout_weight="4.5"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1">
-
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="192dp"
             android:background="@drawable/img_shape_stroke_2dp_gray30"
-            android:layout_weight="1">
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
 
-            <View style="@style/MyLine1"
-                android:id="@+id/hr11"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr12"
-                android:layout_below="@+id/hr11"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr13"
-                android:layout_below="@+id/hr12"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr14"
-                android:layout_below="@+id/hr13"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr15"
-                android:layout_below="@+id/hr14"/>
-            <View style="@style/MyLine1"
-                android:id="@+id/hr16"
-                android:layout_below="@+id/hr15"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+                <View style="@style/MyLine1"/>
+            </LinearLayout>
 
             <EditText style="@style/MyText.EditText.MultiLine"
                 android:id="@+id/sentence_add_en"
@@ -98,10 +71,18 @@
             android:id="@+id/sentence_add_complate_btn"
             style="@style/MyButton.WideBig"
             android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:text="입력\n완료"
-            android:textSize="16sp"
-            android:textColor="@color/gray_30"
-            android:layout_weight="4.5"/>
+            android:layout_margin="5dp"
+            android:text="입 력 완 료"
+            android:textColor="@color/gray_30"/>
+
+        <!-- 투명한 빈 레이아웃. 이거 없으면 스크롤링 안됨!!  첨부터 보이게 한다. -->
+        <LinearLayout
+            android:id="@+id/sentence_add_help_scoll_working"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+        </LinearLayout>
+
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

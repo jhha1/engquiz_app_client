@@ -175,4 +175,9 @@ public class IntroFragment extends Fragment implements IntroContract.View
 
     }
 
+    @Override
+    public void onSignInFail(int msgId) {
+        MyDialog.showDialogAndForcedCloseApp(getActivity(), getString(msgId));
+    }
+
 }

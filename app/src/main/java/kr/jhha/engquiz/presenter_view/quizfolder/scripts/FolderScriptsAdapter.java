@@ -83,7 +83,7 @@ public class FolderScriptsAdapter extends BaseAdapter {
     private Drawable getIcon(Integer state){
         int resourceID;
         switch (state){
-            case QuizFolder.STATE_NEW:
+            case QuizFolder.STATE_NEW_ADDED:
                 resourceID = R.drawable.ic_script__normal_gray;
                 break;
             case QuizFolder.STATE_OTHER:

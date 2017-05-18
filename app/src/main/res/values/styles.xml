@@ -117,7 +117,7 @@
         <item name="android:paddingBottom">6dp</item>
     </style>
     <style name="MyListView.EditText.Item.TextIcon">
-        <item name="android:layout_width">32sp</item>
+        <item name="android:layout_width">42dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:text">Num</item>
@@ -163,7 +163,6 @@
         <item name="android:layout_gravity">left|center_vertical</item>
         <item name="android:paddingTop">5dip</item>
         <item name="android:paddingBottom">8dip</item>
-        <item name="android:text">* 폴더에 넣을 스크립트들을 선택해주세요.</item>
         <item name="android:textColor">@color/black_alpha_70</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
@@ -212,12 +211,11 @@
         <item name="android:textColor">@color/black_alpha_40</item>
         <item name="android:textSize">24sp</item>
     </style>
-    <style name="MyButton.Small"/>
-    <style name="MyButton.Small.Yellow">
+    <style name="MyButton.Small">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/img_btn_blue50</item>
+        <item name="android:background">@drawable/img_btn_small_blue50</item>
         <item name="android:text">OK</item>
         <item name="android:textColor">@color/black_alpha_60</item>
         <item name="android:textSize">14sp</item>

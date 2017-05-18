@@ -1,8 +1,6 @@
 package kr.jhha.engquiz.presenter_view.intro;
 
 import android.content.Context;
-import android.util.Log;
-import android.view.View;
 
 import java.util.List;
 
@@ -12,15 +10,11 @@ import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.User;
 import kr.jhha.engquiz.model.local.UserRepository;
-import kr.jhha.engquiz.presenter_view.FragmentHandler;
-import kr.jhha.engquiz.presenter_view.MainActivity;
 import kr.jhha.engquiz.presenter_view.MyNavigationView;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
-
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.INTRO;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -96,7 +90,7 @@ public class IntroPresenter implements IntroContract.UserActionsListener
                         break;
                     default:
                         MyLog.e( "signIn() OtherError: " + resultCode);
-                        mView.showSignInDialog(R.string.signin__fail);
+                        mView.onSignInFail(R.string.signin__fail);
                         break;
                 }
             }
@@ -162,9 +156,11 @@ public class IntroPresenter implements IntroContract.UserActionsListener
                 return;
             }
 
-            // 해당 스크립트 로드해 스크립트 맵에 initailize.
+            // 해당 스크립트 로드해 스크립트 맵에 initialize.
             final QuizPlayRepository quizPlayRepo = QuizPlayRepository.getInstance();
-            quizPlayRepo.initQuizData( quizfolderForPlaying, quizFolderScriptIds );
+            quizPlayRepo.initialize( quizfolderForPlaying.getId(),
+                    quizfolderForPlaying.getTitle()
+                    , quizFolderScriptIds );
         }
 
         // 2. 싱크 알람 띄우기

@@ -12,20 +12,26 @@ public class EProtocol2 {
         CheckExistUser(1001),
         SIGNIN(1002),
         LOGIN(1003),
-        ParseSciprt(1004),
 
-        AddUserQuizFolder(1006),
-        DelUserQuizFolder(1007),
-        GetUserQuizFolders(1008),
-        AddUserQuizFolderDetail(1009),
-        DelUserQuizFolderDetail(1010),
-        GetUserQuizFolderDetail(1011),
-        ChangePlayingQuizFolder(1012),
-        Report_GetList(1013),
-        Report_Send(1014),
-        Report_Modify(1015),
-        SYNC(1020),
-        Sync_SendResult(1021),
+        ParseSciprt(1100),
+        DeleteScript(1201),
+
+        AddUserQuizFolder(2001),
+        DelUserQuizFolder(2002),
+        GetUserQuizFolders(2003),
+        GetUserQuizFolderDetail(2101),
+        AddUserQuizFolderDetail(2102),
+        DelUserQuizFolderDetail(2103),
+
+        ChangePlayingQuizFolder(2301),
+
+
+        SYNC(3001),
+        Sync_SendResult(3002),
+
+        Report_GetList(5001),
+        Report_Send(5002),
+        Report_Modify(5003),
 
         NONE(9999);
 

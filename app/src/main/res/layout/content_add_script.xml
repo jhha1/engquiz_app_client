@@ -6,12 +6,13 @@
     style="@style/MyFragment"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".presenter_view.add_pdf_script.ParseScriptFragment">
+    tools:context=".presenter_view.scripts.ParseScriptFragment">
 
         <!-- explain how to use -->
         <TextView
             android:id="@+id/add_script_howtouse"
-            style="@style/MyText.MediumTitle" />
+            style="@style/MyText.MediumTitle"
+            android:text="* 추가할 스크립트를 선택해주세요."/>
 
         <!-- file location -->
         <TextView

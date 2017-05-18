@@ -1,7 +1,6 @@
 package kr.jhha.engquiz.presenter_view.quizfolder.scripts;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -54,14 +53,27 @@ public class AddScriptIntoFolderPresenter implements AddScriptIntoFolderContract
     @Override
     public void scriptsSelected( Integer quizfolderId, ListView itemListView )
     {
+        if( check(quizfolderId, itemListView) ) {
+            addScript(quizfolderId, itemListView);
+        }
+    }
+
+    private boolean check (Integer quizfolderId, ListView itemListView ){
+        if( ! mModel.isExistQuizFolder(quizfolderId) ){
+            mView.onFailAddScriptIntoQuizFolder( R.string.add_script_into_folder__fail);
+            return false;
+        }
+
         // 선택한 스크립트 개수 체크
         int selectedCount = itemListView.getCheckedItemCount();
         if( 0 >= selectedCount ) {
             mView.onFailAddScriptIntoQuizFolder( R.string.add_folder__fail_no_scripts_choice);
-            return;
+            return false;
         }
 
-        addScript(quizfolderId, itemListView);
+        // 이미 추가한 스크립트인지는 체크 안함
+        // 서버에서는 이미 추가된거는 제외하고 추가함.
+        return true;
     }
 
     private void addScript(Integer quizfolderId, ListView itemListView)
@@ -136,7 +148,7 @@ public class AddScriptIntoFolderPresenter implements AddScriptIntoFolderContract
             return;
 
         String quizFolderTitle = playRepo.getPlayQuizFolderTitle();
-        playRepo.changePlayingQuizFolder(quizFolderId, quizFolderTitle, updatedScriptIds);
+        //playRepo.reset(quizFolderId, quizFolderTitle, updatedScriptIds);
     }
 
     @Override

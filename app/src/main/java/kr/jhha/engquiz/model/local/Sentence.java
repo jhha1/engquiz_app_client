@@ -1,8 +1,5 @@
 package kr.jhha.engquiz.model.local;
 
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +9,7 @@ import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
 import kr.jhha.engquiz.util.ui.MyLog;
 
-import static kr.jhha.engquiz.model.local.Script.SCRIPT_ID_MIN;
+import static kr.jhha.engquiz.model.local.Script.CUSTOM_SCRIPT_ID_MIN;
 
 /**
  * Created by jhha on 2016-10-14.
@@ -155,7 +152,7 @@ public class Sentence {
         if( map.containsKey(Field_SENTENCE_ID) ){
             Object id = map.get(Field_SENTENCE_ID);
             if(false == checkSentenceID( id )){
-                MyLog.e("Failed Init Sentence Object. sentenceId:"+id );
+                MyLog.e("Failed Init Object 'Sentence'. sentenceId:"+id );
                 return null;
             }
             sentence.sentenceId = (Integer)id;
@@ -164,7 +161,8 @@ public class Sentence {
         if( map.containsKey(Field_SCRIPT_ID) ){
             Object scriptId = map.get(Field_SCRIPT_ID);
             if(false == Script.checkScriptID(scriptId)){
-                MyLog.e("Failed Init scriptId Object. sentenceId:"+sentence.sentenceId);
+                MyLog.e("Failed Init Object 'scriptId'. " +
+                        "scriptId:"+scriptId+", sentenceId:"+sentence.sentenceId);
                 return null;
             }
             sentence.scriptId = (Integer)scriptId;
@@ -173,7 +171,8 @@ public class Sentence {
         if( map.containsKey(Sentence.Field_SENTENCE_KO) ){
             Object ko = map.get(Sentence.Field_SENTENCE_KO);
             if(false == checkKoreanSentence(ko)){
-                MyLog.e("Failed Init KOREAN Sentence Object. sentenceId:"+sentence.sentenceId);
+                MyLog.e("Failed Init Object 'KOREAN Sentence'. " +
+                        "sentence(Id:"+sentence.sentenceId+",data:"+ko+")");
                 return null;
             }
             sentence.textKo = (String)ko;
@@ -182,7 +181,8 @@ public class Sentence {
         if( map.containsKey(Sentence.Field_SENTENCE_EN) ){
             Object en = map.get(Sentence.Field_SENTENCE_EN);
             if(false == checkEnglishSentence(en)){
-                MyLog.e("Failed Init ENGLIST Sentence Object. sentenceId:"+sentence.sentenceId);
+                MyLog.e("Failed Init Object 'ENGLIST Sentence'. " +
+                        "sentence(Id:"+sentence.sentenceId+",data:"+en+")");
                 return null;
             }
             sentence.textEn = (String)en;
@@ -212,7 +212,7 @@ public class Sentence {
     {
         // 수업용 스크립트를 기준으로 sentenceID를 만들 수 없다.
         // User가 만든 문장들이 저장되는 script는 id가 10000 이후 부터이므로.
-        if( scriptId < SCRIPT_ID_MIN ){
+        if( scriptId < CUSTOM_SCRIPT_ID_MIN){
             return -1;
         }
 

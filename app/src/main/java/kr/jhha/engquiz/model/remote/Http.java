@@ -27,8 +27,8 @@ public class Http
     * localhost, 127.0.0.1 등은 모바일 기기에서 실행되는 웹서버를 의미하므로 안됨
     */
     final private static String ContentType = "text/html; charset=utf-8";
-    final private static String url = "http://192.168.0.6:8080/engquiz_server";
-    //final private static String url = "http://172.30.51.58:8080/engquiz_server";
+    //final private static String url = "http://192.168.0.6:8080/engquiz_server/servlet";
+    final private static String url = "http://52.78.150.139:8080/engquiz/servlet";
 
     private static final int CONN_TIMEOUT = 3000;
     private static final int SO_TIMEOUT = 5000;

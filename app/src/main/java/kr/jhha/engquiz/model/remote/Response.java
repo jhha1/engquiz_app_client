@@ -43,8 +43,7 @@ public class Response {
     }
 
     public boolean isSuccess() {
-        EResultCode code = (EResultCode) responseMap.get(EProtocol.CODE);
-        return code.equals(EResultCode.SUCCESS);
+        return getResultCode().equals(EResultCode.SUCCESS);
     }
 
     public boolean isFail() {
@@ -53,6 +52,9 @@ public class Response {
 
     public EResultCode getResultCode() {
         EResultCode code = (EResultCode) responseMap.get(EProtocol.CODE);
+        if( code == null ){
+            code = EResultCode.UNKNOUN_ERR;
+        }
         return code;
     }
 

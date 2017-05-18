@@ -1,14 +1,10 @@
 package kr.jhha.engquiz.presenter_view.admin.report;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -63,7 +59,7 @@ public class ReportAdapter extends BaseAdapter {
         TextView textView2 = (TextView) convertView.findViewById(R.id.sentece_edit_textView2);
 
         // 아이템 내 각 위젯에 데이터 반영
-        numView.setText(getText(item.getState()));
+        numView.setText(getText(item.getModifyState()));
         textView1.setText(item.getTextKo());
         textView2.setText(item.getTextEn());
         return convertView;
@@ -101,7 +97,7 @@ public class ReportAdapter extends BaseAdapter {
     public void updateIcon(int position, int state){
         Report report = (Report)getItem(position);
         if( report != null ){
-            report.setState(state);
+            report.setModifyState(state);
         }
     }
 

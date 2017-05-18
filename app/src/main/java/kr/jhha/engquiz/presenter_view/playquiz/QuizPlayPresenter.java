@@ -6,9 +6,13 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ReportRepository;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
+import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -36,6 +40,11 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
     }
 
     @Override
+    public void resetQuizData() {
+        mModel.reset();
+    }
+
+    @Override
     public void doNextQuestion(){
         mCurrentQuiz = getNewQuiz();
         if(mCurrentQuiz == null) {
@@ -57,13 +66,27 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
     }
 
     @Override
+    public void helpBtnClicked() {
+        FragmentHandler handler = FragmentHandler.getInstance();
+        WebViewFragment fragment = (WebViewFragment)handler.getFragment(WEB_VIEW);
+        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.PLAYQUIZ);
+        handler.changeViewFragment(WEB_VIEW);
+    }
+
+    @Override
     public void sendReportBtnClicked(){
         // 문장이 null이면, 문장이 없는것..
         // 수정요청 할수없다.
         if( mCurrentQuiz == null )
             return;
 
-        mView.showSendReportDialog();
+        if( mCurrentQuiz.isMadeByUser() ) {
+            // 유저가 직접 만든 문장은, 문장수정 요청을 개발자에게 보낼 수 없다.
+            mView.onFailSendReport(R.string.report__send_fail_custom_sentence);
+            return;
+        } else {
+            mView.showSendReportDialog();
+        }
     }
 
     @Override

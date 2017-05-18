@@ -29,6 +29,13 @@ https://developer.android.com/topic/libraries/support-library/features.html?hl=k
 # last build tool version
 https://developer.android.com/studio/releases/build-tools.html
 
+# 릴리즈 apk 디버깅
+buildTypes {
+        release {
+            debuggable true   // 릴리즈 apk 디버깅 가능
+            minifyEnabled false
+        }
+    }
  */
 
 android {
@@ -45,6 +52,7 @@ android {
     }
     buildTypes {
         release {
+            debuggable true
             minifyEnabled false
         }
     }

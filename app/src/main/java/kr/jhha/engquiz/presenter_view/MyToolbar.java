@@ -77,6 +77,10 @@ public class MyToolbar {
                 title = "Quiz Playing";
                 titleColor = R.color.PlayQuizLight;
                 break;
+            case SHOW_SCRIPTS:
+                title = "Scripts";
+                titleColor = R.color.black_alpha_80;
+                break;
             case ADD_SCRIPT:
                 title = "Add Script";
                 titleColor = R.color.black_alpha_80;

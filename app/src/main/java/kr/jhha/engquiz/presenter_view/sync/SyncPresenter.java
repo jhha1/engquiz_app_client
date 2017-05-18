@@ -54,8 +54,7 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
                 List<Integer> updateFailedResult = mModel.syncClient(sentencesForSync);
                 if(false == updateFailedResult.isEmpty()){
                     sendSyncFailed(updateFailedResult);
-                    String msg = "동기화에 실패 했습니다. \n 앱 재시작 후 다시 시도해주시기 바랍니다.";
-                    mView.onFailedSync(msg);
+                    mView.onFailedSync(R.string.sync__fail);
                 } else {
                     final MyNavigationView navigationView = MyNavigationView.getInstance();
                     navigationView.detachAlarmIcon(R.id.nav_sync);
@@ -65,9 +64,8 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
 
             @Override
             public void onFail(EResultCode resultCode) {
-                MyLog.e("sync().onFail() UnkownERROR. resultCode: " + resultCode);
-                String msg = "동기화에 실패 했습니다. \n 앱 재시작 후 다시 시도해주시기 바랍니다.";
-                mView.onFailedSync(msg);
+                MyLog.e("sync().onFail() resultCode: " + resultCode);
+                mView.onFailedSync(R.string.sync__fail);
             }
         };
     }
@@ -82,15 +80,13 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
             @Override
             public void onSuccess() {
                 MyLog.d( "onSyncFailedCallback().onSuccess() ");
-                String msg = "일부 동기화에 실패 했습니다. \n 앱 재시작 후 다시 동기화 받으실 수 있습니다.";
-                mView.onFailedSync(msg);
+                mView.onFailedSync(R.string.sync__fail_apart1);
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
                 MyLog.e("onSyncFailedCallback().onFail() resultCode: " + resultCode);
-                String msg = "일부 동기화에 실패 했습니다.";
-                mView.onFailedSync(msg);
+                mView.onFailedSync(R.string.sync__fail_apart2);
             }
         };
     }

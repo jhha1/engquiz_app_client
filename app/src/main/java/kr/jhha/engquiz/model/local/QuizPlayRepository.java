@@ -1,8 +1,7 @@
 package kr.jhha.engquiz.model.local;
 
-import android.util.Log;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +10,14 @@ import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
  * Created by jhha on 2016-10-14.
+ *
+ * 문장 업데이트
+ * 문장 추가/삭제
+ * 스크립트 추가/삭제
+ *     List<Sentence> mSelectedQuizs - reset
+ *
+ * 퀴즈 폴더 변경
+ *     List<Sentence> mSelectedQuizs - initialize
  */
 
 public class QuizPlayRepository
@@ -27,8 +34,18 @@ public class QuizPlayRepository
     private List<Sentence> mSelectedQuizs = new ArrayList<Sentence>();
     private Random random = new Random();
 
-    public EResultCode initQuizData( QuizFolder quizfolder, List<Integer> quizFolderScriptIds ){
-        return changePlayingQuizFolder( quizfolder.getId(), quizfolder.getTitle(), quizFolderScriptIds );
+    public EResultCode initialize(Integer quizFolderId, String quizFolderTitle, List<Integer> quizFolderScriptIds )
+    {
+        this.mCurrentQuizFolerId = quizFolderId;
+        this.mCurrentQuizFolerTitle = quizFolderTitle;
+        setSentences( quizFolderId, quizFolderScriptIds );
+
+        return EResultCode.SUCCESS;
+    }
+
+    // 업데이트 되었을 수 있는 문장, 스크립트 추가/삭제 등.. 반영
+    public void reset(){
+        setSentences( mCurrentQuizFolerId, null );
     }
 
     public Integer getPlayQuizFolderId(){
@@ -60,46 +77,111 @@ public class QuizPlayRepository
         return selectedIndex;
     }
 
-    public EResultCode changePlayingQuizFolder( Integer quizFolderId, String quizFolderTitle, List<Integer> quizFolderScriptIds )
+    private void setSentences( Integer quizFolderId, List<Integer> scriptIds )
     {
-        List<Integer> scriptIds = quizFolderScriptIds;
-        if( scriptIds == null ) {
-            final QuizFolderRepository quizFolderRepo = QuizFolderRepository.getInstance();
-            scriptIds = quizFolderRepo.getScriptIDsInFolder(quizFolderId);
-            if (scriptIds == null || scriptIds.isEmpty()) {
-                return EResultCode.QUIZFOLDER__NOEXIST_SCRIPTS;
-            }
-        }
+        if(scriptIds != null)
+            setSentencesImpl( quizFolderId, scriptIds );
+        else
+            loadScriptIdsAndSetSentences( quizFolderId, scriptIds );
+    }
 
-        this.mCurrentQuizFolerId = quizFolderId;
-        this.mCurrentQuizFolerTitle = quizFolderTitle;
-        this.mSelectedQuizs.clear();
+    private void loadScriptIdsAndSetSentences( final Integer quizFolderId, List<Integer> scriptIds )
+    {
+        final QuizFolderRepository quizFolderRepo = QuizFolderRepository.getInstance();
+        scriptIds = quizFolderRepo.getScriptIDsInFolder(quizFolderId);
+        if (scriptIds != null && ! scriptIds.isEmpty())
+            setSentencesImpl( quizFolderId, scriptIds );
+
+        quizFolderRepo.getScriptsInFolder(
+                quizFolderId,
+                new QuizFolderRepository.GetQuizFolderScriptListCallback(){
+                    @Override
+                    public void onSuccess(List<Integer> quizFolderScripts) {
+                        setSentencesImpl( quizFolderId, quizFolderScripts );
+                    }
+                    @Override
+                    public void onFail(EResultCode resultCode) {
+                        MyLog.e("loadScriptIds is fail. resultCode("+resultCode.toString()+")");
+                    }
+                }
+        );
+    }
+
+    private void setSentencesImpl( Integer quizFolderId, List<Integer> scriptIds )
+    {
+        List<Sentence> sentences = new ArrayList<>();
         final ScriptRepository scriptRepo = ScriptRepository.getInstance();
-        for(Integer scriptId : scriptIds) {
+        for(Integer scriptId : scriptIds)
+        {
             Script script = scriptRepo.getScript( scriptId );
             if( Script.isNull(script) ) {
                 MyLog.e("Script is null. scriptId("+scriptId+")");
-                return EResultCode.SYSTEM_ERR;
+                return;
             }
+
             MyLog.d("script title:"+script.title);
             for( Sentence sentence : script.sentences ) {
                 if( Sentence.isNull(sentence) ){
                     MyLog.e("Sentence is null. scriptId("+scriptId+")");
-                    return EResultCode.SYSTEM_ERR;
+                    return;
                 }
-                this.mSelectedQuizs.add( sentence );
+                sentences.add( sentence );
             }
         }
-
-        MyLog.i("result mSelectedQuizs:"+ mSelectedQuizs.toString());
-
-        return EResultCode.SUCCESS;
+        this.mSelectedQuizs.clear();
+        this.mSelectedQuizs.addAll(sentences);
     }
 
-    private void rollbackPlayingQuizFolder(String oldQuizFolderTitle,
-                                           List<Sentence> oldSelectedQuizs){
-        this.mCurrentQuizFolerTitle = oldQuizFolderTitle;
-        this.mSelectedQuizs = oldSelectedQuizs;
+
+    /*
+    public void addSentences( List<Sentence> sentences ){
+        if( null == sentences || sentences.isEmpty() ){
+            return;
+        }
+        mSelectedQuizs.addAll(sentences);
     }
+
+    public void delSentences( Integer scriptId ){
+        if(false == Script.checkScriptID(scriptId)){
+            return;
+        }
+
+        for( Sentence sentence : mSelectedQuizs ){
+            if( sentence == null )
+                continue;
+
+            if( sentence.scriptId.equals(scriptId) ){
+                delSentence(sentence);
+            }
+        }
+    }
+
+    public void addSentence( Sentence sentence ){
+        if(Sentence.isNull(sentence))
+            return;
+
+        mSelectedQuizs.add(sentence);
+    }
+
+    public void delSentence( Sentence sentence ){
+        if(Sentence.isNull(sentence))
+            return;
+
+        mSelectedQuizs.remove(sentence);
+    }
+    public void updateSentence( Sentence newSentence ){
+        if( Sentence.isNull(newSentence))
+            return;
+
+        for( Sentence oldSentence: mSelectedQuizs){
+            int oldID = oldSentence.sentenceId;
+            int newID = newSentence.sentenceId;
+            if(oldID == newID){
+                delSentence(oldSentence);
+                addSentence(newSentence);
+            }
+        }
+    }
+    */
 }
 

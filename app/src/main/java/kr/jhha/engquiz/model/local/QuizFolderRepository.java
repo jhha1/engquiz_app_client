@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.model.local;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -311,7 +309,7 @@ public class QuizFolderRepository {
         return quizFolder.getScriptIds();
     }
 
-    public void getScriptsInFolder(Integer userId, Integer quizFolderId, final GetQuizFolderScriptListCallback callback ) {
+    public void getScriptsInFolder(Integer quizFolderId, final GetQuizFolderScriptListCallback callback ) {
         // TODO script Id + title 같이 넘기자.
         List<Integer> scrpitIds = getScriptIDsInFolder(quizFolderId);
         if( scrpitIds != null && ! scrpitIds.isEmpty() ){
@@ -320,7 +318,6 @@ public class QuizFolderRepository {
         }
 
         Request request = new Request( EProtocol2.PID.GetUserQuizFolderDetail);
-        request.set(EProtocol.UserID, userId);
         request.set(EProtocol.QuizFolderId, quizFolderId);
         AsyncNet net = new AsyncNet( request, onGetScriptsInFolder(callback) );
         net.execute();
@@ -427,6 +424,36 @@ public class QuizFolderRepository {
         for( QuizFolder quizFolder : mQuizFolders ){
             if( quizFolder.getId() == quizFolderId ){
                 quizFolder.setScriptIds(scriptIds);
+            }
+        }
+    }
+
+    /*
+        전체 폴더 중 해당 스크립트가 포함되있으면 삭제한다.
+
+        대 전제에서 벗어나는 함수.
+        1. 대 전제 :
+            서버에서 스크립트 추가/빼기 -> 서버가 던져주는 결과값(나머지 스크립트로 ui 리 소팅된 결과)을 클라에 덮어씀
+        2. 이 함수 :
+            서버 조작 완료 -> 클라에게 결과 값 안줌 -> 클라에서 값 조작 해 UI에 띄움.
+
+        # 이렇게 한 이유 :
+           1) 서버에서 클라에게 결과값 넘겨주는 오버헤드가 클것 우려. (폴더가 많고, 각 폴더 당 스크립트가 많고, 스크립트가 여러 폴더에 들어가 있는 경우)
+           2) 앱 재 시작시, 클라 조작 값은 초기화 되어 서버값으로 덮어써지기 때문에.
+     */
+    public void detachScriptFromAllFolder( Integer scriptId )
+    {
+        for( QuizFolder quizFolder : mQuizFolders )
+        {
+            if( QuizFolder.isNull(quizFolder) )
+                continue;
+
+            List<Integer> scriptIds = quizFolder.getScriptIds();
+            if( scriptIds == null )
+                continue;
+
+            if( scriptIds.contains(scriptId) ){
+                scriptIds.remove(scriptId);
             }
         }
     }

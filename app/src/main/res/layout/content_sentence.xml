@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     style="@style/MyFragment.MatchListView"
-    tools:context=".presenter_view.quizfolder.scripts.sentences.SentenceFragment">
+    tools:context=".presenter_view.sentences.SentenceFragment">
 
     <TextView
         android:id="@+id/sentences"

@@ -1,7 +1,5 @@
 package kr.jhha.engquiz.presenter_view.admin.report;
 
-import android.util.Log;
-
 import java.util.List;
 
 import kr.jhha.engquiz.model.local.Report;
@@ -32,8 +30,8 @@ public class ReportPresenter implements ReportContract.ActionsListener {
         return new ReportRepository.GetReportListCallback(){
 
             @Override
-            public void onSuccess(List<Report> reports) {
-                mView.onSuccessGetReportList(reports);
+            public void onSuccess(int reportCountAll, List<Report> reports) {
+                mView.onSuccessGetReportList(reportCountAll, reports);
             }
 
             @Override
@@ -49,16 +47,51 @@ public class ReportPresenter implements ReportContract.ActionsListener {
     }
 
     @Override
-    public void modifySentence(Report modifiedSentence) {
-        mReportModel.sendModifiedSentence( modifiedSentence, onModifySentence() );
+    public void modifySentenceUpdate(Integer scriptID, Integer sentenceID, String ko, String en) {
+        Report modifiedSentence = new Report();
+        modifiedSentence.setModifyType(Report.MODIFY_TYPE.UPDATE);
+        modifiedSentence.setScriptId(scriptID);
+        modifiedSentence.setSentenceId(sentenceID);
+        modifiedSentence.setTextKo(ko);
+        modifiedSentence.setTextEn(en);
+        mReportModel.ModifyUpdate( modifiedSentence, onModifySentence() );
+    }
+
+    @Override
+    public void modifySentenceDel(Integer scriptID, Integer sentenceID) {
+        Report modifiedSentence = new Report();
+        modifiedSentence.setModifyType(Report.MODIFY_TYPE.DEL);
+        modifiedSentence.setScriptId(scriptID);
+        modifiedSentence.setSentenceId(sentenceID);
+        mReportModel.ModifyDel( modifiedSentence, onModifySentence() );
+    }
+
+    @Override
+    public void modifySentenceAdd(Integer scriptID, String ko, String en) {
+        Report modifiedSentence = new Report();
+        modifiedSentence.setModifyType(Report.MODIFY_TYPE.ADD);
+        modifiedSentence.setScriptId(scriptID);
+        modifiedSentence.setTextKo(ko);
+        modifiedSentence.setTextEn(en);
+        mReportModel.ModifyAdd( modifiedSentence, onModifySentence() );
     }
 
     private ReportRepository.ReportModifyCallback onModifySentence() {
         return new ReportRepository.ReportModifyCallback(){
 
             @Override
-            public void onSuccess(String modifiedKo, String modifiedEn) {
-                mView.onSuccessModifyReport(modifiedKo, modifiedEn) ;
+            public void onSuccessUpdate(String modifiedKo, String modifiedEn) {
+                mView.onSuccessModifyReportUpdate(modifiedKo, modifiedEn);
+            }
+
+            @Override
+            public void onSuccessAdd(Integer newSentenceID, String modifiedKo, String modifiedEn) {
+                mView.onSuccessModifyReportAdd(newSentenceID, modifiedKo, modifiedEn);
+            }
+
+            @Override
+            public void onSuccessDel() {
+                mView.onSuccessModifyReportDel();
             }
 
             @Override

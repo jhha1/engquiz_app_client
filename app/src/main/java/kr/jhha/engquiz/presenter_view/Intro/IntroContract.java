@@ -12,6 +12,7 @@ public class IntroContract {
         void onLoginSuccess(String username);
         void onLoginFail(int what);
         void onSignInSuccess(Integer userId);
+        void onSignInFail(int msgId);
     }
 
     interface UserActionsListener {

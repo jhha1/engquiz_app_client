@@ -9,7 +9,7 @@ public class SyncContract {
     interface View {
         void onSyncReady(float sizeMB);
         void onSynced();
-        void onFailedSync(String msg);
+        void onFailedSync(int msgId);
     }
 
     interface UserActionsListener {

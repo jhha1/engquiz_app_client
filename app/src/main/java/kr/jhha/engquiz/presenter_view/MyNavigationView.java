@@ -6,22 +6,26 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.util.ui.MyLog;
 
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REPORT;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_QUIZFOLDERS;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SYNC;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
  * Created by thyone on 2017-04-13.
@@ -50,8 +54,8 @@ public class MyNavigationView {
 
             if (id == R.id.nav_play_quiz) {
                 fragmentHandler.changeViewFragment(PLAYQUIZ);
-            } else if(id == R.id.nav_add_script){
-                fragmentHandler.changeViewFragment(ADD_SCRIPT);
+            } else if(id == R.id.nav_scripts){
+                fragmentHandler.changeViewFragment(SHOW_SCRIPTS);
             } else if(id == R.id.nav_add_sentence){
                 fragmentHandler.changeViewFragment(ADD_SENTENCE);
             } else if (id == R.id.nav_quiz_folders) {
@@ -99,6 +103,19 @@ public class MyNavigationView {
         // 이후, LogIn 결과로 관리자면, 이 메뉴를 다시 보이게 한다.
         Menu nav_Menu = navigationView.getMenu();
         nav_Menu.findItem(R.id.nav_report).setVisible(false);
+
+        // help 버튼 셋팅
+        /*
+        LayoutInflater inflater = (LayoutInflater) mMainActivity.getSystemService( mMainActivity.LAYOUT_INFLATER_SERVICE );
+       View headerView = inflater.inflate( R.layout.nav_header, null );
+        Button helpButton = (Button)headerView.findViewById(R.id.nav_header_help);
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+                fragmentHandler.changeViewFragment(WEB_VIEW);
+            }
+        });*/
     }
 
     public void attachAlarmIcon(int menuId)

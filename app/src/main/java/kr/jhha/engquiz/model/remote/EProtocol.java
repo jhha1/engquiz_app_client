@@ -42,12 +42,15 @@ public enum EProtocol {
 	QuizFolderUIOrder("QuizFolderUIOrder"),
 	QuizFolder("QuizFolder"),
 	QuizFolders("QuizFolders"),
+	DetachScriptFromAllFolder("DetachScriptFromAllFolder"),
 
 	// Sync
 	SyncResult("SyncResult"),
 
 	// REPORT
+	ReportCountAll("ReportCountAll"),
 	ReportList("ReportList"),
+	ReportModifyType("ReportModifyType"),
 	
 	NULL("null");
 	

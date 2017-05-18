@@ -9,6 +9,11 @@
         android:title="@string/action_bar__send_report"
         app:showAsAction="always" />
 
+    <item android:id="@+id/action_bar__help_quizplay"
+        android:icon="@drawable/ic_question_gray1"
+        android:title="@string/action_bar__help"
+        app:showAsAction="always" />
+
     <!-- 오버플로우 공간 안에 있는 "셋팅" 액션 아이템
     <item
         android:sentenceId="@+sentenceId/action_settings"

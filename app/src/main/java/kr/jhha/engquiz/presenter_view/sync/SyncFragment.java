@@ -24,24 +24,14 @@ public class SyncFragment extends Fragment implements SyncContract.View
     private SyncContract.UserActionsListener mActionListener;
 
     private TextView mSyncReadyTextView;
-    private TextView mSubTextView;
-    private TextView mSubTextView2;
+    private TextView mDescription2;
+    private TextView mDescription1;
     private Button mDownloadButton = null;
-
-    private ProgressDialog mDlg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActionListener = new SyncPresenter( getActivity(), this, ScriptRepository.getInstance() );
-        initDialog();
-    }
-
-    private void initDialog(){
-        mDlg = new ProgressDialog(getActivity());
-        mDlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mDlg.setMessage("Start");
-       // mDlg.setToolbarBackground();
     }
 
     @Override
@@ -53,8 +43,8 @@ public class SyncFragment extends Fragment implements SyncContract.View
 
         // 텍스트 뷰
         mSyncReadyTextView = (TextView) view.findViewById(R.id.sync_textview);
-        mSubTextView = (TextView) view.findViewById(R.id.update_text_description2);
-        mSubTextView2 = (TextView) view.findViewById(R.id.update_text_description3);
+        mDescription2 = (TextView) view.findViewById(R.id.update_text_description2);
+        mDescription1 = (TextView) view.findViewById(R.id.update_text_description1);
 
         // 버튼 클릭 이벤트 셋팅
         mDownloadButton = (Button) view.findViewById(R.id.sync_btn_download);
@@ -88,25 +78,29 @@ public class SyncFragment extends Fragment implements SyncContract.View
 
     @Override
     public void onSyncReady(float sizeMB) {
-        String msg = "약 " + sizeMB + "MB의 데이터를 다운로드 "
-                     +"할 예정이에요. WIFI 접속이 아닐경우 "
-                    +"데이터 요금이 부과되어요. 데이터가 큰 경우, " +
-                    "WIFI 접속 환경에서 다운로드 해주세요.";
+        int msgId = R.string.sync__description1_sync_ready;
+        mDescription1.setText(getString(msgId));
+        mDescription2.setVisibility(View.VISIBLE);
+
+        String msg = "약 " + sizeMB + getString(R.string.sync__description3_sync_ready);
         mSyncReadyTextView.setText(msg);
         mDownloadButton.setClickable(true);
     }
 
     @Override
     public void onSynced() {
-        String msg = "넹~ 모든 문장들이 최신이에요.";
-        mSubTextView.setText(msg);
-        mSubTextView2.setVisibility(View.INVISIBLE);
+        int msgId = R.string.sync__description1_synced;
+        mDescription1.setText(getString(msgId));
+
+        mDescription2.setVisibility(View.INVISIBLE);
         mSyncReadyTextView.setVisibility(View.INVISIBLE);
         mDownloadButton.setClickable(false);
     }
 
     @Override
-    public void onFailedSync(String msg) {
-        mSubTextView.setText(msg);
+    public void onFailedSync(int msgId) {
+        mDescription2.setText( getString(msgId) );
+        mSyncReadyTextView.setVisibility(View.INVISIBLE);
+        mDownloadButton.setClickable(false);
     }
 }

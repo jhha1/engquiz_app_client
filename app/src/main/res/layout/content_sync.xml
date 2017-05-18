@@ -17,7 +17,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginTop="15dp"
-            android:text="스크립트 문장을 최신으로 유지하세요!"
             android:textColor="@color/sky"
             android:textSize="20dp"/>
 
@@ -29,22 +28,10 @@
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
             android:gravity="center"
-            android:text="수강생 분들이 요청하신 이상한 문장 수정이 완료 되어 동기화를 기다리고 있어요. \nSYNC 버튼을 클릭하면, \n수정된 문장들을 받을 수 있어요."
+            android:text="@string/sync__description2_sync_ready"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
             android:lineSpacingExtra="6dp"/>
-
-        <TextView
-            android:id="@+id/update_text_description3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:gravity="center"
-            android:text="(문장 수정요청법: 'Quiz Play' 메뉴의 오른쪽 상단 아이콘 클릭)"
-            android:textColor="@color/black_alpha_30"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
     </LinearLayout>
 
     <TextView

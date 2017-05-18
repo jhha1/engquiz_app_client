@@ -10,9 +10,12 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
@@ -30,7 +33,7 @@ public class FileHelper
 
     public static final String TOP_ROOT_DIR = "/";
     public static final String KaKaoDownloadFolder_AndroidPath = "/KakaoTalkDownload/";
-    public static final String AppRoot_AndroidPath = "/SoynaClassEnglishGame/";
+    public static final String AppRoot_AndroidPath = "/EnglishSentenceQuiz/";
     public static final String ParsedFile_AndroidPath = AppRoot_AndroidPath + "parsed/";
     public static final String UserInfoFolderPath = AppRoot_AndroidPath + "User/";
     public static final String UserInfoFileName = "userInfo.txt";
@@ -276,34 +279,40 @@ public class FileHelper
         }
     }
 
-    public byte[] readBinary( String filepath, String filename )
+    /*
+        File file = new File( dirpath + filename );
+
+        dirpath 마지막에 / 가 붙여 있던지,
+        filename 앞에 / 가 있어야 함.
+     */
+    public byte[] readBinary( String dirpath, String filename )
     {
-        if (StringHelper.isNull(filepath) || StringHelper.isNull(filename)) {
-           MyLog.e("path or name is null. path[" + filepath + "], name[" + filename + "]");
+        if (StringHelper.isNull(dirpath) || StringHelper.isNull(filename)) {
+           MyLog.e("path or name is null. dir[" + dirpath + "], name[" + filename + "]");
             return null;
         }
 
-        String fileFullPath = filepath + "/" + filename;
-        BufferedInputStream bs = null;
+        FileInputStream fis = null;
         try
         {
-            File file = new File(fileFullPath);
-            FileInputStream fis = new FileInputStream(fileFullPath);
+            File file = new File( dirpath + filename );
+            fis = new FileInputStream( file );
             int fileSize = (int)file.length();
             byte [] b = new byte [fileSize]; //임시로 읽는데 쓰는 공간
-            MyLog.d("filePath("+ fileFullPath+"), fileLen("+b.length+")");
+            MyLog.d("dir("+ dirpath+"), filename("+filename+"), fileLen("+b.length+")");
             fis.read(b);
 
             // System.out.println(new String(b)); //필요에 따라 스트링객체로 변환
             return b;
         } catch (Exception e) {
-            MyLog.e("Failed readBinary. path("+ filepath +") name("+filename+")");
+            MyLog.e("Failed readBinary. dir("+ dirpath +") name("+filename+")");
             e.printStackTrace();
         } finally {
             try {
-                bs.close(); //반드시 닫는다.
+                if( fis != null )
+                    fis.close();
             } catch (Exception e) {
-                MyLog.e("Failed to close file IO. path("+ filepath +") name("+filename+")");
+                MyLog.e("Failed to close file IO. dir("+ dirpath +") name("+filename+")");
                 e.printStackTrace();
             }
         }
@@ -389,5 +398,45 @@ public class FileHelper
         String filePath = absolutePath + fileName;
         File file = new File( filePath );
         return file.exists();
+    }
+
+    // 현재 디렉토리 하이락키, 파일 가져오기
+    // extension : 해당 확장자가 있는 파일만 가져옴
+    public Map loadFileListInDirectory( String dirName, String extension ) {
+        File files[] = listFiles(dirName);
+        if (files == null) {
+            MyLog.e("Directory is null. mFilepath:" + dirName);
+            return Collections.emptyMap();
+        }
+
+        List items = new ArrayList<String>();    // 리스트에 보여질 파일이름 리스트
+        List filepath = new ArrayList<String>(); // 파일이름에 해당하는 실제 파일로케이션
+
+        // 현재 디렉토리가 루트가 아니면, 현재폴더 상위 디렉토리를 뷰 리스트에 삽입
+        if (false == isRootDirectory(dirName)) {
+            items.add("../"); // 상위 디렉토리로 이동 텍스트
+            String parentDir = getParentDirectoryName(dirName);
+            filepath.add(parentDir); // 상위 디렉토리 경로 삽입
+        }
+
+        // 폴더 내 파일들을 뷰 리스트에 삽입
+        for (File file : files) {
+            if( ! StringHelper.isNull(extension) ){
+                // 디렉토리와 특정 확장자 파일만 표시
+                boolean bHasExtention = file.getName().contains(extension);
+                boolean bHideFile = (false == file.isDirectory()) && (false == bHasExtention);
+                if( bHideFile )
+                    continue;
+            }
+
+            filepath.add(file.getPath());  // file path = file dir + file name
+            String fileName = (file.isDirectory()) ? file.getName() + "/" : file.getName();
+            items.add(fileName);
+        }
+
+        Map<String, List> listMap = new HashMap<>();
+        listMap.put("path", filepath);
+        listMap.put("file", items);
+        return listMap;
     }
 }

@@ -14,11 +14,7 @@ public class AddSentenceContract {
         void showDialogMakeNewScript();
         void showDialogMakeNewScript_ReInput();
 
-        void showQuizFolderSelectDialog(List<String> quizFolderList);
-        void showMakeNewQuizFolderDialog();
-        void showNewQuizFolderTitleInputDialog();
-
-        void showAddSentenceSuccessDialog(String quizFolderName, String scriptName);
+        void showAddSentenceSuccessDialog(String scriptName);
 
         void showErrorDialog(int what);
     }
@@ -28,8 +24,5 @@ public class AddSentenceContract {
         void makeNewScriptBtnClicked();
         void scriptSelected(String selectedScriptTitle);
         void makeNewScript(String scriptName);
-
-        void quizFolderSelected(String quizFolderName);
-        void newQuizFolderTitleInputted(String quizFolderName);
     }
 }
