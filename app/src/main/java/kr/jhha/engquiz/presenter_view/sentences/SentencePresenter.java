@@ -3,14 +3,18 @@ package kr.jhha.engquiz.presenter_view.sentences;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ReportRepository;
 import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
+import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.model.local.Sentence.STATE_NEW_BUTTON;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -38,6 +42,15 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
         mView.showTitle(title);
     }
 
+    // toolbar option menu
+    @Override
+    public void helpBtnClicked() {
+        FragmentHandler handler = FragmentHandler.getInstance();
+        WebViewFragment fragment = (WebViewFragment)handler.getFragment(WEB_VIEW);
+        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT);
+        handler.changeViewFragment(WEB_VIEW);
+    }
+
     @Override
     public void getSentences(Integer scriptId) {
         MyLog.d( "scriptId:"+scriptId);
@@ -50,7 +63,8 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
 
             @Override
             public void onSuccess(List<Sentence> sentences) {
-                mView.onSuccessGetSentences(sentences);
+                boolean bCustomSentences = mScriptModel.isUserMadeScript(mScriptId);
+                mView.onSuccessGetSentences(bCustomSentences, sentences);
             }
 
             @Override
@@ -72,48 +86,33 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
         return sb.toString();
     }
 
+
     @Override
-    public void sentenceDoubleClicked(Sentence item) {
-        mSelectedSentence = item;
-        // 유저가 작성한 문장은 수정 가능
-        if( mScriptModel.isUserMadeScript(mScriptId) ){
-            mView.showModifyDialog(item);
+    public void sentenceSingleClicked(Sentence item) {
+        // 새 문장 만들기 버튼
+        if( item.state == STATE_NEW_BUTTON ){
+            mView.showAddSentenceFragment(item);
             return;
-        } else {
-            // 정규 스크립트는 개발자에게 문장수정요청
-            mView.showSendReportDialog();
         }
     }
 
     @Override
     public void sentenceLongClicked(Sentence item) {
         mSelectedSentence = item;
-        // 유저가 작성한 문장은 삭제 가능
-        if( mScriptModel.isUserMadeScript(mScriptId) ) {
-            Script script = mScriptModel.getScript(mScriptId);
-            if( script == null )
-                return;
-            if( script.sentences == null || script.sentences.isEmpty() )
-                return;
-
-            if( script.sentences.size() <= 1 )
-                mView.onFailDeleteSentence(R.string.sentence__del_fail_sentence_min_count);
-             else
-                mView.showDeleteDialog();
-        }
+        mView.onShowOptionDialog(item);
     }
 
 
     // 정규 스크립트 문장 - 문장 수정 요청
     @Override
-    public void sendReport() {
-        if( mSelectedSentence.isMadeByUser() ) {
+    public void sendReport(Sentence item) {
+        if( item.isMadeByUser() ) {
             // 유저가 직접 만든 문장은, 문장수정 요청을 개발자에게 보낼 수 없다.
             mView.onFailSendReport(R.string.report__send_fail_custom_sentence);
             return;
         }
         final ReportRepository reportRepo = ReportRepository.getInstance();
-        reportRepo.sendReport(mSelectedSentence, onSendReportCallback());
+        reportRepo.sendReport(item, onSendReportCallback());
     }
 
     private ReportRepository.ReportCallback onSendReportCallback() {
@@ -140,7 +139,7 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
         Sentence sentence = new Sentence();
         sentence.scriptId = mSelectedSentence.scriptId;
         sentence.sentenceId = mSelectedSentence.sentenceId;
-        sentence.src = mSelectedSentence.src;
+        sentence.state = mSelectedSentence.state;
         sentence.textKo = ko;
         sentence.textEn = en;
         scriptRepo.updateSentence(sentence, onUpdateSentence());
@@ -162,9 +161,18 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     }
 
     @Override
-    public void deleteSentence() {
+    public void deleteSentence(Sentence item) {
+        // 유저가 작성한 문장은 삭제 가능
+        if( item.isMadeByUser() ) {
+            Script script = mScriptModel.getScript(mScriptId);
+            if( script == null )
+                return;
+            if( script.sentences == null || script.sentences.isEmpty() )
+                return;
+        }
+
         final ScriptRepository scriptRepo = ScriptRepository.getInstance();
-        scriptRepo.deleteSentence(mSelectedSentence, onDeleteSentence(mSelectedSentence));
+        scriptRepo.deleteSentence(item, onDeleteSentence(item));
     }
 
     private ScriptRepository.DeleteSenteceCallback onDeleteSentence(final Sentence sentence) {

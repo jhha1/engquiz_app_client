@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.presenter_view.intro;
 
+import android.Manifest;
 import android.content.Context;
 
 import java.util.List;
@@ -10,11 +11,17 @@ import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.User;
 import kr.jhha.engquiz.model.local.UserRepository;
+import kr.jhha.engquiz.presenter_view.MainActivity;
 import kr.jhha.engquiz.presenter_view.MyNavigationView;
+import kr.jhha.engquiz.util.FileHelper;
+import kr.jhha.engquiz.util.FileHelper2;
+import kr.jhha.engquiz.util.PermmissionHelper;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.util.PermmissionHelper.PERMISSION_STORAGE;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -30,18 +37,45 @@ public class IntroPresenter implements IntroContract.UserActionsListener
         mContext = context;
         mUser = userRepository;
         mView = view;
-
-        preInitailize();
     }
 
-    // 서버 안 갔다와도 init 가능한 데이터 초기화
-    private void preInitailize(){
-        boolean bOK =  ScriptRepository.getInstance().initailize();
-        if( !bOK ){
-            String msg = mContext.getString(R.string.common__failed_loading);
+    public void initialize(){
+        String msg = mContext.getString(R.string.common__failed_loading);
+
+        final FileHelper2 fileHelper = FileHelper2.getInstance();
+        boolean bOK = fileHelper.init();
+        if( ! bOK ){
             MyDialog.showDialogAndForcedCloseApp(mContext, msg);
             return;
         }
+/*
+        fileHelper.makeDirectoryIfNotExist(FileHelper2.PlayInfoFolderPath, new FileHelper2.MakeDirectoryCallback() {
+            @Override
+            public void onSuccess() {
+                MyLog.e("!!!!!!!!!!!!!!!!!!!!!!!Success make directory. dirPath["+FileHelper2.PlayInfoFolderPath+"]");
+            }
+
+            @Override
+            public void onFail() {
+                MyLog.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!Failed make directory. dirPath["+FileHelper2.PlayInfoFolderPath+"]");
+            }
+        });
+
+*/
+
+         bOK =  ScriptRepository.getInstance().initailize();
+        if( !bOK ){
+            MyDialog.showDialogAndForcedCloseApp(mContext, msg);
+            return;
+        }
+
+        bOK = QuizPlayRepository.getInstance().initialize();
+        if( !bOK ){
+            MyDialog.showDialogAndForcedCloseApp(mContext, msg);
+            return;
+        }
+
+        checkUserExist();
     }
 
     public void checkUserExist() {
@@ -143,34 +177,14 @@ public class IntroPresenter implements IntroContract.UserActionsListener
             navigationView.showAdminMenu();
         }
 
-        // Init App Data
-        // 1. playing quiz
-        if( StringHelper.isNull(quizfolderString) ){
-            // 첫 로긴시에는 quizFolder이 없다
-        } else {
-            QuizFolder quizfolderForPlaying = new QuizFolder();
-            quizfolderForPlaying.deserialize(quizfolderString);
-
-            if( QuizFolder.isNull(quizfolderForPlaying) ){
-                MyLog.e("QuizFolder is Null " + quizfolderForPlaying.toString());
-                return;
-            }
-
-            // 해당 스크립트 로드해 스크립트 맵에 initialize.
-            final QuizPlayRepository quizPlayRepo = QuizPlayRepository.getInstance();
-            quizPlayRepo.initialize( quizfolderForPlaying.getId(),
-                    quizfolderForPlaying.getTitle()
-                    , quizFolderScriptIds );
-        }
-
-        // 2. 싱크 알람 띄우기
+        // 싱크 알람 띄우기
         if( syncNeededSentenceIds == null || syncNeededSentenceIds.isEmpty() )
             return;
 
         final ScriptRepository scriptRepo = ScriptRepository.getInstance();
         scriptRepo.saveSyncNeededSentencesSummary( syncNeededSentenceIds );
         final MyNavigationView navigationView = MyNavigationView.getInstance();
-        navigationView.attachAlarmIcon(R.id.nav_sync);
+        navigationView.attachAlarmIcon(R.id.nav_scripts);
 
         MyLog.i("onLoginSuccess()  " +
                 "quizfolderForPlaying: " + ((quizfolderString!=null)?quizfolderString.toString():null) +

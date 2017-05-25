@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import kr.jhha.engquiz.util.FileHelper;
+import kr.jhha.engquiz.util.FileHelper2;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.model.remote.AsyncNet;
 import kr.jhha.engquiz.model.remote.EProtocol;
@@ -16,6 +17,9 @@ import kr.jhha.engquiz.model.remote.Request;
 import kr.jhha.engquiz.model.remote.Response;
 import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.util.FileHelper.UserInfoFileName;
+import static kr.jhha.engquiz.util.FileHelper.UserInfoFolderPath;
 
 /**
  * Created by jhha on 2017-03-15.
@@ -208,8 +212,8 @@ public class UserRepository {
         }
         try {
             final FileHelper file = FileHelper.getInstance();
-            String fileName = FileHelper.UserInfoFileName;
-            userInfo = file.readFile( FileHelper.UserInfoFolderPath, fileName );
+            String fileName = UserInfoFileName;
+            userInfo = file.readFile( UserInfoFolderPath, fileName );
         } catch (MyIllegalStateException e){
             throw e;
         }
@@ -231,31 +235,14 @@ public class UserRepository {
 
     private boolean checkUserInfoFile(){
         final FileHelper file = FileHelper.getInstance();
-        boolean bOK = file.makeDirectoryIfNotExist(FileHelper.AppRoot_AndroidPath);
+        boolean bOK = file.createFileIfNotExist(UserInfoFolderPath, UserInfoFileName);
         if( bOK == false ){
-            MyLog.e("Failed checkUserInfo. Make Directory is failed. dir["+FileHelper.AppRoot_AndroidPath+"]");
-            return false;
-        }
-        bOK = file.makeDirectoryIfNotExist(FileHelper.UserInfoFolderPath);
-        if( bOK == false ){
-            MyLog.e("Failed checkUserInfo. Make Directory is failed. dir["+FileHelper.UserInfoFolderPath+"]");
+            MyLog.e("Failed create User File. " +
+                    "dir["+UserInfoFolderPath+"], " +
+                    "name["+UserInfoFileName+"]");
             return false;
         }
 
-        String dir = FileHelper.UserInfoFolderPath;
-        String fileName = FileHelper.UserInfoFileName;
-        boolean bExist = file.isExist(dir, fileName);
-        if( !bExist ){
-            // userInfo 파일이 없는 경우. userInfo 파일을 만든다.
-            // 앱 처음 깔면 없음.
-            bOK = file.createFile( dir, fileName);
-            if( !bOK ){
-                MyLog.e("Failed createFile. " +
-                        "dir["+dir+"], " +
-                        "name["+fileName+"]");
-                return false;
-            }
-        }
         return true;
     }
 
@@ -265,8 +252,8 @@ public class UserRepository {
 
         // 2. save into file
         final FileHelper file = FileHelper.getInstance();
-        String dirPath = FileHelper.UserInfoFolderPath;
-        String fileName = FileHelper.UserInfoFileName;
+        String dirPath = UserInfoFolderPath;
+        String fileName = UserInfoFileName;
         String userInfoText = this.user.serialize();
         file.overwrite( dirPath, fileName, userInfoText );
     }

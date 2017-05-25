@@ -4,9 +4,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -19,19 +23,22 @@ import java.util.List;
 import kr.jhha.engquiz.model.local.Sentence;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
+import kr.jhha.engquiz.model.remote.EProtocol;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.StringHelper;
-import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
-import kr.jhha.engquiz.util.ui.click_detector.ListViewClickDetector;
 
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.sentences.AddSentenceFragment.FIELD__HAS_PARENT_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.sentences.AddSentenceFragment.FIELD__SCRIPT_ID;
 
 /**
  * Created by jhha on 2016-12-16.
  */
 
-public class SentenceFragment extends Fragment implements SentenceContract.View, ClickDetector.Callback
+public class SentenceFragment extends Fragment implements SentenceContract.View
 {
     private SentenceContract.ActionsListener mActionListener;
 
@@ -58,8 +65,11 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
     Button mEditSentence_CompleteBtn;  // 영어 문장 수정 완료 버튼
     LinearLayout mScrollingWorkHelpder;
 
-    // 클릭 or 더블클릭 감지자. 안드로이드 더블클릭 감지해 알려주는 지원없어 직접 만듬.
-    private ClickDetector mClickDetector = null;
+    // long-click  option
+    ArrayAdapter<String> mOptionAdapterForRegular;
+    ArrayAdapter<String> mOptionAdapterForCustom;
+
+    private MyToolbar mToolbar;
 
     public SentenceFragment() {}
 
@@ -68,7 +78,12 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
     {
         super.onCreate(savedInstanceState);
         mActionListener = new SentencePresenter( this, ScriptRepository.getInstance() );
-        mClickDetector = new ListViewClickDetector( this );
+
+        // 롱 클릭 액션
+        initOptionDialog();
+
+        // 툴 바
+        initToolbarOptionMenu();
     }
 
     @Override
@@ -133,15 +148,24 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
         mScriptTitle = scriptTitle;
     }
 
+    private void initOptionDialog(){
+        String[] optionsType1 = new String[] {"문장 수정 요청하기"};
+        String[] optionsType2 = new String[] {"문장 수정 하기", "스크립트에서 삭제"};
+        mOptionAdapterForRegular =
+                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, optionsType1);
+        mOptionAdapterForCustom =
+                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, optionsType2);
+    }
+
     /*
         문장 리스트 가져오기
      */
     @Override
-    public void onSuccessGetSentences(List<Sentence> sentences) {
+    public void onSuccessGetSentences(boolean bCustomSentences, List<Sentence> sentences) {
         mTextView.setVisibility(View.INVISIBLE);
         mItemListView.setVisibility(View.VISIBLE);
 
-        mAdapter = new SentenceAdapter( sentences );
+        mAdapter = new SentenceAdapter( bCustomSentences, sentences );
         mItemListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
@@ -162,24 +186,12 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
 
             Sentence item = (Sentence) parent.getItemAtPosition(position) ;
             mListviewSelectedItem = item;
-            // 클릭과 더블클릭을 구분해 그에따른 동작.
-            mClickDetector.onClick( position );
+            // 한번 클릭 (리스트뷰 아이템): 문장 추가 버튼이 아니면 아무동작 안함
+            mActionListener.sentenceSingleClicked( mListviewSelectedItem );
         }
     };
 
-    // 한번 클릭 (리스트뷰 아이템)
-    @Override
-    public void onSingleClicked() {
-        // nothing
-    }
-
-    // 더블 클릭 (리스트뷰 아이템) : 문장 수정 다이알로그를 띄운다
-    @Override
-    public void onDoubleClicked() {
-        mActionListener.sentenceDoubleClicked( mListviewSelectedItem );
-    }
-
-    // 롱 클릭 (리스트뷰 아이템) : 문장 삭제 다이알로그 띄운다
+    // 롱 클릭 (리스트뷰 아이템) : 문장 옵션 다이알로그 띄운다
     private AdapterView.OnItemLongClickListener mListItemLongClickListener
             = new AdapterView.OnItemLongClickListener()
     {
@@ -192,16 +204,81 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
         }
     };
 
+    @Override
+    public void onShowOptionDialog(final Sentence item) {
+        final MyDialog dialog = new MyDialog(getActivity());
+        dialog.setTitle(getString(R.string.sentence__option_title));
+        ListView optionListView = createOptionListView(item, dialog);
+        dialog.setCustomView(optionListView, getActivity());
+        dialog.setCancelable(true);
+        dialog.showUp();
+    }
+
+    private ListView createOptionListView(final Sentence item, final MyDialog dialog)
+    {
+        ListView listView = new ListView(getActivity());
+
+        // 문장 타입에 따라 옵션 어댑터를 다르게.
+        if( item.isMadeByUser() ){
+            listView.setAdapter(mOptionAdapterForCustom);
+        } else {
+            listView.setAdapter(mOptionAdapterForRegular);
+        }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                                    int position, long arg3) {
+                int option = position;
+                switch (option){
+                    case 0:
+                         // 문장 수정 옵션
+                        if( item.isMadeByUser() ) {
+                            // 문장 직접수정
+                            showModifyDialog(item);
+                        } else {
+                            // 개발자에게 수정요청
+                            showSendReportDialog(item);
+                        }
+                        dialog.dismiss();
+                        break;
+                    case 1:
+                        // 문장 삭제 옵션.
+                        if( item.isMadeByUser() ) {
+                            // 커스텀 문장만 삭제가능
+                            mActionListener.deleteSentence(item);
+                        }
+                        dialog.dismiss();
+                        break;
+                }
+            }
+        });
+        return listView;
+    }
+
+
+    // 문장 추가
+    @Override
+    public void showAddSentenceFragment(Sentence item) {
+        // 문장 추가 창으로 이동
+        Bundle bundle = new Bundle();
+        bundle.putInt(FIELD__HAS_PARENT_SCRIPT, 1);
+        bundle.putInt(FIELD__SCRIPT_ID, mScriptId);
+
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        fragmentHandler.changeViewFragment(ADD_SENTENCE, bundle);
+    }
+
     // 정규 스클립트 -  개발자에게 수정요청 보내기 다이알로그
     @Override
-    public void showSendReportDialog(){
+    public void showSendReportDialog(final Sentence item){
         final MyDialog dialog = new MyDialog(getActivity());
         dialog.setTitle(getString(R.string.report__send_title));
         dialog.setMessage(getString(R.string.report__send_guide));
         dialog.setNeutralButton( "수정 요청", new View.OnClickListener() {
             public void onClick(View arg0)
             {
-                mActionListener.sendReport();
+                mActionListener.sendReport(item);
                 dialog.dismiss();
             }});
         dialog.setNegativeButton();
@@ -252,9 +329,9 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
         mScrollingWorkHelpder = ((LinearLayout) mEditSentence_View.findViewById(R.id.sentence_edit_help_scoll_working));
         mScrollingWorkHelpder.setVisibility(View.GONE);
 
-        // EN edit text로 포커스가 오면, 긴~ empty 레이아웃을 보이게 해서 스크롤링이 되게 한다.
+        // edit text로 포커스가 오면, 긴~ empty 레이아웃을 보이게 해서 스크롤링이 되게 한다.
+        mEditSentence_EditTextKo.setOnFocusChangeListener(editTextViewFocusChangeListner);
         mEditSentence_EditTextEN.setOnFocusChangeListener(editTextViewFocusChangeListner);
-
         return mEditSentence_View;
     }
 
@@ -307,20 +384,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
     }
 
     @Override
-    public void showDeleteDialog(){
-        final MyDialog dialog = new MyDialog(getActivity());
-        dialog.setTitle(getString(R.string.sentence__del_confirm));
-        dialog.setPositiveButton(new View.OnClickListener() {
-            public void onClick(View arg0) {
-                mActionListener.deleteSentence();
-                dialog.dismiss();
-            }
-        });
-        dialog.setNegativeButton();
-        dialog.showUp();
-    }
-
-    @Override
     public void onSuccessDeleteSentence() {
         Toast.makeText(getActivity(),
                 getString(R.string.sentence__del_succ),
@@ -335,6 +398,44 @@ public class SentenceFragment extends Fragment implements SentenceContract.View,
         Toast.makeText(getActivity(),
                 getString(msgId),
                 Toast.LENGTH_SHORT).show();
+    }
+
+
+    /*
+     Action Bar
+    */
+    private void initToolbarOptionMenu() {
+        // 액션 바 보이기
+        mToolbar = MyToolbar.getInstance();
+        mToolbar.show();
+        setHasOptionsMenu(true);
+    }
+
+    // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    // 화면에 보여질때 마다 호출됨
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.getItem(0).setVisible(false);
+        menu.getItem(1).setEnabled(true);
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_bar__help_quizplay:
+                mActionListener.helpBtnClicked();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 

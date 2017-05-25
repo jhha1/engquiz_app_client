@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
+import kr.jhha.engquiz.util.FileHelper;
 import kr.jhha.engquiz.util.ui.click_detector.BackPressedCloseHandler;
 import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
 

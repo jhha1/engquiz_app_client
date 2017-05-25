@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MyFragment"
     android:orientation="vertical"
-    tools:context=".presenter_view.quizfolder.AddQuizFolderFragment">
+    tools:context=".z_legacy.quizfolder.AddQuizFolderFragment">
 
     <!-- explain how to use -->
     <TextView

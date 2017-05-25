@@ -14,10 +14,16 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         app:contentInsetEnd="0dp"
         app:contentInsetStart="0dp"
-        android:background="@drawable/img_toolbar__background">
-    </android.support.v7.widget.Toolbar>
+        app:titleTextAppearance="@style/MyText.Toolbar" />
+<!--
+    <ImageView
+        android:id="@+id/toolbar_round_layout"
+        android:padding = "3dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/img_toolbar__background"/>-->
 
 </android.support.design.widget.AppBarLayout>

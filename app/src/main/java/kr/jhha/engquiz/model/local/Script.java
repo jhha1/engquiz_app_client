@@ -22,8 +22,9 @@ public class Script
     public List<Sentence> sentences = new LinkedList<Sentence>();
 
     public static final int STATE_NONE = 0;
-    public static final int STATE_NORMAL_SCRIPT = 2;
-    public static final int STATE_NON_PARSED_SCRIPT = 3;
+    public static final int STATE_QUIZPLAYING_SCRIPT = 1;
+    public static final int STATE_ADDED_SCRIPT = 2;
+    public static final int STATE_NON_ADDED_SCRIPT = 3;
     public static final int STATE_NEWBUTTON = 4;
     public static final int STATE_DESCRIPTION = 5;
 
@@ -119,7 +120,7 @@ public class Script
         Integer[] scriptIds = scriptRepo.getScriptIdAll();
         if( scriptIds != null ) {
             for (Integer id : scriptIds) {
-                lastCustomScriptID = (CUSTOM_SCRIPT_ID_MIN < id) ? id : CUSTOM_SCRIPT_ID_MIN;
+                lastCustomScriptID = (lastCustomScriptID < id) ? id : lastCustomScriptID;
             }
         }
         return lastCustomScriptID + 1;
@@ -184,7 +185,7 @@ public class Script
 
 
     /*
-        Deserialize a AddScript Server Result
+        Deserialize a AddScript Server CreateScriptResult
      */
     public static Script deserialize( Map<String , Object> map )
     {

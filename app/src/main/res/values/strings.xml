@@ -20,14 +20,13 @@
     <string name="common__failed_loading">오류가 발생하여 앱 로딩에 실패했어요. \n 앱을 종료합니다. 잠시 후 다시 시도해주세요. \n여러번 같은 증상이 반복되면 개발자에게 문의해주세요 ㅜ_ㅜ</string>
 
     <!-- Navigation Drawer -->
-    <string name="nav_menu__play_quiz">Play Quiz</string>
-    <string name="nav_menu__add_script">Scripts</string>
-    <string name="nav_menu__add_sentence">Add Sentence</string>
-    <string name="nav_menu__folder">Folders</string>
-    <string name="nav_menu__sync">Sync</string>
+    <string name="nav_menu__play_quiz">퀴즈 게임 하기</string>
+    <string name="nav_menu__add_script">스크립트</string>
+    <string name="nav_menu__add_sentence">문장 추가</string>
+    <string name="nav_menu__sync">동기화</string>
     <string name="nav_menu__report">Report</string>
-    <string name="tools_text_account_information_username">Sotti</string>
-    <string name="tools_text_account_information_email">sotti@sottocorp.com</string>
+    <string name="tools_text_account_information_username">UserName</string>
+    <string name="tools_text_account_information_email">abc@abc.com</string>
 
     <!-- folders -->
     <string name="show_folders__get_folders__fail_defaut">폴더 리스트를 가져오는데 실패했습니다. \n잠시 후 다시 시도해 주세요.</string>
@@ -65,12 +64,21 @@
     <string name="add_script_into_folder__fail_already_added">이미 폴더에 있는 스크립트에요.</string>
     <string name="add_script_into_folder__fail_noexist_script">폴더에 넣을 스크립트가 없어요. \n\n앱에 스크립트를 추가하세요.</string>
 
+    <string name="script_option__title">스크립트 메뉴</string>
+    <string name="script_add_playing__success">퀴즈 게임에 스크립트를 추가했어요.</string>
+    <string name="script_add_playing__fail_default">퀴즈 게임에 스크립트를 추가하지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="script_del_playing__success">퀴즈 게임에서 스크립트를 제외시켰어요.</string>
+    <string name="script_del_playing__fail_default">퀴즈 게임에서 스크립트를 제외시키지 못했어요. 잠시 후 다시 시도해주세요.</string>
+
+    <string name="create_script__succ">새 스크립트를 만들었어요.</string>
+    <string name="create_script__fail">새 스크립트를 만들지 못했어요. 잠시 후 다시 시도해주세요.</string>
     <string name="del_script__succ">스크립트를 삭제했어요.</string>
     <string name="del_script__fail">스크립트 삭제에 실패했어요..ㅜ_ㅜ</string>
     <string name="del_script__fail_get_list">스크립트 리스트를 가져오는데 실패했어요 \n 잠시 후 다시 시도해 주세요 ㅠ_ㅠ</string>
     <string name="del_script__fail_no_exist_script">삭제할 스크립트가 없어요a</string>
     <string name="del_script__fail_no_allowed">삭제할 수 없는 아이템이에요.</string>
 
+    <string name="sentence__option_title">문장 메뉴</string>
     <string name="sentence__edit_neutral_btn">수정 완료</string>
     <string name="sentence__edit_title">문장을 수정합니다.</string>
     <string name="sentence__edit_succ">문장이 수정되었어요.</string>
@@ -99,10 +107,6 @@
     <string name="add_pdf_script__succ_dialog_title">스크립트 추가 완료!</string>
 
     <!-- show scripts -->
-    <string name="show_scripts__custom_script_desc"><![CDATA[<h2>Custom Scripts</h2> : 직접 만든 문장이 저장된 스크립트들]]></string>
-    <string name="show_scripts__parsed_script_desc"><![CDATA[<h2>Regular Scripts - Added </h2> : 쌤이 올려주신 스크립트들. 앱에 추가됨 ]]></string>
-    <string name="show_scripts__nonparsed_script_desc"><![CDATA[<h2>Regular Scripts - Non Added </h2> : 쌤이 올려주신 스크립트들. 앱에 안 추가됨 ]]></string>
-    <string name="show_scripts__empty_scripts">아직 스크립트가 없어요 :)</string>
     <string name="show_scripts__fail_get_scripts">스크립트 리스트를 가져오는데 실패했어요. \n모바일 저장공간에서 앱 파일 및 폴더가 삭제된 것이 원인일 수 있어요.</string>
 
     <!-- sign in -->
@@ -128,17 +132,30 @@
 
     <!-- report -->
     <string name="report__send_title">문장 수정 요청 하기</string>
-    <string name="report__send_guide">현재 문장이 이상한가요? \n [수정요청] 버튼을 눌러 개발자에게 수정요청을 할 수 있어요. \n 수정 된 문장은 [Sync] 메뉴에서 업데이트 받을 수 있어요.</string>
-    <string name="report__send_succ">문장 수정 요청을 보냈어요. \n 수정 된 문장은 [Sync] 메뉴를 통해 업데이트 받을 수 있어요.</string>
+    <string name="report__send_guide">현재 문장이 이상한가요? \n\n[수정요청] 버튼을 눌러 개발자에게 수정요청을 할 수 있어요.</string>
+    <string name="report__send_succ">수정 요청을 보냈어요. \n\n 수정 된 문장은 앱 접속시에 알림으로 업데이트 받을 수 있어요.</string>
     <string name="report__send_fail_custom_sentence">직접 만든 문장은 수정요청 보낼 수 없어요.</string>
     <string name="report__send_fali">일시적인 오류로 문장 수정 요청에 실패했어요 ㅜ_ㅜ</string>
 
     <!-- sync -->
-    <string name="sync__description1_synced">현재 모든 문장들이 최신입니다 :)</string>
+    <string name="sync__title">문장 업데이트</string>
+    <string name="sync__sync_btn">업데이트</string>
+    <string name="sync__description1_synced">문장 업데이트를 완료했습니다.</string>
     <string name="sync__description1_sync_ready">스크립트 문장을 최신으로 유지하세요!</string>
-    <string name="sync__description2_sync_ready">수강생 분들이 요청하신 이상한 문장 수정이 완료 되어 동기화를 기다리고 있어요. \nSYNC 버튼을 클릭하면, \n수정된 문장들을 받을 수 있어요.</string>
-    <string name="sync__description3_sync_ready">MB의 데이터를 다운로드 할 예정이에요. WIFI 접속이 아닐경우 데이터 요금이 부과되어요. 데이터가 큰 경우, WIFI 접속 환경에서 다운로드 해주세요.</string>
-    <string name="sync__fail">동기화에 실패 했어요. 앱 재 시작 후 다시 시도해주세요 ㅜㅜ </string>
-    <string name="sync__fail_apart1">일부 동기화에 실패 했어요. 앱 재 시작 후 다시 동기화 받을 수 있어요. </string>
-    <string name="sync__fail_apart2">일부 동기화에 실패 했어요.</string>
+    <string name="sync__description2_sync_ready">일부 문장들이 수정되었어요. [업데이트] 버튼을 눌러 공유받으세요.</string>
+    <string name="sync__description3_sync_ready1">WIFI 접속이 아닌경우,\n 약 </string>
+    <string name="sync__description3_sync_ready2">MB의 데이터가 소모됩니다.</string>
+    <string name="sync__fail">동기화에 실패 했어요.\n 앱 재 시작 후 다시 시도해주세요 ㅜㅜ </string>
+    <string name="sync__fail_apart1">일부 동기화에 실패 했어요 ㅜ ㅜ \n 앱 재 시작 후 다시 동기화 받을 수 있어요. </string>
+    <string name="sync__fail_apart2">일부 동기화에 실패 했어요 ㅜ ㅜ </string>
+
+    <string name="permission_request">
+        영어문장 스크립트를 저장하고 열람하기 위해 \"저장공간\" 접근 허용이 필요해요.
+        \n\n권한 허용 후 앱을 이용할 수 있어요.
+        \n\n허용하시면 다음 창에서 \"사진, 미디어에 접근\" 이라 나오는데, 이것은 안드로이드 공용메세지에요. \n 실제로 전혀! 접근하지 않아요 :)
+    </string>
+    <string name="permission_guide_final">
+        영어문장 스크립트를 저장하고 열람하기 위해 \"저장공간\" 접근 허용이 필요해요.
+        \n\n권한 허용 후 앱을 이용할 수 있어요.
+        \n\n설정 > 애플리케이션 관리자 > 앱권한에서 저장소 권한을 허용해주세요</string>
 </resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="@color/PlayQuizDark"
+        android:centerColor="@color/PlayQuizDark"
+        android:endColor="@color/PlayQuizDark"
+        android:angle="45"
+        android:centerX="0.2"
+        android:centerY="0.9" />
+</shape>
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+<item>
+    <shape android:shape="rectangle" >
+        <solid android:color="@color/gray_10" />
+    </shape>
+</item>
+<item>
+    <shape android:shape="rectangle">
+        <stroke android:width="3dp"
+            android:color="@color/gray_30"/>
+        <corners android:radius="30dp"/>
+    </shape>
+</item>
+
+</layer-list>

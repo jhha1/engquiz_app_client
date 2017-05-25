@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MyFragment"
     android:orientation="vertical"
-    tools:context=".presenter_view.sync.SyncFragment">
+    tools:context=".presenter_view.sync.SyncDialog">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,20 +16,20 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_marginTop="15dp"
-            android:textColor="@color/sky"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/orange"
             android:textSize="20dp"/>
 
         <TextView
             android:id="@+id/update_text_description2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop ="15dp"
+            android:layout_marginTop ="24dp"
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
             android:gravity="center"
             android:text="@string/sync__description2_sync_ready"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black_alpha_40"
             android:textSize="16dp"
             android:lineSpacingExtra="6dp"/>
     </LinearLayout>
@@ -37,22 +37,26 @@
     <TextView
         android:id="@+id/sync_textview"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:padding="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:gravity="center"
         android:layout_weight="5"
         android:textColor="@color/black_alpha_40"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:lineSpacingExtra="8dp"
-        android:background="@drawable/img_shape_stroke_2dp_gray30"/>
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:lineSpacingExtra="4dp"
+        android:background="@drawable/img_shape_stroke_2dp_gray30"
+        />
 
     <Button
         android:id="@+id/sync_btn_download"
         style="@style/MyButton.WideBig"
-        android:text="Sync"
+        android:text="@string/sync__sync_btn"
         android:textColor="@color/gray_10"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="5dp"
         android:padding="15dp"
         android:layout_height="wrap_content"

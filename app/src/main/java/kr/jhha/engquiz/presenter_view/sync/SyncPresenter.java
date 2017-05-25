@@ -34,8 +34,6 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
             float sizeMB = (float)count * 0.01f;
             sizeMB = Math.round(sizeMB*100f) / 100f;
             mView.onSyncReady(sizeMB);
-        } else {
-            mView.onSynced();
         }
     }
 
@@ -53,12 +51,11 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
 
                 List<Integer> updateFailedResult = mModel.syncClient(sentencesForSync);
                 if(false == updateFailedResult.isEmpty()){
-                    sendSyncFailed(updateFailedResult);
                     mView.onFailedSync(R.string.sync__fail);
                 } else {
                     final MyNavigationView navigationView = MyNavigationView.getInstance();
-                    navigationView.detachAlarmIcon(R.id.nav_sync);
-                    mView.onSynced();
+                    navigationView.detachAlarmIcon(R.id.nav_scripts);
+                    mView.onSuccessSync();
                 }
             }
 
@@ -68,10 +65,6 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
                 mView.onFailedSync(R.string.sync__fail);
             }
         };
-    }
-
-    private void sendSyncFailed(  List<Integer> updateFailedResult ) {
-        mModel.sendSyncFailed(updateFailedResult, onSyncFailedCallback());
     }
 
     private ScriptRepository.SyncFailedCallback onSyncFailedCallback() {

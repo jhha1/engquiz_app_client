@@ -34,11 +34,15 @@ public class FileHelper
     public static final String TOP_ROOT_DIR = "/";
     public static final String KaKaoDownloadFolder_AndroidPath = "/KakaoTalkDownload/";
     public static final String AppRoot_AndroidPath = "/EnglishSentenceQuiz/";
-    public static final String ParsedFile_AndroidPath = AppRoot_AndroidPath + "parsed/";
+    public static final String ParsedFile_AndroidPath = AppRoot_AndroidPath + "Parsed/";
     public static final String UserInfoFolderPath = AppRoot_AndroidPath + "User/";
+    public static final String PlayInfoFolderPath = AppRoot_AndroidPath + "Play/";
     public static final String UserInfoFileName = "userInfo.txt";
+    public static final String PlayInfoFileName = "playInfo.txt";
 
-    private FileHelper() {}
+    private FileHelper() {
+
+    }
 
     public static FileHelper getInstance() {
         return singletonInstance;
@@ -361,10 +365,18 @@ public class FileHelper
         }
     }
 
+    public boolean isExist(String releativeDirPath, String fileName){
+        String absolutePath = getAndroidAbsolutePath(releativeDirPath);
+        String filePath = absolutePath + fileName;
+        File file = new File( filePath );
+        return file.exists();
+    }
+
     public boolean makeDirectoryIfNotExist( String directoryPath ){
-        String absoluteDirectoryPath = getAndroidAbsolutePath(directoryPath);
-        File file = new File( absoluteDirectoryPath );
-        if( false == file.exists() ) {
+        if( false == isExist(directoryPath, ""))
+        {
+            String absoluteDirectoryPath = getAndroidAbsolutePath(directoryPath);
+            File file = new File( absoluteDirectoryPath );
             boolean bMadeDirectory = file.mkdirs();
             if( false  == bMadeDirectory ) {
                 MyLog.e("Failed make directory. absoluteDirPath["+absoluteDirectoryPath+"]");
@@ -374,9 +386,12 @@ public class FileHelper
         return true;
     }
 
-    public boolean createFile( String directoryPath, String fileName ){
-        String absoluteDirectoryPath = getAndroidAbsolutePath(directoryPath);
-        return write(absoluteDirectoryPath, fileName, StringHelper.EMPTY_STRING);
+    public boolean createFileIfNotExist( String relativeDirPath, String fileName ){
+        if( false == isExist(relativeDirPath, fileName) ) {
+            String absoluteDirectoryPath = getAndroidAbsolutePath(relativeDirPath);
+            return write(absoluteDirectoryPath, fileName, StringHelper.EMPTY_STRING);
+        }
+        return true;
     }
 
     public boolean deleteFile(String dirPath, String fileName) {
@@ -391,13 +406,6 @@ public class FileHelper
             }
         }
         return true;
-    }
-
-    public boolean isExist(String releativeDirPath, String fileName){
-        String absolutePath = getAndroidAbsolutePath(releativeDirPath);
-        String filePath = absolutePath + fileName;
-        File file = new File( filePath );
-        return file.exists();
     }
 
     // 현재 디렉토리 하이락키, 파일 가져오기

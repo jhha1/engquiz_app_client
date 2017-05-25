@@ -2,6 +2,7 @@ package kr.jhha.engquiz.presenter_view.playquiz;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,12 +18,10 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
-import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -58,7 +57,6 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        setUpToolBar();
         mView = inflater.inflate(R.layout.content_playquiz, container, false);
 
         mScrollView = (NestedScrollView) mView.findViewById(R.id.fragment_playquiz_scroll);
@@ -74,7 +72,6 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
         mShowAddScriptFragmentBtn = (Button) mView.findViewById(R.id.showAddScriptFragment);
         mShowAddScriptFragmentBtn.setOnClickListener(mClickListener);
 
-        mActionListener.initToolbarTitle();
         mActionListener.doNextQuestion();
 
         // Inflate the layout for this fragment
@@ -92,26 +89,7 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     @Override
     public void onResume() {
         super.onResume();
-
-        // 화면이 올라올때마다 호출됨
-        // 문장 수정/삭제/추가, 스크립트 삭제/추가에 따른
-        // 퀴즈 데이터 다시 셋업.
-        mActionListener.resetQuizData();
-    }
-
-    private void setUpToolBar(){
         mToolbar.setToolBar(PLAYQUIZ);
-
-        // 툴바에 현 프래그먼트 제목 출력
-        mActionListener.initToolbarTitle();
-    }
-
-    @Override
-    public void showTitle(String title) {
-        if(StringHelper.isNull(title)){
-            title = "Play Quiz";
-        }
-        mToolbar.setToolbarTitle( title );
     }
 
     @Override
@@ -127,6 +105,8 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
     public void showNotAvailableQuiz(){
         mQuestionView.setText(getString(R.string.play__no_exist_sentence));
         // 스크립트 추가하러 바로가기 버튼 활성화
+        int color = ContextCompat.getColor(getActivity(), R.color.yellow100);
+        mShowAddScriptFragmentBtn.setBackgroundColor(color);
         mShowAddScriptFragmentBtn.setVisibility(View.VISIBLE);
         mShowAnswerBtn.setVisibility(View.INVISIBLE);
     }
@@ -143,7 +123,7 @@ public class QuizPlayFragment extends Fragment implements QuizPlayContract.View
                     break;
                 case R.id.showAddScriptFragment:
                     final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
-                    fragmentHandler.changeViewFragment( FragmentHandler.EFRAGMENT.SHOW_SCRIPTS );
+                    fragmentHandler.changeViewFragment( FragmentHandler.EFRAGMENT.REGULAR_SCRIPTS);
                     break;
             }
         }

@@ -20,23 +20,24 @@ public class Sentence {
     public Integer scriptId;
     public String textKo;
     public String textEn;
-    public Integer src;
+    public Integer state;
 
     public final static String Field_SENTENCE_ID = "SENTENCE_ID";
     public final static String Field_SCRIPT_ID = "SCRIPT_ID";
     public final static String Field_SENTENCE_KO = "SENTENCE_KO";
     public final static String Field_SENTENCE_EN = "SENTENCE_EN";
 
-    public final static Integer SRC_NONE = 0;
-    public final static Integer SRC_SYSTEM = 1;
-    public final static Integer SRC_USER = 2;
+    public final static Integer STATE_NONE = 0;
+    public final static Integer STATE_MADE_BY_SYSTEM = 1;
+    public final static Integer STATE_MADE_BY_USER = 2;
+    public final static Integer STATE_NEW_BUTTON = 3;
 
     public Sentence() {
         sentenceId = 0;
         scriptId = 0;
         textKo = StringHelper.EMPTY_STRING;
         textEn = StringHelper.EMPTY_STRING;
-        src = SRC_NONE;
+        state = STATE_NONE;
     }
 
     public Sentence(ObjectBundle bundle) {
@@ -143,7 +144,7 @@ public class Sentence {
     }
 
     /*
-       Deserialize a Server Result
+       Deserialize a Server CreateScriptResult
         : List<HashMap> -> List<Sentence>
     */
     public static Sentence deserialize( Map<String , Object> map )
@@ -192,7 +193,7 @@ public class Sentence {
     }
 
     public boolean isMadeByUser(){
-        return this.src == SRC_USER;
+        return this.state == STATE_MADE_BY_USER;
     }
 
     /*
@@ -243,7 +244,7 @@ public class Sentence {
                 && sentence.scriptId == 0
                 && sentence.textKo == StringHelper.EMPTY_STRING
                 && sentence.textEn == StringHelper.EMPTY_STRING
-                && sentence.src == SRC_NONE)
+                && sentence.state == STATE_NONE)
             return true;
 
         return false;
@@ -253,7 +254,7 @@ public class Sentence {
     public String toString() {
         return "sentenceId("+ sentenceId +"), "
                 + "scriptId("+scriptId+"), "
-                + "src("+src+"), "
+                + "state("+ state +"), "
                 + "textKo("+textKo+"), "
                 + "textEn("+textEn+")";
     }

@@ -8,7 +8,7 @@ public class SyncContract {
 
     interface View {
         void onSyncReady(float sizeMB);
-        void onSynced();
+        void onSuccessSync();
         void onFailedSync(int msgId);
     }
 

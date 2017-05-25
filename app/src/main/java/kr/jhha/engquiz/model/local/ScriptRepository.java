@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ import kr.jhha.engquiz.model.remote.Response;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyLog;
 
-import static kr.jhha.engquiz.presenter_view.scripts.ParseScriptPresenter.TEXT_ALREADY_ADDED;
+import static kr.jhha.engquiz.presenter_view.scripts.regular.AddScriptOtherDirectoryPresenter.TEXT_ALREADY_ADDED;
 import static kr.jhha.engquiz.util.FileHelper.ParsedFile_AndroidPath;
 
 
@@ -253,29 +254,36 @@ public class ScriptRepository {
         return pdfFile;
     }
 
-    public Script loadParsedTextScript(Integer scriptId) {
+    public Script loadParsedTextScript(Integer scriptId)
+    {
         String scriptTitle = this.mAllParsedScriptIdsAndTitles.get(scriptId);
 
-        // load from file
+        // make file header
         String scriptFileName = Script.makeScriptFileHeader(scriptId, scriptTitle);
         if (StringHelper.isNull(scriptFileName)) {
             MyLog.e("makeScriptFileHeader is null. filename("+scriptFileName+")");
             return null;
         }
 
+        // read body
         final FileHelper file = FileHelper.getInstance();
         final String path = ParsedFile_AndroidPath;
-        String scriptText = file.readFile(path, scriptFileName);
-        if( StringHelper.isNull(scriptText) ){
-            MyLog.e("read file is null. filename("+scriptFileName+")");
-            return null;
+        String scriptTextBody = file.readFile(path, scriptFileName);
+        if( StringHelper.isNull(scriptTextBody) ){
+            MyLog.w("read file is empty. filename("+scriptFileName+")");
+           // nothing. 빈 파일 - 문장이 없는 경우가 가능. 새로 생성시나 문장을 다 삭제시.
         }
 
         // create script object
         Script script = new Script();
         script.scriptId = scriptId;
         script.title = scriptTitle;
-        script.sentences = Parsor.parse(scriptId, scriptText);
+        boolean bEmptyScript = StringHelper.isNull(scriptTextBody);
+        if( bEmptyScript )
+            script.sentences = new ArrayList<Sentence>();
+        else
+            script.sentences = Parsor.parse(scriptId, scriptTextBody);
+
         return script;
     }
 
@@ -567,9 +575,7 @@ public class ScriptRepository {
 
         List<Sentence> sentences = script.sentences;
         if (sentences == null || sentences.isEmpty()) {
-            MyLog.e("getSentencesByScriptId() sentences is null. scriptId:" + scriptId);
-            callback.onFail(EResultCode.INVALID_ARGUMENT);
-            return;
+            // nothing. 문장이 없을수있다. 문장을 다 지우거나, 첨 만든 스크립트 케이스.
         }
 
         callback.onSuccess(sentences);
@@ -738,7 +744,7 @@ public class ScriptRepository {
         {
             boolean bUpdated = syncSentence(sentence);
             if (bUpdated == false) {
-                Log.e("AppContent", "getSentencesForSync(). Client Sync Failed. sentenceId:" + sentence.sentenceId);
+                MyLog.e("getSentencesForSync(). Client Sync Failed. sentenceId:" + sentence.sentenceId);
                 updateFailedResult.add(sentence.sentenceId);
             }
         }
@@ -748,8 +754,6 @@ public class ScriptRepository {
     }
 
     public boolean syncSentence(Sentence modifiedSentence){
-        MyLog.i("Sync. syncSentence() called. modifiedSentence:"+modifiedSentence.toString());
-
         if( Sentence.isNull(modifiedSentence) ){
             MyLog.e("Failed Sync. modifiedSentence is null. ");
             return false;

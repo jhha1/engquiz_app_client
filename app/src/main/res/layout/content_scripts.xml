@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/MyFragment.MatchListView"
+    tools:context=".presenter_view.scripts.regular.RegularScriptsFragment">
+
+    <!--
+    script list view
+    -->
+    <ListView style="@style/MyListView"
+        android:id="@+id/script_list_view"/>
+
+    <!--
+    FloatingActionButton
+    -->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/script_sync_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/img_sync_fab"
+        app:backgroundTint="@color/orange"
+        android:visibility="gone"/>
+
+</android.support.design.widget.CoordinatorLayout>
+
+

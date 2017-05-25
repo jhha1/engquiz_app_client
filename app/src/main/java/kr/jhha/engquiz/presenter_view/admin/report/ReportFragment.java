@@ -127,8 +127,6 @@ public class ReportFragment extends Fragment implements  ReportContract.View
         // custom view 를 새로 생성한다.
         // 안하면 이 에러 남..  You must call removeView() on the child's parent first.
         View mEditSentence_View = createView();
-        MyLog.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + report.getScriptName());
-        mScriptNameTextView.setText(report.getScriptName());
         mEditTextKo.setText(report.getTextKo());
         mEditTextEn.setText(report.getTextEn());
         mEditSentenceDialog.setCustomView(mEditSentence_View, getActivity());
@@ -140,7 +138,6 @@ public class ReportFragment extends Fragment implements  ReportContract.View
     private View createView(){
         // 문장 수정 관련
         View mEditSentence_View = View.inflate(getActivity(), R.layout.content_report_modify, null);
-        mScriptNameTextView = ((TextView) mEditSentence_View.findViewById(R.id.report_modify__scriptname));
         mEditTextKo = ((EditText) mEditSentence_View.findViewById(R.id.report_modify__edit_ko));
         mEditTextEn = ((EditText) mEditSentence_View.findViewById(R.id.report_modify__edit_en));
         Button updateSentence = ((Button) mEditSentence_View.findViewById(R.id.report_modify__update_btn));

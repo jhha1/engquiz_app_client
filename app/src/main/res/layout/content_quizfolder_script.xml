@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     style="@style/MyFragment.MatchListView"
-    tools:context=".presenter_view.quizfolder.scripts.FolderScriptsFragment">
+    tools:context=".z_legacy.quizfolder.scripts.FolderScriptsFragment">
 
     <ListView  style="@style/MyListView"
         android:id="@+id/quizfolder_detail_listview"

@@ -1,12 +1,12 @@
 package kr.jhha.engquiz.presenter_view.intro;
 
-import android.content.DialogInterface;
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -19,9 +19,12 @@ import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MainActivity;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.UserRepository;
+import kr.jhha.engquiz.util.PermmissionHelper;
 import kr.jhha.engquiz.util.ui.Etc;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.util.PermmissionHelper.PERMISSION_STORAGE;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -39,6 +42,7 @@ public class IntroFragment extends Fragment implements IntroContract.View
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mActionListener = new IntroPresenter( getActivity(), this, UserRepository.getInstance() );
     }
 
@@ -51,24 +55,74 @@ public class IntroFragment extends Fragment implements IntroContract.View
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         actionBar.hide();
 
-        // 1초간 intro 화면 보이기. 이후 유저 로긴 프로세스 시작
+        // 1초간 intro 화면 보이기. 이후 앱 시작.
         Handler handler = new Handler();
         handler.postDelayed( runnable, mIntroAnimationSec );
 
         return view;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            initUser();
+            initData();
         }
     };
 
-    public void initUser(){
+    public void initData(){
         if( bInitailized == false ) {
-            bInitailized = true;
-            mActionListener.checkUserExist();
+
+            // 파일 r/w 에 필요한 접근 얻기.
+            int permissionCode = PERMISSION_STORAGE;
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};  // write에  read도 포함됨.
+            boolean bPermissionAllowed = PermmissionHelper.checkAndRequestPermission(this, permissionCode, permissions);
+
+            // 권한이 이미 허락되어있다.
+            if (bPermissionAllowed) {
+                mActionListener.initialize();
+                bInitailized = true;
+            }
+        }
+    }
+
+    // 권한을 유저로부터 허락받는중.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSION_STORAGE:
+                if (PermmissionHelper.verifyPermissions(grantResults))
+                {
+                    // 권한을 얻었다.
+                    MyLog.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! onRequestPermissionsResult: PermissionAllowed " );
+                    mActionListener.initialize();
+
+                }
+                else
+                {
+                    // 권한을 얻지 못했다. Show Rational Dialog
+                    MyLog.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! onRequestPermissionsResult: NONE!! Permission Not Allowed " );
+                    PermmissionHelper.showGoToAppSettingForPermissionDialog(getActivity());
+
+                    /*
+                    if( PermmissionHelper.isMaxPermissionRefused() ){
+                        MyLog.d("onRequestPermissionsResult: MaxPermissionRefused. " );
+                        MyDialog.showDialogAndForcedCloseApp(getActivity(), getString(R.string.common__finish_app));
+                        return;
+                    }
+                    PermmissionHelper.increasePermissionRefuseCount();
+
+                    // 권한을 얻지 못했다. Show Rational Dialog
+                    MyLog.d("onRequestPermissionsResult: NONE!! Permission Not Allowed " );
+                    String message = PermmissionHelper.getRationalMessage(getActivity(), PERMISSION_STORAGE);
+                    PermmissionHelper.showRequestPermissionDialog(getActivity(), this, message);*/
+                }
+                break;
         }
     }
 

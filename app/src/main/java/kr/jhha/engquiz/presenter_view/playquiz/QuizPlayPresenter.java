@@ -31,20 +31,6 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
     }
 
     @Override
-    public void initToolbarTitle() {
-        String title = mModel.getPlayQuizFolderTitle();
-        if(StringHelper.isNull(title)){
-            title = "Play Game";
-        }
-        mView.showTitle(title);
-    }
-
-    @Override
-    public void resetQuizData() {
-        mModel.reset();
-    }
-
-    @Override
     public void doNextQuestion(){
         mCurrentQuiz = getNewQuiz();
         if(mCurrentQuiz == null) {

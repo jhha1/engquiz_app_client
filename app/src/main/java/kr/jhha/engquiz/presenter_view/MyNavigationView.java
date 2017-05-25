@@ -6,13 +6,10 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import kr.jhha.engquiz.R;
@@ -23,9 +20,7 @@ import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTE
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REPORT;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_QUIZFOLDERS;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SYNC;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
 
 /**
  * Created by thyone on 2017-04-13.
@@ -55,14 +50,10 @@ public class MyNavigationView {
             if (id == R.id.nav_play_quiz) {
                 fragmentHandler.changeViewFragment(PLAYQUIZ);
             } else if(id == R.id.nav_scripts){
-                fragmentHandler.changeViewFragment(SHOW_SCRIPTS);
+                fragmentHandler.changeViewFragment(SCRIPT_TAB);
             } else if(id == R.id.nav_add_sentence){
                 fragmentHandler.changeViewFragment(ADD_SENTENCE);
-            } else if (id == R.id.nav_quiz_folders) {
-                fragmentHandler.changeViewFragment(SHOW_QUIZFOLDERS);
-            } else if (id == R.id.nav_sync) {
-                fragmentHandler.changeViewFragment(SYNC);
-            } else if(id == R.id.nav_report){
+            }  else if(id == R.id.nav_report){
                 fragmentHandler.changeViewFragment(REPORT);
             }
             DrawerLayout drawer = (DrawerLayout) mMainActivity.findViewById(R.id.drawer_layout);
@@ -175,11 +166,14 @@ public class MyNavigationView {
             {
                 case INTRO:
                 case PLAYQUIZ:
-                    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm_grey);
+                    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_grey);
+                    //toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm_grey);
                     break;
-                default:
-                    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm);
-                    break;
+               // default:
+                 //   toggleHamburgerIcon(R.drawable.ic_hamburge_orange);
+                //    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_white);
+                   // toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm);
+                //    break;
             }
             return;
         }
@@ -190,9 +184,10 @@ public class MyNavigationView {
             case PLAYQUIZ:
                 toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_grey);
                 break;
-            default:
-                toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_white);
-                break;
+          //  default:
+           //     toggleHamburgerIcon(R.drawable.ic_hamburge_orange);
+           //     toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_white);
+           //     break;
         }
     }
 

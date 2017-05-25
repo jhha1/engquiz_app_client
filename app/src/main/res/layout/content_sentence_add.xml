@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="10dp"
     android:scrollbarStyle="outsideOverlay"
-    tools:context=".presenter_view.addsentence.AddSentenceFragment">
+    tools:context=".presenter_view.sentences.AddSentenceFragment">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="18dp"
             android:layout_marginBottom="16dp"
             android:layout_width="match_parent"
             android:layout_height="192dp"
@@ -24,7 +24,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginTop="10dp">
+
                 <View style="@style/MyLine1"/>
                 <View style="@style/MyLine1"/>
                 <View style="@style/MyLine1"/>
@@ -37,20 +39,22 @@
 
             <EditText style="@style/MyText.EditText.MultiLine"
                 android:id="@+id/sentence_add_ko"
-                android:hint="한글 문장 입력.."/>
+                android:hint="질문 문장 입력.."/>
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="192dp"
             android:background="@drawable/img_shape_stroke_2dp_gray30"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginTop="10dp">
+
                 <View style="@style/MyLine1"/>
                 <View style="@style/MyLine1"/>
                 <View style="@style/MyLine1"/>
@@ -63,7 +67,7 @@
 
             <EditText style="@style/MyText.EditText.MultiLine"
                 android:id="@+id/sentence_add_en"
-                android:hint="영어 문장 입력.." />
+                android:hint="답 문장 입력.." />
         </RelativeLayout>
 
         <!-- complate button  -->

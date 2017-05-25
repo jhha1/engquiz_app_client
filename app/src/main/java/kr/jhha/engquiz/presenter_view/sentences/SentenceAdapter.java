@@ -1,6 +1,8 @@
 package kr.jhha.engquiz.presenter_view.sentences;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.local.Report;
+import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.Sentence;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.model.local.Sentence.STATE_NEW_BUTTON;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -24,9 +28,16 @@ public class SentenceAdapter extends BaseAdapter {
     private Context mContext;
     private List<Sentence> mListView;
 
-    public SentenceAdapter(List<Sentence> sentences) {
-        mListView = new ArrayList<>(sentences);
-        MyLog.e("new SentenceAdapter() mListView:"+ mListView.toString());
+    public SentenceAdapter(boolean bCustomSentences, List<Sentence> sentences)
+    {
+        // 문장이 없을 수 있다. 스크립트 첨 만들거나 문장삭제하면.
+        if( sentences == null || sentences.isEmpty() )
+            mListView = new ArrayList<>();
+        else
+            mListView = new ArrayList<>(sentences);
+
+        if( bCustomSentences)
+            mListView.add( makeNewButton() ); // 새 문장 추가 버튼
     }
     /*
         Adapter에 사용되는 데이터의 개수를 리턴
@@ -59,21 +70,44 @@ public class SentenceAdapter extends BaseAdapter {
         TextView textViewEn = (TextView) convertView.findViewById(R.id.sentece_edit_textView2);
 
         // 아이템 내 각 위젯에 데이터 반영
-        numView.setText(getText(position));
-        textViewKo.setText(item.textKo);
-        textViewEn.setText(item.textEn);
+        setIconText(numView, item.state, position);
+        setText(textViewKo, textViewEn, item);
         MyLog.d( "ReportAdapter.getView() " +
                 "Item:"+ item.toString()
         +", textViewKo:"+textViewKo.getText());
         return convertView;
     }
 
-    private String getText(Integer position){
-        try {
-            return Integer.toString(position + 1);
-        } catch (Exception e){
-            return new String("#");
+    private void setIconText(TextView numView, int state, Integer position){
+        if( state == STATE_NEW_BUTTON){
+            numView.setText("+");
+            int color = ContextCompat.getColor(mContext, R.color.orange);
+            numView.setTextColor(color);
+        } else {
+            int color = ContextCompat.getColor(mContext, R.color.black_alpha_70);
+            numView.setTextColor(color);
+            numView.setText(Integer.toString(position + 1));
         }
+    }
+
+    private void setText( TextView textViewKo, TextView textViewEn, Sentence item ){
+       if( item.state == STATE_NEW_BUTTON )
+       {
+           textViewKo.setText("새 문장 만들기");
+           int color = ContextCompat.getColor(mContext, R.color.orange);
+           textViewKo.setTextColor(color);
+           textViewKo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+           textViewEn.setVisibility(View.GONE);
+       }
+       else
+       {
+           textViewKo.setText(item.textKo);
+           int color = ContextCompat.getColor(mContext, R.color.black_alpha_45);
+           textViewKo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+           textViewKo.setTextColor(color);
+           textViewEn.setVisibility(View.VISIBLE);
+           textViewEn.setText(item.textEn);
+       }
     }
 
     /*
@@ -92,10 +126,10 @@ public class SentenceAdapter extends BaseAdapter {
         return mListView.get(position);
     }
 
-    public void updateIcon(int position, int state){
-        Report report = (Report)getItem(position);
-        if( report != null ){
-            report.setModifyState(state);
-        }
+    private Sentence makeNewButton()
+    {
+        Sentence newbutton = new Sentence();
+        newbutton.state = STATE_NEW_BUTTON;
+        return newbutton;
     }
 }

@@ -1,6 +1,7 @@
 package kr.jhha.engquiz.presenter_view.admin.report;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,8 @@ public class ReportAdapter extends BaseAdapter {
 
         // 아이템 내 각 위젯에 데이터 반영
         numView.setText(getText(item.getModifyState()));
+        int color = ContextCompat.getColor(mContext, R.color.sky);
+        numView.setTextColor(color);
         textView1.setText(item.getTextKo());
         textView2.setText(item.getTextEn());
         return convertView;

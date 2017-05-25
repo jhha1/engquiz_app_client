@@ -7,7 +7,6 @@ package kr.jhha.engquiz.presenter_view.playquiz;
 public class QuizPlayContract {
 
     interface View {
-        void showTitle(String title);
         void showNextQuestion(String question);
         void showNotAvailableQuiz();
         void showAnswer(String answer);
@@ -18,8 +17,6 @@ public class QuizPlayContract {
     }
 
     interface UserActionsListener {
-        void initToolbarTitle();
-        void resetQuizData();
 
         void doNextQuestion();
         void getAnswer();

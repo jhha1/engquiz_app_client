@@ -1,9 +1,13 @@
 package kr.jhha.engquiz.presenter_view;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import kr.jhha.engquiz.R;
@@ -15,7 +19,6 @@ import kr.jhha.engquiz.util.StringHelper;
 public class MyToolbar {
     private MainActivity mMainActivity;
     private android.support.v7.widget.Toolbar mToolbar;
-    private TextView mToolbarTextview;
 
     private static MyToolbar ourInstance = new MyToolbar();
     public static MyToolbar getInstance() {
@@ -34,6 +37,7 @@ public class MyToolbar {
         final Context context = mMainActivity.getApplicationContext();
         int color = ContextCompat.getColor(context, R.color.PlayQuizLight);
         mToolbar.setTitleTextColor(color);
+        mToolbar.setTitleMargin(0,0,0,0);
 
         /*
         setSupportActionBar(mToolbar);
@@ -74,51 +78,35 @@ public class MyToolbar {
                 titleColor = R.color.PlayQuizDark;
                 break;
             case PLAYQUIZ:
-                title = "Quiz Playing";
-                titleColor = R.color.PlayQuizLight;
+                title = "";
+                titleColor = R.color.gray_50;
                 break;
-            case SHOW_SCRIPTS:
-                title = "Scripts";
-                titleColor = R.color.black_alpha_80;
+            case SCRIPT_TAB:
+                title = "Script";
+                titleColor = R.color.black_alpha_60;
                 break;
             case ADD_SCRIPT:
-                title = "Add Script";
-                titleColor = R.color.black_alpha_80;
+                title = "Script";
+                titleColor = R.color.black_alpha_60;
                 break;
             case ADD_SENTENCE:
                 title = "Add Sentence";
-                titleColor = R.color.black_alpha_80;
-                break;
-            case SHOW_QUIZFOLDERS:
-                title = "Folders";
-                titleColor = R.color.black_alpha_80;
-                break;
-            case SYNC:
-                title = "Sync";
-                titleColor = R.color.black_alpha_80;
+                titleColor = R.color.black_alpha_60;
                 break;
             case REPORT:
                 title = "Report";
-                titleColor = R.color.black_alpha_80;
-                break;
-            case NEW_QUIZFOLDER:
-                title = "New Folder";
-                titleColor = R.color.black_alpha_80;
+                titleColor = R.color.black_alpha_60;
                 break;
             case SHOW_SCRIPTS_IN_QUIZFOLDER:
-                title = "Scripts";
-                titleColor = R.color.black_alpha_80;
+                title = "Script";
+                titleColor = R.color.black_alpha_60;
                 break;
             case SHOW_SENTENCES_IN_SCRIPT:
                 title = "Sentences";
-                titleColor = R.color.black_alpha_80;
-                break;
-            case ADD_SCRIPT_INTO_QUIZFOLDER:
-                title = "Add Script";
-                titleColor = R.color.black_alpha_80;
+                titleColor = R.color.black_alpha_60;
                 break;
             default:
-                title = "ENGLISH QUIZ";
+                title = "";
                 titleColor = R.color.PlayQuizLight;
                 break;
         }
@@ -157,6 +145,7 @@ public class MyToolbar {
             case PLAYQUIZ:
                 int color = ContextCompat.getColor(context, R.color.PlayQuizDark);
                 mToolbar.setBackgroundColor(color);
+                mToolbar.setTitleMargin(0,0,0,0);
                 break;
             default:
                 /*
@@ -166,8 +155,9 @@ public class MyToolbar {
                         null);
                 mToolbar.setBackground(drawable);
                 */
-                color = ContextCompat.getColor(context, R.color.yellow100);
-                mToolbar.setBackgroundColor(color);
+                mToolbar.setTitleMarginTop(10);
+                Drawable background = ContextCompat.getDrawable(context, R.drawable.img_toolbar__background);
+                mToolbar.setBackground(background);
                 break;
         }
     }

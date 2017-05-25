@@ -12,10 +12,12 @@
     <color name="PlayQuizYellowGreen">@android:color/holo_green_light</color>
 
     <!-- Red -->
-    <color name="yellow_10">#f0f0e9</color>
+    <color name="yellow_10">#F7F3A9</color>
     <color name="yellow50">#f2c771</color>
     <color name="yellow100">@android:color/holo_orange_light</color>
     <color name="orange">#e27e6a</color>
+    <color name="holo_orange">#FF894F</color>
+    <color name="vivid_dark_orange">#bb7d5a</color>
 
     <!-- Blue -->
     <color name="mint">#B8EBBE</color>
@@ -35,6 +37,7 @@
     <color name="black_alpha_20">#22000000</color>
     <color name="black_alpha_30">#44000000</color>
     <color name="black_alpha_40">#66000000</color>
+    <color name="black_alpha_45">#77000000</color>
     <color name="black_alpha_50">#88000000</color>
     <color name="black_alpha_60">#99000000</color>
     <color name="black_alpha_70">#aa000000</color>

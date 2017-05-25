@@ -13,31 +13,43 @@ public class SentenceContract {
     interface View {
         void showTitle(String title);
 
-        void onSuccessGetSentences(List<Sentence> sentences);
+        // 문장 리스트 보기
+        void onSuccessGetSentences(boolean bCustomSentences, List<Sentence> sentences);
         void onFailGetSentences();
 
-        void showSendReportDialog();
+        // 문장 옵션보기
+        void onShowOptionDialog(Sentence item);
+
+        // 문장 추가
+        void showAddSentenceFragment(Sentence item);
+
+        // 문장 수정 요청
+        void showSendReportDialog(Sentence item);
         void onSuccessSendReport();
         void onFailSendReport(int msgId);
 
+        // 문장 직접 수정
         void showModifyDialog(Sentence item);
         void onSuccessUpdateSentence();
         void onFailUpdateSentence();
 
-        void showDeleteDialog();
+        // 문장 삭제
         void onSuccessDeleteSentence();
         void onFailDeleteSentence(int msgId);
     }
 
     interface ActionsListener {
+        // 툴바 옵션 메뉴 - 도움말클릭
+        void helpBtnClicked();
+
         void initToolbarTitle(Integer scriptId);
         void getSentences(Integer scriptId);
 
-        void sentenceDoubleClicked(Sentence item);
+        void sentenceSingleClicked(Sentence item);
         void sentenceLongClicked(Sentence item);
 
-        void sendReport();
+        void sendReport(Sentence item);
         void modifySentence(String ko, String en);
-        void deleteSentence();
+        void deleteSentence(Sentence item);
     }
 }
