@@ -1,11 +1,17 @@
 package kr.jhha.engquiz.util;
 
+import android.text.Html;
+import android.text.Spanned;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import kr.jhha.engquiz.R;
+import kr.jhha.engquiz.util.exception.EResultCode;
 
 /**
  * Created by thyone on 2017-02-04.
@@ -80,4 +86,14 @@ public class StringHelper {
             throw new IllegalStateException("JsonAPI ERR", e);
         }
     }
+
+    public static Spanned formatHtml(String source){
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
+            // noinspection deprecation
+            return Html.fromHtml(source);
+        }
+        return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+    }
+
+
 }

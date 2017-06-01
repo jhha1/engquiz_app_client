@@ -20,10 +20,10 @@
                android:layout_height="wrap_content"
                android:paddingTop="10dp"
                android:background="@color/gray_10"
-               app:tabSelectedTextColor="@color/orange"
+               app:tabSelectedTextColor="@color/holo_orange"
                app:tabTextAppearance="@style/MyListView.EditText.Item.Text"
                app:tabTextColor="@color/black_alpha_40"
-               app:tabIndicatorColor="@color/orange"
+               app:tabIndicatorColor="@color/holo_orange"
                app:tabIndicatorHeight="0.8dp"
                app:tabMode="fixed"
                app:tabGravity="fill"/>

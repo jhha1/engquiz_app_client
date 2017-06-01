@@ -1,27 +1,21 @@
 package kr.jhha.engquiz.presenter_view.intro;
 
-import android.Manifest;
 import android.content.Context;
 
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.local.QuizFolder;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ScriptRepository;
+import kr.jhha.engquiz.model.local.SyncRepository;
 import kr.jhha.engquiz.model.local.User;
 import kr.jhha.engquiz.model.local.UserRepository;
-import kr.jhha.engquiz.presenter_view.MainActivity;
 import kr.jhha.engquiz.presenter_view.MyNavigationView;
-import kr.jhha.engquiz.util.FileHelper;
+import kr.jhha.engquiz.presenter_view.sync.SyncDialog;
 import kr.jhha.engquiz.util.FileHelper2;
-import kr.jhha.engquiz.util.PermmissionHelper;
-import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
-
-import static kr.jhha.engquiz.util.PermmissionHelper.PERMISSION_STORAGE;
 
 /**
  * Created by thyone on 2017-03-15.
@@ -40,7 +34,12 @@ public class IntroPresenter implements IntroContract.UserActionsListener
     }
 
     public void initialize(){
-        String msg = mContext.getString(R.string.common__failed_loading);
+        loadLocalData();
+        checkUserExist();
+    }
+
+    private void loadLocalData(){
+        String msg = mContext.getString(R.string.init__data_loading_err);
 
         final FileHelper2 fileHelper = FileHelper2.getInstance();
         boolean bOK = fileHelper.init();
@@ -63,7 +62,7 @@ public class IntroPresenter implements IntroContract.UserActionsListener
 
 */
 
-         bOK =  ScriptRepository.getInstance().initailize();
+        bOK =  ScriptRepository.getInstance().initailize();
         if( !bOK ){
             MyDialog.showDialogAndForcedCloseApp(mContext, msg);
             return;
@@ -75,10 +74,9 @@ public class IntroPresenter implements IntroContract.UserActionsListener
             return;
         }
 
-        checkUserExist();
     }
 
-    public void checkUserExist() {
+    private void checkUserExist() {
         User user = mUser.getUser();
 
         if( false == mUser.isExistUser() ){
@@ -123,8 +121,9 @@ public class IntroPresenter implements IntroContract.UserActionsListener
                         mView.showSignInDialog(R.string.signin__fail_invalid_name);
                         break;
                     default:
-                        MyLog.e( "signIn() OtherError: " + resultCode);
-                        mView.onSignInFail(R.string.signin__fail);
+                        int msgId = EResultCode.commonMsgHandler(resultCode, R.string.signin__fail);
+                        MyLog.e( "signIn() OtherError. resultCode: " + resultCode);
+                        mView.onSignInFail(msgId);
                         break;
                 }
             }
@@ -152,16 +151,12 @@ public class IntroPresenter implements IntroContract.UserActionsListener
                 MyLog.e("onLogInFail() resultCode: "+resultCode+", username: " + username);
                 switch (resultCode){
                     case NONEXIST_USER:
-                        mView.onLoginFail(1);
-                        break;
-                    case NETWORK_ERR:
-                        mView.onLoginFail(2);
-                        break;
                     case INVALID_ARGUMENT:
-                        mView.onLoginFail(3);
+                        mView.onLoginFail(R.string.login__fail_invalid_name);
                         break;
                     default:
-                        mView.onLoginFail(0);
+                        int msgId = EResultCode.commonMsgHandler(resultCode, R.string.login__fail);
+                        mView.onLoginFail(msgId);
                         break;
                 }
             }
@@ -170,21 +165,24 @@ public class IntroPresenter implements IntroContract.UserActionsListener
 
     private void loginPostProcess( String quizfolderString, List quizFolderScriptIds, List syncNeededSentenceIds )
     {
-        // Admin
+        // show Admin menu
         final UserRepository userRepo = UserRepository.getInstance();
         if(userRepo.isAdminUser()) {
             final MyNavigationView navigationView = MyNavigationView.getInstance();
             navigationView.showAdminMenu();
         }
 
-        // 싱크 알람 띄우기
-        if( syncNeededSentenceIds == null || syncNeededSentenceIds.isEmpty() )
+        // Sync 관련
+        if( syncNeededSentenceIds == null || syncNeededSentenceIds.isEmpty() ) {
+            // sync 불 필요.
             return;
-
-        final ScriptRepository scriptRepo = ScriptRepository.getInstance();
-        scriptRepo.saveSyncNeededSentencesSummary( syncNeededSentenceIds );
-        final MyNavigationView navigationView = MyNavigationView.getInstance();
-        navigationView.attachAlarmIcon(R.id.nav_scripts);
+        } else {
+            // sync list 저장.
+            final SyncRepository syncRepo = SyncRepository.getInstance();
+            syncRepo.saveSyncNeededSentencesSummary( syncNeededSentenceIds );
+            // 알람 띄우기
+            SyncDialog.attachSyncAlarmIcons(mContext);
+        }
 
         MyLog.i("onLoginSuccess()  " +
                 "quizfolderForPlaying: " + ((quizfolderString!=null)?quizfolderString.toString():null) +

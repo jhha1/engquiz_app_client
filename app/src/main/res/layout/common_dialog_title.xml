@@ -16,12 +16,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:paddingRight="10dip"
-        android:src="@drawable/ic_dialog__edit" />
+        android:src="@drawable/ic_dialog__edit"
+        android:visibility="gone"/>
 
     <TextView android:id="@+id/alertTitle"
         style="@android:style/TextAppearance.Holo.DialogWindowTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black_alpha_40" />
+        android:paddingLeft="15dip"
+        android:textColor="@color/black_alpha_60" />
 
 </LinearLayout>

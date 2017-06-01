@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.util.exception;
 
+import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.util.StringHelper;
 
 public enum EResultCode {
@@ -50,14 +51,17 @@ public enum EResultCode {
 	REPORT_DUPLICATED(1801),
 	REPORT_MEMORY_UPDATE_FAIL(1802),
 
+	MAINTAIN_SERVER ( 9993 ),
 	ENCODING_ERR(9994),
 	SYSTEM_ERR ( 9995 ),
 	NETWORK_ERR ( 9996 ),
 	DB_ERR ( 9997 ),
 	UNKNOUN_ERR ( 9998 ),
-	MAX( 9999 );
-	
-	
+	MAX( 9999 ),
+
+	// only client
+	SAVE_DATA_ON_CLIENT_ERR(8001);
+
 	private Integer code;
 	
 	EResultCode( int value )
@@ -87,5 +91,21 @@ public enum EResultCode {
 				return e;
 		}
 		throw new IllegalArgumentException("No Existed EResultCode. value:"+value);
+	}
+
+	public static int commonMsgHandler(EResultCode code, int defaultMsgId) {
+		int msgId = 0;
+		switch (code){
+			case NETWORK_ERR:
+				msgId = R.string.common__network_err;
+				break;
+			case MAINTAIN_SERVER:
+				msgId = R.string.common__maintain_server;
+				break;
+			default:
+				msgId = defaultMsgId;
+				break;
+		}
+		return msgId;
 	}
 }

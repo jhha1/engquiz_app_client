@@ -41,7 +41,7 @@ public class CustomScriptsPresenter implements CustomScriptsContract.ActionsList
     public void helpBtnClicked() {
         FragmentHandler handler = FragmentHandler.getInstance();
         WebViewFragment fragment = (WebViewFragment)handler.getFragment(WEB_VIEW);
-        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.REGULAR_SCRIPTS);
+        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.CUSTOM_SCRIPTS);
         handler.changeViewFragment(WEB_VIEW);
     }
 
@@ -133,14 +133,18 @@ public class CustomScriptsPresenter implements CustomScriptsContract.ActionsList
             mView.showErrorDialog( R.string.del_script__fail_no_exist_script );
             return;
         }
+        if( STATE_QUIZPLAYING_SCRIPT == item.state ) {
+            mView.showErrorDialog(R.string.del_script__fail_palying_state);
+            return;
+        }
         if( STATE_ADDED_SCRIPT != item.state ) {
-            mView.showErrorDialog(R.string.del_script__fail_no_allowed);
+            mView.showErrorDialog(R.string.cannot_remove_item);
             return;
         }
 
         // 유저가 만든 스크립트는 로컬파일에서 제거.
         final ScriptRepository scriptRepository = ScriptRepository.getInstance();
-        boolean bOK = scriptRepository.removeScriptFromLocal(item.scriptId);
+        boolean bOK = scriptRepository.removeScript(item.scriptId);
         if( ! bOK ){
             // 제거 실패
             mView.showErrorDialog(R.string.del_script__fail );

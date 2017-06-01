@@ -26,7 +26,7 @@ public class Etc
         final EditText editText = new EditText(context);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setTextColor(Color.DKGRAY);
-        editText.setPadding(10, 5, 5, 5);
+        editText.setPadding(10, 0, 5, 16);  // s8에서 bottom 16 이하면, 글씨가 언더라인 아래로 내려감
         editText.setText(initText);
         //editText.setImeOptions(EditorInfo.IME_ACTION_DONE);.////////
         if( listener != null )

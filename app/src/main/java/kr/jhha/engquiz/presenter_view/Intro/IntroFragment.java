@@ -1,9 +1,7 @@
 package kr.jhha.engquiz.presenter_view.intro;
 
-import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -19,10 +17,11 @@ import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MainActivity;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.UserRepository;
+import kr.jhha.engquiz.presenter_view.MyNavigationView;
+import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.util.PermmissionHelper;
 import kr.jhha.engquiz.util.ui.Etc;
 import kr.jhha.engquiz.util.ui.MyDialog;
-import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.util.PermmissionHelper.PERMISSION_STORAGE;
 
@@ -35,7 +34,7 @@ public class IntroFragment extends Fragment implements IntroContract.View
     private IntroContract.UserActionsListener mActionListener;
 
     private final int mIntroAnimationSec = 1000;
-    private static boolean bInitailized = false;
+    private static boolean bAppInitailized = false;
 
     private EditText mInputText = null;
 
@@ -52,42 +51,46 @@ public class IntroFragment extends Fragment implements IntroContract.View
         View view = inflater.inflate(R.layout.content_intro, container, false);
 
         // 액션 바 감추기
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
-        actionBar.hide();
+        MyToolbar.getInstance().hide();
+
+        return view;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if( bAppInitailized )
+            return;
+
+        // onResume() 에서 반복 호출로 중복 퍼미션 체킹 및 권한 다이알로그 띄워서
+        // UX의 루프에 빠지는걸 막기 위해 플레그 셋팅.
+        if( PermmissionHelper.bAlreadyCheckAndShowDialog)
+            return;
 
         // 1초간 intro 화면 보이기. 이후 앱 시작.
         Handler handler = new Handler();
         handler.postDelayed( runnable, mIntroAnimationSec );
-
-        return view;
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     Runnable runnable = new Runnable() {
         @Override
-        public void run() {
-            initData();
-        }
-    };
+        public void run()
+        {
+            // onResume() 에서 반복 호출 막기 위해 플레그 셋팅.
+            PermmissionHelper.bAlreadyCheckAndShowDialog = true;
 
-    public void initData(){
-        if( bInitailized == false ) {
-
-            // 파일 r/w 에 필요한 접근 얻기.
-            int permissionCode = PERMISSION_STORAGE;
-            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};  // write에  read도 포함됨.
-            boolean bPermissionAllowed = PermmissionHelper.checkAndRequestPermission(this, permissionCode, permissions);
-
-            // 권한이 이미 허락되어있다.
+            // 앱 권한 체크 및 권한얻기 다이알로그 띄우기
+            IntroFragment thisFragmentObject = (IntroFragment)FragmentHandler.getInstance().getFragment(FragmentHandler.EFRAGMENT.INTRO);
+            boolean bPermissionAllowed = PermmissionHelper.checkAndRequestPermission( thisFragmentObject );
             if (bPermissionAllowed) {
-                mActionListener.initialize();
-                bInitailized = true;
+                // 권한이 이미 허락되어있다.
+                // 앱 데이터 로드 및 셋팅
+                appInitialize();
             }
         }
-    }
+    };
 
     // 권한을 유저로부터 허락받는중.
     @Override
@@ -96,34 +99,21 @@ public class IntroFragment extends Fragment implements IntroContract.View
 
         switch (requestCode) {
             case PERMISSION_STORAGE:
-                if (PermmissionHelper.verifyPermissions(grantResults))
-                {
+                if (PermmissionHelper.verifyPermissions(grantResults)) {
                     // 권한을 얻었다.
-                    MyLog.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! onRequestPermissionsResult: PermissionAllowed " );
-                    mActionListener.initialize();
-
-                }
-                else
-                {
-                    // 권한을 얻지 못했다. Show Rational Dialog
-                    MyLog.d("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! onRequestPermissionsResult: NONE!! Permission Not Allowed " );
+                    appInitialize();
+                } else {
+                    // 권한을 얻지 못했다. Show Dialog
                     PermmissionHelper.showGoToAppSettingForPermissionDialog(getActivity());
-
-                    /*
-                    if( PermmissionHelper.isMaxPermissionRefused() ){
-                        MyLog.d("onRequestPermissionsResult: MaxPermissionRefused. " );
-                        MyDialog.showDialogAndForcedCloseApp(getActivity(), getString(R.string.common__finish_app));
-                        return;
-                    }
-                    PermmissionHelper.increasePermissionRefuseCount();
-
-                    // 권한을 얻지 못했다. Show Rational Dialog
-                    MyLog.d("onRequestPermissionsResult: NONE!! Permission Not Allowed " );
-                    String message = PermmissionHelper.getRationalMessage(getActivity(), PERMISSION_STORAGE);
-                    PermmissionHelper.showRequestPermissionDialog(getActivity(), this, message);*/
                 }
                 break;
         }
+    }
+
+    private void appInitialize(){
+        // 앱 데이터 로드 및 셋팅
+        mActionListener.initialize();
+        bAppInitailized = true;
     }
 
     // 중복으로 뜨ㅣ울때, 전 다이알로그 삭제 안됬다는 에러가 나서
@@ -155,47 +145,36 @@ public class IntroFragment extends Fragment implements IntroContract.View
     }
 
     @Override
-    public void onLoginFail(int what) {
-        switch (what){
+    public void onLoginFail(int msgId) {
+        switch (msgId){
             case 1:
-                showLoginDialog(R.string.login__fail_no_exist_user);
+                showLoginDialog(msgId);
                 break;
             case 2:
-                String msg = getString(R.string.login__fail_network_err);
+                String msg = getString(msgId);
                 MyDialog.showDialogAndForcedCloseApp(getActivity(), msg);
                 break;
             case 3:
-                showLoginDialog(R.string.login__fail_invalid_name);
+                showLoginDialog(msgId);
                 break;
             default:
-                msg = getString(R.string.login__fail);
+                msg = getString(msgId);
                 MyDialog.showDialogAndForcedCloseApp(getActivity(), msg);
                 break;
         }
     }
 
+    // 로긴성공.
+    // 게임 진입 첫 화면으로 이동 : 퀴즈 플레이 화면
     @Override
     public void onLoginSuccess(String username) {
         String msg =  "Welcome  "+username+" !! ";
         Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
 
-        updateNavDrawer(username);
+        MyNavigationView.getInstance().setUserName(username);
+
         final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
         fragmentHandler.changeViewFragment( FragmentHandler.EFRAGMENT.PLAYQUIZ );
-    }
-
-    private void updateNavDrawer(String username){
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-
-        // TODO
-        boolean bAdmin = true;
-        if( ! bAdmin ) {
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_report).setVisible(false);
-        }
-
-        TextView navHeaderUserName = (TextView) getActivity().findViewById(R.id.nav_header_username);
-        navHeaderUserName.setText(username);
     }
 
     @Override

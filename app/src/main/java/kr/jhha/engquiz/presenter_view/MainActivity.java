@@ -6,9 +6,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.NativeExpressAdView;
+
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
-import kr.jhha.engquiz.util.FileHelper;
 import kr.jhha.engquiz.util.ui.click_detector.BackPressedCloseHandler;
 import kr.jhha.engquiz.util.ui.click_detector.ClickDetector;
 
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setUpFragments();
         //restoreState(savedInstanceState);
         showDefaultFragment();
+        setUpAddModule();
     }
 
     /*
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mMyToolbar = MyToolbar.getInstance();
-        mMyToolbar.setUpToolbar(this, toolbar);
+        mMyToolbar.initialize(this, toolbar);
     }
 
     /*
@@ -122,6 +126,15 @@ public class MainActivity extends AppCompatActivity {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
+    /*
+       광고 모듈
+    */
+    private void setUpAddModule() {
+        MobileAds.initialize(this, getString(R.string.ad_app_id));
+        NativeExpressAdView adView = (NativeExpressAdView)findViewById(R.id.adView);
+        AdRequest request = new AdRequest.Builder().build();
+        adView.loadAd(request);
+    }
 
     /*
         onSaveInstanceState(), restoreState()
@@ -143,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             showDefaultFragment();
         }
         else {
-            mMyToolbar.setToolBar(NONE);
+            mMyToolbar.updateToolBar(NONE);
         }
     }
 }

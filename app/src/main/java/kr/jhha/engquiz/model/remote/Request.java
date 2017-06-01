@@ -22,6 +22,7 @@ public class Request {
 
     private void setRequiredFields( EProtocol2.PID pid ) {
         set( EProtocol.PID, pid.toInt() );
+        set( EProtocol.sPID, pid.name() );  // for logging. pid와 매핑되는 프로토콜 이름
         Integer userId = UserRepository.getInstance().getUserID();
         set( EProtocol.UserID, userId );
     }

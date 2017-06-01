@@ -17,16 +17,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
-import kr.jhha.engquiz.model.local.UserRepository;
+import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
+import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.Actions;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.CUSTOM_SCRIPTS;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SENTENCES;
 
 /**
  * Created by Junyoung on 2016-06-23.
@@ -52,22 +56,22 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initToolbar(); // 액션 바
         mActionListener = new AddSentencePresenter(getActivity(), this, ScriptRepository.getInstance());
-
-        // 액션 바
-        initToolbarOptionMenu();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_sentence_add, container, false);
 
-        setUpToolBar();
         setUpArgs( getArguments() );
 
         // 문장 입력 칸
         mEditTextKo = (EditText) view.findViewById(R.id.sentence_add_ko);
         mEditTextEn = (EditText) view.findViewById(R.id.sentence_add_en);
+        mEditTextKo.setText(StringHelper.EMPTY_STRING);
+        mEditTextEn.setText(StringHelper.EMPTY_STRING);
+
 
         // 키보드 IME로  '완료'로 다음 액션 선택.
         // IME 자판이 바뀌려면, inputType이 Text여야 한다. but,
@@ -77,19 +81,19 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
         mEditTextEn.setOnEditorActionListener(mEditorActionListener);
 
         // 버튼 '완료' 으로 다음 액션 선택
-        //Button nextButton = (Button) view.findViewById(R.id.sentence_add_next_btn);
         Button doneButton = (Button) view.findViewById(R.id.sentence_add_complate_btn);
-       // nextButton.setOnClickListener(mClickListener);
         doneButton.setOnClickListener(mClickListener);
 
         view.bringToFront(); // 리스트가 길어질 경우 가장 위로 스크롤.
         return view;
     }
 
-    private void setUpToolBar(){
-        final MyToolbar toolbar = MyToolbar.getInstance();
-        toolbar.setToolBar(ADD_SENTENCE);
+    @Override
+    public void onResume() {
+        super.onResume();
+        mToolbar.updateToolBar(ADD_SENTENCE);
     }
+
     private void setUpArgs( Bundle bundle ){
         if( bundle != null ){
             mParentScriptId = bundle.getInt(FIELD__SCRIPT_ID);
@@ -130,13 +134,6 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
         String ko = mEditTextKo.getText().toString();
         String en = mEditTextEn.getText().toString();
         mActionListener.sentencesInputted( bHasParentScript, mParentScriptId,  ko, en );
-        clearEditTexts();
-    }
-
-    private void clearEditTexts(){
-        mEditTextEn.setText("");
-        mEditTextKo.setText("");
-        mEditTextKo.requestFocus();
         Actions.hideKeyboard(getActivity());
     }
 
@@ -165,7 +162,7 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
 
 
         final MyDialog dialog = new MyDialog(getActivity());
-        dialog.setTitle("문장을 넣을 스크립트를 선택해주세요 :)");
+        dialog.setTitle("문장을 넣을 스크립트를 선택해주세요.");
         dialog.setNeutralButton("새 스크립트 만들기", new View.OnClickListener() {
             public void onClick(View arg0) {
                 mActionListener.makeNewScriptBtnClicked();
@@ -173,14 +170,13 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
             }
         });
         dialog.setNegativeButton();
-        dialog.setAdapter(adapter,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        String listItemTitle = adapter.getItem(id);
-                        mActionListener.scriptSelected(listItemTitle);
-                        dialog.dismiss();
-                    }
-                });
+        dialog.setListView(getActivity(), adapter, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                String listItemTitle = adapter.getItem(id);
+                mActionListener.scriptSelected(listItemTitle);
+                dialog.dismiss();
+            }
+        });
         adapter.notifyDataSetChanged();
         dialog.showUp();
     }
@@ -189,41 +185,23 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
         3. 모든 단계 완료.
      */
     @Override
-    public void showAddSentenceSuccessDialog(String scriptName) {
-        final MyDialog dialog = new MyDialog(getActivity());
-        dialog.setTitle("문장 추가 완료");
-        dialog.setMessage( "새 문장이 ["+scriptName+"] 스크립트에 저장되었어요." );
-        dialog.setPositiveButton( new View.OnClickListener() {
-            public void onClick(View arg0)
-            {
-                dialog.dismiss(); // 다이알로그 닫기
-                clearEditTexts();
-            }});
-        dialog.showUp();
+    public void showSentenceFragment(final Integer scriptId, final String scriptName) {
+        // 문장이 들어있는 스크립트 창으로 이동
+        final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
+        SentenceFragment fragment = (SentenceFragment) fragmentHandler.getFragment(SENTENCES);
+        fragment.setScriptInfo(scriptId, scriptName);
+        fragmentHandler.changeViewFragment(SENTENCES);
+
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__create_succ),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void showErrorDialog(int what) {
-        MyLog.e("addScriptFragment.showErrorDialog() what:"+what);
-        String msg = null;
-        switch (what) {
-            case 1:
-                msg = "이미 똑같은 이름의 스크립트가 있어요. \n 다른 이름을 지어주세요. ";
-                break;
-            case 2:
-                msg = "스크립트에 넣는 과정에서 오류가 발생했어요. \n 잠시 후 다시 시도해 주세요 ㅜ";
-                break;
-            case 7:
-                msg = "잘못된 문장이에요.  문장을 다시 입력해 주세요.";
-                break;
-            default:
-                msg = "오류가 발생했어요. \n 잠시 후 다시 시도해 주세요 ㅜㅜ";
-                break;
-        }
-
+    public void showErrorDialog(int msgId) {
+        MyLog.e("addScriptFragment.showErrorDialog() msg:"+getString(msgId));
         MyDialog dialog = new MyDialog(getActivity());
-        dialog.setTitle(getString(R.string.common__warning));
-        dialog.setMessage(msg);
+        dialog.setMessage(getString(msgId));
         dialog.setPositiveButton();
         dialog.showUp();
     }
@@ -231,17 +209,15 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
     /*
      Action Bar
     */
-    private void initToolbarOptionMenu() {
+    private void initToolbar() {
         // 액션 바 보이기
         mToolbar = MyToolbar.getInstance();
-        mToolbar.show();
         setHasOptionsMenu(true);
     }
 
     // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -249,15 +225,14 @@ public class AddSentenceFragment extends Fragment implements AddSentenceContract
     // 화면에 보여질때 마다 호출됨
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(false);
-        menu.getItem(1).setEnabled(true);
+        mToolbar.updateToolBarOptionMenu(ADD_SENTENCE, menu);
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_bar__help_quizplay:
+            case R.id.action_bar__help_webview:
                 mActionListener.helpBtnClicked();
                 return true;
             default:

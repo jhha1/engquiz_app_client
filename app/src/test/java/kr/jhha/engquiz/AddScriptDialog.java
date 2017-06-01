@@ -65,7 +65,7 @@ public class AddScriptDialog extends Dialog
 
 
         mFileLocationView = (TextView) findViewById(R.id.add_script_file_location);
-        showCurrentPath( ScriptRepository.getInstance().getAbsoluteFilePath(currentDirectoryName) );
+        showCurrentPath( FileHelper.getInstance().getAndroidAbsolutePath(currentDirectoryName) );
 
         // 2. 파일 리스트뷰
         mItemListView = (ListView) findViewById(R.id.add_script_filebrower);

@@ -1,6 +1,8 @@
 package kr.jhha.engquiz.model.local;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import kr.jhha.engquiz.util.exception.system.MyIllegalStateException;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.model.local.Script.CUSTOM_SCRIPT_ID_MIN;
+import static kr.jhha.engquiz.util.Parsor.MainSeperator;
+import static kr.jhha.engquiz.util.Parsor.TabSeperator;
 
 /**
  * Created by jhha on 2016-10-14.
@@ -20,43 +24,49 @@ public class Sentence {
     public Integer scriptId;
     public String textKo;
     public String textEn;
-    public Integer state;
+    public TYPE type;
 
     public final static String Field_SENTENCE_ID = "SENTENCE_ID";
     public final static String Field_SCRIPT_ID = "SCRIPT_ID";
     public final static String Field_SENTENCE_KO = "SENTENCE_KO";
     public final static String Field_SENTENCE_EN = "SENTENCE_EN";
 
-    public final static Integer STATE_NONE = 0;
-    public final static Integer STATE_MADE_BY_SYSTEM = 1;
-    public final static Integer STATE_MADE_BY_USER = 2;
-    public final static Integer STATE_NEW_BUTTON = 3;
+    public enum TYPE {
+        NONE (0),
+        REGULAR(1),
+        CUSTOM(2),
+        NEW_BUTTON(3);
+
+        private static Map<Integer, TYPE> lookup = null;
+        static
+        {
+            lookup = new HashMap<Integer, TYPE>();
+            for( TYPE e : EnumSet.allOf(TYPE.class) ) {
+                lookup.put( e.value(), e );
+            }
+        }
+        private Integer value;
+        private TYPE(Integer value )
+        {
+            this.value = value;
+        }
+        public Integer value()
+        {
+            return value;
+        }
+        public static TYPE toEnum(Integer key ) {
+            if( key == null )
+                return TYPE.NONE;
+            return (lookup.containsKey(key)? lookup.get(key) : NONE );
+        }
+    }
 
     public Sentence() {
         sentenceId = 0;
         scriptId = 0;
         textKo = StringHelper.EMPTY_STRING;
         textEn = StringHelper.EMPTY_STRING;
-        state = STATE_NONE;
-    }
-
-    public Sentence(ObjectBundle bundle) {
-        deserialize(bundle);
-    }
-
-    public Sentence deserialize(ObjectBundle bundle){
-        if( bundle == null ){
-            return null;
-        }
-        try {
-            this.sentenceId = bundle.getInt(Sentence.Field_SENTENCE_ID);
-            this.textKo = bundle.getString(Sentence.Field_SENTENCE_KO);
-            this.textEn = bundle.getString(Sentence.Field_SENTENCE_EN);
-            return this;
-        } catch (Exception e){
-            String msg = "Failed Deserialize Sentence Object. " + e.getMessage();
-            throw new MyIllegalStateException(msg);
-        }
+        type = TYPE.NONE;
     }
 
     public static boolean checkSentenceID( Object sentenceId ) {
@@ -143,11 +153,57 @@ public class Sentence {
         return true;
     }
 
-    /*
-       Deserialize a Server CreateScriptResult
-        : List<HashMap> -> List<Sentence>
-    */
-    public static Sentence deserialize( Map<String , Object> map )
+    //  Serialize a File
+    // Sentence Object -> String
+    public static String serializeFileData( Sentence obj ) {
+        try {
+            StringBuffer str = new StringBuffer();
+            str.append(obj.sentenceId + TabSeperator);
+            str.append(obj.textKo + TabSeperator);
+            str.append(obj.textEn + TabSeperator);
+            str.append(obj.type.value() + MainSeperator);
+            return str.toString();
+        } catch ( Exception e ){
+            e.printStackTrace();
+            return StringHelper.EMPTY_STRING;
+        }
+    }
+
+    //   Deserialize a File
+    //    : String -> Sentence Object
+    private static int SENTENCE_ELEMENT_COUNT = 4;
+    public static Sentence deserializeFileData( Integer scriptId, String str )
+    {
+        if(str.isEmpty()) {
+            MyLog.w("row is empty");
+            return null;
+        }
+
+        String[] dividedRow = str.split(TabSeperator);
+        if(dividedRow.length != SENTENCE_ELEMENT_COUNT) {
+            MyLog.w("split 'TAP' row count is :" + dividedRow.length);
+            return null;
+        }
+
+        try {
+            Sentence unit = new Sentence();
+            unit.scriptId = scriptId;
+            unit.sentenceId = Integer.parseInt(dividedRow[0].trim());
+            unit.textKo = dividedRow[1].trim();
+            unit.textEn = dividedRow[2].trim();
+            unit.type = TYPE.toEnum(Integer.parseInt(dividedRow[3].trim()));
+
+            return unit;
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //   Deserialize a Server CreateScriptResult
+    //    : List<HashMap> -> List<Sentence>
+    public static Sentence deserializeServerData(Map<String , Object> map )
     {
         Sentence sentence = new Sentence();
         if( map.containsKey(Field_SENTENCE_ID) ){
@@ -189,11 +245,12 @@ public class Sentence {
             sentence.textEn = (String)en;
         }
 
+        sentence.type = TYPE.REGULAR;
         return sentence;
     }
 
     public boolean isMadeByUser(){
-        return this.state == STATE_MADE_BY_USER;
+        return TYPE.CUSTOM.equals(this.type);
     }
 
     /*
@@ -244,7 +301,7 @@ public class Sentence {
                 && sentence.scriptId == 0
                 && sentence.textKo == StringHelper.EMPTY_STRING
                 && sentence.textEn == StringHelper.EMPTY_STRING
-                && sentence.state == STATE_NONE)
+                && TYPE.NONE.equals(sentence.type))
             return true;
 
         return false;
@@ -254,7 +311,7 @@ public class Sentence {
     public String toString() {
         return "sentenceId("+ sentenceId +"), "
                 + "scriptId("+scriptId+"), "
-                + "state("+ state +"), "
+                + "type("+ type.name() +"), "
                 + "textKo("+textKo+"), "
                 + "textEn("+textEn+")";
     }

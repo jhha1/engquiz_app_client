@@ -3,7 +3,6 @@ package kr.jhha.engquiz.presenter_view.scripts.regular;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +98,7 @@ public class RegularScriptsAdapter extends BaseAdapter {
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)  mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.content_quizfolder_listview_item, parent, false);
+            convertView = inflater.inflate(R.layout.content_script_listview_item, parent, false);
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
@@ -129,7 +128,7 @@ public class RegularScriptsAdapter extends BaseAdapter {
                 resourceID = R.drawable.img_play_orange;
                 break;
             case STATE_NEWBUTTON:
-                resourceID = R.drawable.img_script_add_orange;
+                resourceID = R.drawable.img_script_add_blue;
                 break;
             case STATE_DESCRIPTION:
                 resourceID = R.drawable.ic_script__subject_orange;
@@ -150,7 +149,7 @@ public class RegularScriptsAdapter extends BaseAdapter {
             titleTextView.setTextColor(color);
            // titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
         } else if( state == STATE_NEWBUTTON) {
-            int color = ContextCompat.getColor(context, R.color.colorAccent);
+            int color = ContextCompat.getColor(context, R.color.holo_blue);
             titleTextView.setTextColor(color);
             //titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
         } else if( state == STATE_ADDED_SCRIPT
@@ -242,7 +241,7 @@ public class RegularScriptsAdapter extends BaseAdapter {
             script.scriptId = id;
             script.scriptTitle = mScriptModel.getScriptTitleById(id);
             if( StringHelper.isNull(script.scriptTitle) ){
-                script.scriptTitle = "스크립트 제목을 가져올 수 없습니다";
+                script.scriptTitle = mContext.getString(R.string.script__fail_get_name);
             }
             boolean bQuizPlayingScript = QuizPlayRepository.getInstance().hasScript(id);
             if( bQuizPlayingScript )
@@ -264,7 +263,7 @@ public class RegularScriptsAdapter extends BaseAdapter {
             script.scriptId = 0;
             script.scriptTitle = filename;
             if( StringHelper.isNull(script.scriptTitle) ){
-                script.scriptTitle = "파일 이름을 가져올 수 없습니다";
+                script.scriptTitle = mContext.getString(R.string.script__fail_get_filename);
             }
             script.state = STATE_NON_ADDED_SCRIPT;
             scripts.add(script);
@@ -277,27 +276,8 @@ public class RegularScriptsAdapter extends BaseAdapter {
     {
         ScriptSummary newbutton = new ScriptSummary();
         newbutton.scriptId = 0;
-        newbutton.scriptTitle = "다른 위치에서 스크립트 추가하기 \n (현재 위치: 카카오톡 다운로드)";
+        newbutton.scriptTitle = mContext.getString(R.string.add_pdf_script__other_dir);
         newbutton.state = Script.STATE_NEWBUTTON;
         return newbutton;
     }
-
-    private ScriptSummary makeDescription(int stringId) {
-        return makeDescription(stringId, 0);
-    }
-
-    private ScriptSummary makeDescription(int stringId, int itemCnt)
-    {
-        String title = ( itemCnt <= 0 )
-                ? mContext.getString(stringId)
-                : mContext.getString(stringId) + " ("+itemCnt+" 개)";
-        int state = STATE_DESCRIPTION;
-
-        ScriptSummary fakeObject = new ScriptSummary();
-        fakeObject.scriptId = 0;
-        fakeObject.scriptTitle = title;
-        fakeObject.state = state;
-        return fakeObject;
-    }
-
 }

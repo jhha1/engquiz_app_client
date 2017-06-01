@@ -1,9 +1,11 @@
 package kr.jhha.engquiz.util.ui.click_detector;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.Toast;
 
 import kr.jhha.engquiz.presenter_view.FragmentHandler;
+import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 /**
@@ -42,8 +44,20 @@ public class BackPressedCloseHandler implements ClickDetector {
 
         boolean doubleClicked = System.currentTimeMillis() <= backKeyPressedTime + 2000;
        if (doubleClicked) {
-           SystemExit();
+           showAppFinishDialog();
+           //SystemExit();
         }
+    }
+
+    private void showAppFinishDialog() {
+        final MyDialog dialog = new MyDialog(activity);
+        dialog.setMessage("이 광고로 얻는 수익금은 앱의 일부인? 서버 임대에 사용합니다. \n[광고가 들어감]");
+        dialog.setPositiveButton("종료", new View.OnClickListener() {
+            public void onClick(View arg0) {
+                dialog.dismiss();
+                SystemExit();
+            }});
+        dialog.setNegativeButton();
     }
 
     private void SystemExit() {

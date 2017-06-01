@@ -1,5 +1,6 @@
 package kr.jhha.engquiz.model.local;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,8 @@ import kr.jhha.engquiz.util.Parsor;
 import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.system.MyIllegalArgumentException;
 import kr.jhha.engquiz.util.ui.MyLog;
+
+import static kr.jhha.engquiz.util.Parsor.MainSeperator;
 
 
 /**
@@ -52,7 +55,7 @@ public class Script
             return;
         }
 
-        String rows[] = textScript.split(Parsor.MainSeperator);
+        String rows[] = textScript.split(MainSeperator);
         if(rows.length <= 2) {
             MyLog.e("invalied param. invalid param format: "+textScript);
             return;
@@ -151,43 +154,80 @@ public class Script
         }
     }
 
-    public String makeScriptFileHeader() {
+    /*
+        Serialize / Deserialize
+     */
+    // make file header for Memory -> Client file
+    public String serializeFileDataHeader() {
         if( StringHelper.isNull(this.title) ){
             MyLog.e("cannot make script file name. script title is null");
             return null;
         }
 
         String title_pdf_removed = Parsor.removeExtensionFromScriptTitle(title, ".pdf");
-        return makeScriptFileHeader(this.scriptId, title_pdf_removed);
+        return serializeFileDataHeader(this.scriptId, title_pdf_removed);
     }
 
-    public static String makeScriptFileHeader(Integer scriptId, String scriptTitle) {
+    public static String serializeFileDataHeader(Integer scriptId, String scriptTitle) {
         if( scriptId <= 0 || StringHelper.isNull(scriptTitle)){
             return new String();
         }
 
         StringBuffer filename = new StringBuffer();
-        filename.append(scriptId + Parsor.MainSeperator);
+        filename.append(scriptId + MainSeperator);
         filename.append(scriptTitle+ ".txt");
         return filename.toString();
     }
 
-    public String makeScriptFileBody() {
+    // make file body for Memory -> Client file
+    public String serializeFileBody() {
         StringBuffer fileText = new StringBuffer();
         for(Sentence unit : sentences)
         {
-            fileText.append(unit.sentenceId + Parsor.TabSeperator);
-            fileText.append(unit.textKo + Parsor.TabSeperator);
-            fileText.append(unit.textEn + Parsor.MainSeperator);
+            fileText.append( Sentence.serializeFileData(unit) );
         }
         return fileText.toString();
     }
 
+    // parse file body for Client file -> Memory
+    public static Script deserializeFileDataBody( Integer scriptId, String scriptTitle, String fileText )
+    {
+        // create script object
+        Script script = new Script();
+        script.scriptId = scriptId;
+        script.title = scriptTitle;
+
+        boolean bEmptyScript = StringHelper.isNull(fileText);
+        if( bEmptyScript ) {
+            script.sentences = new ArrayList<Sentence>();
+        } else {
+            String rows[] = fileText.split(MainSeperator);
+            if(rows == null) {
+                MyLog.e("Cound not split with. text["+fileText+"]");
+                return null;
+            }
+
+            for(int i=0; i<rows.length; ++i)
+            {
+                String row = rows[i];
+                Sentence sentence = Sentence.deserializeFileData(scriptId, row);
+                if(Sentence.isNull(sentence)) {
+                    MyLog.w("row is null. but ignore it and continue. scriptId:"+scriptId);
+                    continue;
+                }
+                script.sentences.add(sentence);
+            }
+        }
+
+        MyLog.d("Sentences COUNT ("+ script.sentences.size() +")");
+
+        return script;
+    }
 
     /*
         Deserialize a AddScript Server CreateScriptResult
      */
-    public static Script deserialize( Map<String , Object> map )
+    public static Script deserializeServerData(Map<String , Object> map )
     {
         Script script = new Script();
         try {
@@ -205,7 +245,7 @@ public class Script
             // unserialize Sentence Objects
             List<Sentence> unserializedSentences = new LinkedList<Sentence>();
             for( Map<String, Object> sentence : sentencesMap ) {
-                Sentence unserializedSentence = Sentence.deserialize(sentence);
+                Sentence unserializedSentence = Sentence.deserializeServerData(sentence);
                 if( Sentence.isNull(unserializedSentence) ) {
                     MyLog.e("Failed To UnSerialize a Sentence. " +
                             "this sentence is not adding into the Script.");

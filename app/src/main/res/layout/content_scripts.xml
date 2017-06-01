@@ -22,7 +22,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/img_sync_fab"
-        app:backgroundTint="@color/orange"
+        app:backgroundTint="@color/holo_orange"
         android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

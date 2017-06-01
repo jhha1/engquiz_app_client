@@ -10,6 +10,7 @@ import kr.jhha.engquiz.model.local.QuizFolderRepository;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.ScriptRepository;
+import kr.jhha.engquiz.model.local.SyncRepository;
 import kr.jhha.engquiz.model.local.UserRepository;
 import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
@@ -34,6 +35,7 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
     private final ScriptRepository mModel;
 
     private final String mDefaultPDFDir;
+    public static float DEFAUT_FILE_UPDOWN_SIZE = 0.2f;
 
     public RegularScriptsPresenter(RegularScriptsContract.View view, ScriptRepository model ) {
         mModel = model;
@@ -44,7 +46,7 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
     public void init()
     {
         // Sync Floating button
-        boolean bSyncNeed = ( mModel.getSyncNeededCount() > 0 );
+        boolean bSyncNeed = ( SyncRepository.getInstance().getSyncNeededCount() > 0 );
         if( bSyncNeed ){
             mView.showSyncFloatingBtn();
         } else {
@@ -174,7 +176,7 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
     private void showFileSizeConfirmDialog(RegularScriptsAdapter.ScriptSummary item){
         String fileName = item.scriptTitle;
         final FileHelper file = FileHelper.getInstance();
-        float filesize = file.getFileMegaSize( mDefaultPDFDir, fileName );
+        float filesize = file.getFileMegaSize( mDefaultPDFDir, fileName ) * 2;  // *2 == upload and download
         mView.showAddScriptConfirmDialog(fileName, filesize, item);
     }
 
@@ -185,7 +187,7 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
 
         mView.showLoadingDialog();
         Integer userId = UserRepository.getInstance().getUserID();
-        mModel.addPDFScript( userId,
+        mModel.addRegularScript( userId,
                 mDefaultPDFDir,
                 pdfFileName,
                 onAddScriptCallback( msgForLog, item ) );
@@ -200,20 +202,21 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
 
             @Override
             public void onSuccess( Script script ) {
-                MyLog.d("addPDFScript onSuccess()  user: " + msgForLog);
+                MyLog.d("addRegularScript onSuccess()  user: " + msgForLog);
                 mView.showAddScriptSuccessDialog(item, script);
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
-                MyLog.d("addPDFScript onFail() " +
+                MyLog.d("addRegularScript onFail() " +
                         "resultCode:"+resultCode.toString()+", user: " + msgForLog);
                 switch (resultCode) {
                     case SCRIPT__NO_HAS_KR_OR_EN:
                         mView.showErrorDialog(R.string.add_pdf_script__fail_only_has_en_or_kn);
                         break;
                     default:
-                        mView.showErrorDialog(R.string.add_pdf_script__fail);
+                        int msgId = EResultCode.commonMsgHandler(resultCode, R.string.common__fail_retry);
+                        mView.showErrorDialog(msgId);
                         break;
                 }
             }
@@ -227,15 +230,19 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
             mView.showErrorDialog( R.string.del_script__fail_no_exist_script );
             return;
         }
+        if( STATE_QUIZPLAYING_SCRIPT == item.state ) {
+            mView.showErrorDialog(R.string.del_script__fail_palying_state);
+            return;
+        }
         if( STATE_ADDED_SCRIPT != item.state ) {
-            mView.showErrorDialog(R.string.del_script__fail_no_allowed);
+            mView.showErrorDialog(R.string.cannot_remove_item);
             return;
         }
 
         // 정규 스크립트는 서버에서 유저 having을 detach.
         // 서버에서 folder having도 detach 시켜줌.
         Integer scriptId = item.scriptId;
-        mModel.deleteScript(scriptId, onDelScript(item) );
+        mModel.deleteRegularScript(scriptId, onDelScript(item) );
     }
 
     private ScriptRepository.DeleteScriptCallback onDelScript(final RegularScriptsAdapter.ScriptSummary item) {
@@ -251,15 +258,7 @@ public class RegularScriptsPresenter implements RegularScriptsContract.ActionsLi
 
             @Override
             public void onFail(EResultCode resultCode) {
-                int msgId;
-                switch (resultCode){
-                    case NETWORK_ERR:
-                        msgId = R.string.common__network_err;
-                        break;
-                    default:
-                        msgId = R.string.del_script__fail;
-                        break;
-                }
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.del_script__fail);
                 mView.showErrorDialog(msgId);
             }
         };

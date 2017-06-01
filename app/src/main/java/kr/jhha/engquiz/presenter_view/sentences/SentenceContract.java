@@ -11,11 +11,11 @@ import kr.jhha.engquiz.model.local.Sentence;
 public class SentenceContract {
 
     interface View {
-        void showTitle(String title);
+        void showToolbarTitle(String title);
 
         // 문장 리스트 보기
         void onSuccessGetSentences(boolean bCustomSentences, List<Sentence> sentences);
-        void onFailGetSentences();
+        void onFailGetSentences(int msgId);
 
         // 문장 옵션보기
         void onShowOptionDialog(Sentence item);
@@ -42,7 +42,7 @@ public class SentenceContract {
         // 툴바 옵션 메뉴 - 도움말클릭
         void helpBtnClicked();
 
-        void initToolbarTitle(Integer scriptId);
+        void updateToolbarTitle(Integer scriptId);
         void getSentences(Integer scriptId);
 
         void sentenceSingleClicked(Sentence item);

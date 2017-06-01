@@ -1,15 +1,14 @@
 package kr.jhha.engquiz.presenter_view.playquiz;
 
-import android.util.Log;
-
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.ReportRepository;
+import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.model.local.SyncRepository;
 import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.util.exception.EResultCode;
-import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
@@ -24,10 +23,26 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
     private final QuizPlayRepository mModel;
     private Sentence mCurrentQuiz;
 
+    private static int playCount = 1;
+
+    // 싱크 받으라는 다이알로그는 접속시에 한번만 보여준다. 구분위해 플래그사용
+    private static boolean bNotShowSyncAlarmDialog = true;
+
+    public enum ARALM_TYPE { SYNC }
+
     public QuizPlayPresenter(QuizPlayContract.View view, QuizPlayRepository model ) {
         mModel = model;
         mView = view;
         mCurrentQuiz = null;
+    }
+
+    @Override
+    public void checkAlarm() {
+        boolean bNeedSync = (SyncRepository.getInstance().getSyncNeededCount() > 0);
+        if( bNeedSync && bNotShowSyncAlarmDialog ){
+            mView.showAlarmDialog(ARALM_TYPE.SYNC);
+            bNotShowSyncAlarmDialog = false;
+        }
     }
 
     @Override
@@ -49,6 +64,17 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
     @Override
     public void getAnswer(){
         mView.showAnswer(mCurrentQuiz.textEn);
+    }
+
+    @Override
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    @Override
+    public void increaseQuizCount() {
+        // 퀴즈 맞추는 개수
+        playCount++;
     }
 
     @Override
@@ -96,8 +122,10 @@ public class QuizPlayPresenter implements QuizPlayContract.UserActionsListener {
 
             @Override
             public void onFail(EResultCode resultCode) {
-                MyLog.e("onFailSendReport() code: " + resultCode.stringCode());
-                mView.onFailSendReport(R.string.report__send_fali);
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.report__send_fali);
+                mView.onFailSendReport(msgId);
+
+                MyLog.e("onFailSendReport() code: " + resultCode.stringCode() +",msgId:"+msgId);
             }
         };
     }

@@ -1,92 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/MyFragment"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:fillViewport="true"
     android:orientation="vertical"
-    android:padding="10dp"
+    android:padding="20dp"
     android:scrollbarStyle="outsideOverlay"
-    tools:context=".presenter_view.sentences.AddSentenceFragment">
+    android:windowSoftInputMode="adjustResize">
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
 
-        <RelativeLayout
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="192dp"
-            android:background="@drawable/img_shape_stroke_2dp_gray30">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp">
-
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-            </LinearLayout>
-
-            <EditText style="@style/MyText.EditText.MultiLine"
-                android:id="@+id/sentence_add_ko"
-                android:hint="질문 문장 입력.."/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="192dp"
-            android:background="@drawable/img_shape_stroke_2dp_gray30"
+        <EditText style="@style/MyText.EditText.MultiLine"
+            android:layout_height="wrap_content"
+            android:layout_weight="4.5"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="16dp">
+            android:hint="@string/sentence__create_input_question"
+            android:id="@+id/sentence_add_ko" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp">
-
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-            </LinearLayout>
-
-            <EditText style="@style/MyText.EditText.MultiLine"
-                android:id="@+id/sentence_add_en"
-                android:hint="답 문장 입력.." />
-        </RelativeLayout>
+        <EditText style="@style/MyText.EditText.MultiLine"
+            android:layout_height="wrap_content"
+            android:layout_weight="4.5"
+            android:layout_marginTop="15dp"
+            android:hint="@string/sentence__create_input_answer"
+            android:id="@+id/sentence_add_en" />
 
         <!-- complate button  -->
         <Button
             android:id="@+id/sentence_add_complate_btn"
             style="@style/MyButton.WideBig"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
-            android:text="입 력 완 료"
-            android:textColor="@color/gray_30"/>
-
-        <!-- 투명한 빈 레이아웃. 이거 없으면 스크롤링 안됨!!  첨부터 보이게 한다. -->
-        <LinearLayout
-            android:id="@+id/sentence_add_help_scoll_working"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:orientation="vertical"
-            android:visibility="visible">
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/sentence__create_btn"
+            android:textSize="20sp"
+            android:textColor="@color/gray_15"/>
 
     </LinearLayout>
 </ScrollView>

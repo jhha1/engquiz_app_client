@@ -122,7 +122,7 @@
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:text">Num</item>
         <item name="android:textColor">@color/black_alpha_50</item>
-        <item name="android:textSize">32sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
     </style>
     <style name="MyListView.EditText.Item.Text" parent="MyListView.Item.Text">
@@ -182,9 +182,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">top|left</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingLeft">18dp</item>
-        <item name="android:paddingRight">18dp</item>
+        <item name="android:padding">18dp</item>
         <item name="android:inputType">textMultiLine</item>
         <item name="android:scrollbars">vertical</item>
         <item name="android:lines">6</item>
@@ -194,7 +192,7 @@
         <item name="android:textColorHint">@color/black_alpha_50</item>
         <item name="android:textColor">@color/black_alpha_50</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">@drawable/img_shape_stroke_2dp_gray30</item>
         <item name="android:lineSpacingExtra">10dp</item>
     </style>
     <style name="MyText.Toolbar" >
@@ -218,7 +216,7 @@
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/img_btn_orange</item>
         <item name="android:text">OK</item>
-        <item name="android:textColor">@color/black_alpha_40</item>
+        <item name="android:textColor">@color/gray_10</item>
         <item name="android:textSize">24sp</item>
     </style>
     <style name="MyButton.Small">

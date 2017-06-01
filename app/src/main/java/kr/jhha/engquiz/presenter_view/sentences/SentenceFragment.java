@@ -2,7 +2,6 @@ package kr.jhha.engquiz.presenter_view.sentences;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -23,14 +21,13 @@ import java.util.List;
 import kr.jhha.engquiz.model.local.Sentence;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
-import kr.jhha.engquiz.model.remote.EProtocol;
 import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.util.ui.MyDialog;
 import kr.jhha.engquiz.util.StringHelper;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SENTENCES;
 import static kr.jhha.engquiz.presenter_view.sentences.AddSentenceFragment.FIELD__HAS_PARENT_SCRIPT;
 import static kr.jhha.engquiz.presenter_view.sentences.AddSentenceFragment.FIELD__SCRIPT_ID;
 
@@ -46,11 +43,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     private String mScriptTitle;
 
     /*
-     READ-ONLY 문장 보여주는 뷰 관련
-      */
-    private TextView mTextView;
-
-    /*
      수정 가능한 문장을 보여주는 뷰 관련
       - EditText ListView
       */
@@ -63,7 +55,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     EditText mEditSentence_EditTextEN; // 영어 문장 수정 칸
     // mEditSentence_CompleteKoBtn;  // 한글 문장 수정 완료 버튼
     Button mEditSentence_CompleteBtn;  // 영어 문장 수정 완료 버튼
-    LinearLayout mScrollingWorkHelpder;
 
     // long-click  option
     ArrayAdapter<String> mOptionAdapterForRegular;
@@ -79,11 +70,11 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
         super.onCreate(savedInstanceState);
         mActionListener = new SentencePresenter( this, ScriptRepository.getInstance() );
 
-        // 롱 클릭 액션
-        initOptionDialog();
+        // 문장 롱 클릭 액션
+        initEachSentenceOptionDialog();
 
         // 툴 바
-        initToolbarOptionMenu();
+        initToolbar();
     }
 
     @Override
@@ -92,13 +83,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
 
         View view = inflater.inflate(R.layout.content_sentence, null);
 
-        setUpToolBar();
-
-        // 선생님이 올려준 스크립트 문장을 보는경우.
-        // READ-ONLY. 유저는 수정할 수 없으므로 일반 텍스트 창에 뿌린다.
-        mTextView = (TextView) view.findViewById(R.id.sentences);
-        mTextView.setMovementMethod(new ScrollingMovementMethod()); // text view scrolling
-
         // 유저가 만든 스크립트 문장을 보는경우.
         // 수정을 유저가 직접해야하므로, 각 문장의 선택이벤트 등 구별위해 리스트뷰에 뿌려준다.
         mItemListView = (ListView) view.findViewById(R.id.sentence_listview);
@@ -106,11 +90,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
         mItemListView.setOnItemClickListener(mListItemClickListener);
         // 롱 클릭 이벤트 핸들러 정의: 문장 삭제
         mItemListView.setOnItemLongClickListener(mListItemLongClickListener);
-
-        // 조건에 따라 어떤 뷰를 보여줄지 다르기 때문에,
-        // 조건을 계산하는 사이에 뷰가 보이지 않도록 설정.
-        mTextView.setVisibility(View.INVISIBLE);
-        mItemListView.setVisibility(View.INVISIBLE);
 
         // 데이터 초기화
         mActionListener.getSentences(mScriptId);
@@ -121,25 +100,11 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    private void setUpToolBar(){
-        MyToolbar.getInstance().setToolBar(SHOW_SENTENCES_IN_SCRIPT);
-
-        // 툴바에 현 프래그먼트 제목 출력
-        mActionListener.initToolbarTitle(mScriptId);
-    }
-
-    @Override
-    public void showTitle(String title) {
-        if(StringHelper.isNull(title)){
-            title = "Sentences";
-        }
-        MyToolbar.getInstance().setToolbarTitle( title );
+        updateToolbar();
     }
 
     /*
-        FolderScriptsFragment 에서 호출함.
+        Script Fragment 에서 호출함.
         선택한 스크립트 정보를 넘겨줌.
         여기서는 그 정보를 기반으로 문장들을 가져온다.
      */
@@ -148,7 +113,7 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
         mScriptTitle = scriptTitle;
     }
 
-    private void initOptionDialog(){
+    private void initEachSentenceOptionDialog(){
         String[] optionsType1 = new String[] {"문장 수정 요청하기"};
         String[] optionsType2 = new String[] {"문장 수정 하기", "스크립트에서 삭제"};
         mOptionAdapterForRegular =
@@ -162,18 +127,15 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
      */
     @Override
     public void onSuccessGetSentences(boolean bCustomSentences, List<Sentence> sentences) {
-        mTextView.setVisibility(View.INVISIBLE);
-        mItemListView.setVisibility(View.VISIBLE);
-
         mAdapter = new SentenceAdapter( bCustomSentences, sentences );
         mItemListView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onFailGetSentences() {
+    public void onFailGetSentences(int msgID) {
         Toast.makeText(getActivity(),
-                getString(R.string.sentence__fail_get_list),
+                getString(msgID),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -267,6 +229,10 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
 
         final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
         fragmentHandler.changeViewFragment(ADD_SENTENCE, bundle);
+
+        Toast.makeText(getActivity(),
+                getString(R.string.sentence__create_succ),
+                Toast.LENGTH_SHORT).show();
     }
 
     // 정규 스클립트 -  개발자에게 수정요청 보내기 다이알로그
@@ -323,25 +289,11 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
         mEditSentence_EditTextKo = ((EditText) mEditSentence_View.findViewById(R.id.sentence_edit_ko));
         mEditSentence_EditTextEN = ((EditText) mEditSentence_View.findViewById(R.id.sentence_edit_en));
         mEditSentence_CompleteBtn = ((Button) mEditSentence_View.findViewById(R.id.sentence_edit_complate_btn));
+        mEditSentence_CompleteBtn.setText(getString(R.string.sentence__edit_btn));
         mEditSentence_CompleteBtn.setOnClickListener(mClickListener);
-        // 긴~ empty 레이아웃. 이거 없음 스크롤링이 안됨.
-        // 첫화면에서는 안보이게.
-        mScrollingWorkHelpder = ((LinearLayout) mEditSentence_View.findViewById(R.id.sentence_edit_help_scoll_working));
-        mScrollingWorkHelpder.setVisibility(View.GONE);
 
-        // edit text로 포커스가 오면, 긴~ empty 레이아웃을 보이게 해서 스크롤링이 되게 한다.
-        mEditSentence_EditTextKo.setOnFocusChangeListener(editTextViewFocusChangeListner);
-        mEditSentence_EditTextEN.setOnFocusChangeListener(editTextViewFocusChangeListner);
         return mEditSentence_View;
     }
-
-    // edit text로 포커스가 오면, 긴~ empty 레이아웃을 보이게 해서 스크롤링이 되게 한다.
-    View.OnFocusChangeListener editTextViewFocusChangeListner = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View view, boolean bFocus) {
-            mScrollingWorkHelpder.setVisibility(View.VISIBLE);
-        }
-    };
 
     // 문장 입력 완료 버튼 클릭
     Button.OnClickListener mClickListener = new View.OnClickListener() {
@@ -356,9 +308,6 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
                     String ko = mEditSentence_EditTextKo.getText().toString();
                     String en = mEditSentence_EditTextEN.getText().toString();
                     mActionListener.modifySentence(ko, en);
-
-                    // 스크롤링 되게하는 빈 레이아웃을 다시 안보이게 함.
-                    mScrollingWorkHelpder.setVisibility(View.GONE);
 
                     mEditSentenceDialog.dismiss();
                     break;
@@ -404,17 +353,15 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     /*
      Action Bar
     */
-    private void initToolbarOptionMenu() {
+    private void initToolbar() {
         // 액션 바 보이기
         mToolbar = MyToolbar.getInstance();
-        mToolbar.show();
-        setHasOptionsMenu(true);
+       setHasOptionsMenu(true);
     }
 
     // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -422,15 +369,28 @@ public class SentenceFragment extends Fragment implements SentenceContract.View
     // 화면에 보여질때 마다 호출됨
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(false);
-        menu.getItem(1).setEnabled(true);
+        mToolbar.updateToolBarOptionMenu(SENTENCES, menu);
         super.onPrepareOptionsMenu(menu);
+    }
+
+    private void updateToolbar(){
+        // 툴바에 현 프래그먼트 제목 출력
+        MyToolbar.getInstance().updateToolBar(SENTENCES);
+        mActionListener.updateToolbarTitle(mScriptId);
+    }
+
+    @Override
+    public void showToolbarTitle(String title) {
+        if(StringHelper.isNull(title)){
+            title = "Sentences";
+        }
+        MyToolbar.getInstance().updateToolbarTitle( title );
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_bar__help_quizplay:
+            case R.id.action_bar__help_webview:
                 mActionListener.helpBtnClicked();
                 return true;
             default:

@@ -7,5 +7,5 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     android:adjustViewBounds="true"
     android:maxHeight="24dp"
     android:maxWidth="24dp"
-    android:src="@drawable/ic_folder__new_red"
+    android:src="@drawable/img_sync_nav_icon_orange"
     android:visibility="invisible"/>

@@ -7,6 +7,8 @@ package kr.jhha.engquiz.presenter_view.playquiz;
 public class QuizPlayContract {
 
     interface View {
+        void showAlarmDialog(QuizPlayPresenter.ARALM_TYPE type);
+
         void showNextQuestion(String question);
         void showNotAvailableQuiz();
         void showAnswer(String answer);
@@ -18,8 +20,13 @@ public class QuizPlayContract {
 
     interface UserActionsListener {
 
+        void checkAlarm();
+
         void doNextQuestion();
         void getAnswer();
+
+        int getPlayCount();
+        void increaseQuizCount();
 
         void sendReportBtnClicked();
         void sendReport();

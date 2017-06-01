@@ -8,6 +8,7 @@ import java.util.List;
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.Sentence;
+import kr.jhha.engquiz.model.local.SyncRepository;
 import kr.jhha.engquiz.presenter_view.MyNavigationView;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyLog;
@@ -19,10 +20,10 @@ import kr.jhha.engquiz.util.ui.MyLog;
 public class SyncPresenter implements SyncContract.UserActionsListener {
 
     private final SyncContract.View mView;
-    private ScriptRepository mModel;
+    private SyncRepository mModel;
     private Context mContext;
 
-    public SyncPresenter( Context context, SyncContract.View view, ScriptRepository model ) {
+    public SyncPresenter( Context context, SyncContract.View view, SyncRepository model ) {
         mView = view;
         mModel = model;
         mContext = context;
@@ -42,8 +43,8 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
         mModel.getSentencesForSync( onSyncCallback() );
     }
 
-    private ScriptRepository.SyncCallback onSyncCallback() {
-        return new ScriptRepository.SyncCallback(){
+    private SyncRepository.SyncCallback onSyncCallback() {
+        return new SyncRepository.SyncCallback(){
 
             @Override
             public void onSuccess( List<Sentence> sentencesForSync ) {
@@ -53,8 +54,6 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
                 if(false == updateFailedResult.isEmpty()){
                     mView.onFailedSync(R.string.sync__fail);
                 } else {
-                    final MyNavigationView navigationView = MyNavigationView.getInstance();
-                    navigationView.detachAlarmIcon(R.id.nav_scripts);
                     mView.onSuccessSync();
                 }
             }
@@ -62,13 +61,14 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
             @Override
             public void onFail(EResultCode resultCode) {
                 MyLog.e("sync().onFail() resultCode: " + resultCode);
-                mView.onFailedSync(R.string.sync__fail);
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.sync__fail);
+                mView.onFailedSync(msgId);
             }
         };
     }
 
-    private ScriptRepository.SyncFailedCallback onSyncFailedCallback() {
-        return new ScriptRepository.SyncFailedCallback(){
+    private SyncRepository.SyncFailedCallback onSyncFailedCallback() {
+        return new SyncRepository.SyncFailedCallback(){
 
             @Override
             public void onSuccess() {
@@ -79,7 +79,8 @@ public class SyncPresenter implements SyncContract.UserActionsListener {
             @Override
             public void onFail(EResultCode resultCode) {
                 MyLog.e("onSyncFailedCallback().onFail() resultCode: " + resultCode);
-                mView.onFailedSync(R.string.sync__fail_apart2);
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.sync__fail_apart2);
+                mView.onFailedSync(msgId);
             }
         };
     }

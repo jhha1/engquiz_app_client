@@ -24,6 +24,10 @@ public class WebViewFragment extends Fragment
 
     private static String URL_ROOT = "http://52.78.150.139:8080/engquiz/help/";
     public static String URL_QUICK_GUIDE = URL_ROOT + "quick_guide.htm";
+    public static String URL_PLAY = URL_ROOT + "help_playquiz.htm";
+    public static String URL_REGULAR_SCRIPT = URL_ROOT + "help_regular_script.htm";
+    public static String URL_CUSTOM_SCRIPT = URL_ROOT + "help_custom_script.htm";
+    public static String URL_SENTENCE = URL_ROOT + "help_sentence.htm";
 
     public WebViewFragment() {}
 
@@ -74,11 +78,20 @@ public class WebViewFragment extends Fragment
     }
 
     private String getUrl(){
-        String url = URL_QUICK_GUIDE;
+        String url = URL_PLAY;
         switch (mWhichUrlShow){
             case PLAYQUIZ:
-                url = URL_QUICK_GUIDE;
+                url = URL_PLAY;
             break;
+            case REGULAR_SCRIPTS:
+                url = URL_REGULAR_SCRIPT;
+                break;
+            case CUSTOM_SCRIPTS:
+                url = URL_CUSTOM_SCRIPT;
+                break;
+            case SENTENCES:
+                url = URL_SENTENCE;
+                break;
         }
         return url;
     }

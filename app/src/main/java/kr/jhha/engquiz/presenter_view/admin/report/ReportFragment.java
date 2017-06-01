@@ -87,7 +87,7 @@ public class ReportFragment extends Fragment implements  ReportContract.View
     }
 
     private void setUpToolBar(){
-        MyToolbar.getInstance().setToolBar(REPORT);
+        MyToolbar.getInstance().updateToolBar(REPORT);
     }
 
     @Override
@@ -155,11 +155,6 @@ public class ReportFragment extends Fragment implements  ReportContract.View
         mExtraEditTextKo = ((EditText) mEditSentence_View.findViewById(R.id.report_sentence_extra_edit_ko));
         mExtraEditTextEn = ((EditText) mEditSentence_View.findViewById(R.id.report_sentence_extra_edit_en));
         mExtraEditLayout.setVisibility(View.GONE);
-
-        // 긴~ empty 레이아웃. 이거 없음 스크롤링이 안됨.
-        // sentence fragment는 default가 gone이므로 건들지말고, 여기서는 visible 처리해 쓴다.
-        LinearLayout scrollingWorkHelpder = ((LinearLayout) mEditSentence_View.findViewById(R.id.report_modify__help_scoll_working));
-        scrollingWorkHelpder.setVisibility(View.VISIBLE);
 
         return mEditSentence_View;
     }

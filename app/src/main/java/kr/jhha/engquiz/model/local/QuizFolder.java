@@ -64,7 +64,7 @@ public class QuizFolder
         return false;
     }
 
-    // QuizFolderInfo={sentenceId=0, userId=-1, uiOrder=-1, state=-1, title=, scriptIdsJson=, createdTime_UnixTimestamp=0, scriptIndexes=[], teminatedNEWState=true}, MSG=SUCCESS, UserID=7}
+    // QuizFolderInfo={sentenceId=0, userId=-1, uiOrder=-1, type=-1, title=, scriptIdsJson=, createdTime_UnixTimestamp=0, scriptIndexes=[], teminatedNEWState=true}, MSG=SUCCESS, UserID=7}
     public static boolean isNull( Map<String, Object> quizfolder ){
         if( quizfolder == null || quizfolder.isEmpty() )
             return true;
@@ -89,7 +89,7 @@ public class QuizFolder
     public String toString() {
         return "quizFolderId("+ quizFolderId +"), "
                 + "ui_order("+uiOrder+"), "
-                + "state("+state+"), "
+                + "type("+state+"), "
                 + "title("+title+")"
                 + "usrID("+userId+"), "
                 + "scriptIds("+ scriptIds.toString()+")";
@@ -158,7 +158,7 @@ public class QuizFolder
         if( newState instanceof Integer ) {
             return checkState( (Integer)newState );
         } else {
-            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "newState Type is not Integer. state:"+newState );
+            throw new MyIllegalArgumentException(EResultCode.INVALID_ARGUMENT, "newState Type is not Integer. type:"+newState );
         }
     }
 

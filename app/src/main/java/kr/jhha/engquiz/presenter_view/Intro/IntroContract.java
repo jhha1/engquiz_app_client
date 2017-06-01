@@ -18,7 +18,6 @@ public class IntroContract {
     interface UserActionsListener {
         void initialize();
 
-        void checkUserExist();
         void login(String username);
         void alreadySignIn();
         void signIn(String username);

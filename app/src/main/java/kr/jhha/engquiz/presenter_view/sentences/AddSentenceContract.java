@@ -11,7 +11,7 @@ public class AddSentenceContract {
     interface View {
         void showDialogSelectScript( String[] scriptTitleAll );
 
-        void showAddSentenceSuccessDialog(String scriptName);
+        void showSentenceFragment(Integer scriptId, String scriptName);
         void showErrorDialog(int what);
     }
 

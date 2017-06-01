@@ -9,7 +9,8 @@ public enum EProtocol {
 	// Required
 	JSON ("JSON"),
 	PID ("pid"),	// string
-	iPID ("iPID"),  // integer
+	sPID ("sPID"), // pid name
+
 	// Response Only
 	CODE("code"),
 	MSG("msg"),

@@ -5,10 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.util.StringHelper;
@@ -20,6 +18,9 @@ public class MyToolbar {
     private MainActivity mMainActivity;
     private android.support.v7.widget.Toolbar mToolbar;
 
+    public static int OPTION_MENU_HELP = 1;
+    public static int OPTION_MENU_SEND_REPORT = 0;
+
     private static MyToolbar ourInstance = new MyToolbar();
     public static MyToolbar getInstance() {
         return ourInstance;
@@ -28,28 +29,9 @@ public class MyToolbar {
     }
 
     // 툴바 초기화
-    public void setUpToolbar(MainActivity activity, Toolbar toolbar) {
+    public void initialize(MainActivity activity, Toolbar toolbar) {
         mMainActivity = activity;
         mToolbar = toolbar;
-
-        // 툴바 글자색.
-        // 첫 화면이 게임플레이이므로, 겜플레이 화면용 글자색셋팅 (회색)
-        final Context context = mMainActivity.getApplicationContext();
-        int color = ContextCompat.getColor(context, R.color.PlayQuizLight);
-        mToolbar.setTitleTextColor(color);
-        mToolbar.setTitleMargin(0,0,0,0);
-
-        /*
-        setSupportActionBar(mToolbar);
-
-        final ActionBar actionBar = getSupportActionBar();
-
-        if (actionBar != null)
-        {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-         */
     }
 
     public void show(){
@@ -57,62 +39,59 @@ public class MyToolbar {
         actionBar.show();
     }
 
+    public void hide(){
+        ActionBar actionBar = mMainActivity.getSupportActionBar();
+        actionBar.hide();
+    }
+
     public Toolbar getToolbar(){
         return mToolbar;
     }
 
-    public void setToolBar(FragmentHandler.EFRAGMENT fragment) {
-        setToolbarTitle(fragment);
+    public void updateToolBar(FragmentHandler.EFRAGMENT fragment) {
+        updateToolbarTitle(fragment);
         setToolbarBackground(fragment);
-        MyNavigationView.getInstance().toggleHamburgerIcon(fragment);
     }
 
-    private void setToolbarTitle(FragmentHandler.EFRAGMENT fragment ){
+    private void updateToolbarTitle( FragmentHandler.EFRAGMENT fragment ){
         String title;
         int titleColor;
         switch (fragment)
         {
-            case INTRO:
-                // intro 에는 toolbar가 안보인다.
-                title = StringHelper.EMPTY_STRING;
-                titleColor = R.color.PlayQuizDark;
-                break;
             case PLAYQUIZ:
                 title = "";
-                titleColor = R.color.gray_50;
+                titleColor = R.color.gray;
                 break;
             case SCRIPT_TAB:
                 title = "Script";
-                titleColor = R.color.black_alpha_60;
+                titleColor = R.color.holo_orange;
                 break;
-            case ADD_SCRIPT:
+            case ADD_SCRIPT_FROM_OTHER_LOCATION:
                 title = "Script";
-                titleColor = R.color.black_alpha_60;
+                titleColor = R.color.holo_orange;
+                break;
+            case SENTENCES:
+                title = "Sentences";
+                titleColor = R.color.holo_orange;
                 break;
             case ADD_SENTENCE:
                 title = "Add Sentence";
-                titleColor = R.color.black_alpha_60;
+                titleColor = R.color.holo_orange;
                 break;
             case REPORT:
                 title = "Report";
-                titleColor = R.color.black_alpha_60;
+                titleColor = R.color.holo_orange;
                 break;
-            case SHOW_SCRIPTS_IN_QUIZFOLDER:
-                title = "Script";
-                titleColor = R.color.black_alpha_60;
-                break;
-            case SHOW_SENTENCES_IN_SCRIPT:
-                title = "Sentences";
-                titleColor = R.color.black_alpha_60;
-                break;
+            case INTRO:
             default:
-                title = "";
-                titleColor = R.color.PlayQuizLight;
+                // toolbar title 안보인다.
+                title = StringHelper.EMPTY_STRING;
+                titleColor = R.color.PlayQuizDark;
                 break;
         }
 
         // text
-        setToolbarTitle(title);
+        updateToolbarTitle(title);
 
         // text color
         final Context context = mMainActivity.getApplicationContext();
@@ -120,7 +99,7 @@ public class MyToolbar {
         mToolbar.setTitleTextColor(titleColor);
     }
 
-    public void setToolbarTitle( String title ){
+    public void updateToolbarTitle( String title ){
         if (mMainActivity.getSupportActionBar() != null) {
             mMainActivity.getSupportActionBar().setTitle(title);
         }
@@ -155,9 +134,34 @@ public class MyToolbar {
                         null);
                 mToolbar.setBackground(drawable);
                 */
-                mToolbar.setTitleMarginTop(10);
+                //mToolbar.setTitleMarginTop(10);
                 Drawable background = ContextCompat.getDrawable(context, R.drawable.img_toolbar__background);
                 mToolbar.setBackground(background);
+                break;
+        }
+    }
+
+   // private static MenuItem mToolbarMenu_QuizplayCount;
+    public void updateToolBarOptionMenu(FragmentHandler.EFRAGMENT fragment, Menu menu) {
+        MenuItem sendReport = menu.findItem(R.id.action_bar__send_report);
+        MenuItem help = menu.findItem(R.id.action_bar__help_webview);
+       // mToolbarMenu_QuizplayCount = menu.findItem(R.id.action_bar__play_count);
+
+        switch (fragment) {
+            case INTRO:
+                sendReport.setVisible(false);
+                help.setVisible(false);
+               // mToolbarMenu_QuizplayCount.setVisible(false);
+                break;
+            case PLAYQUIZ:
+                sendReport.setVisible(true);
+                help.setVisible(true);
+             //   mToolbarMenu_QuizplayCount.setVisible(true);
+                break;
+            default:
+                sendReport.setVisible(false);
+                help.setVisible(true);
+              //  mToolbarMenu_QuizplayCount.setVisible(false);
                 break;
         }
     }

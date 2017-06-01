@@ -1,23 +1,23 @@
 <resources>
     <string name="app_name">영어문장퀴즈</string>
+
+    <!-- common -->
     <string name="empty_string">empty string</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_bar__send_report">Send Report</string>
-    <string name="action_bar__help">Help</string>
-    <string name="action_settings">Settings</string>
-    <string name="add_script_dialog_msg"><![CDATA[</br>스크립트를 추가하시겠습니까?
-    </br><b>앱을 사용하는 모든 수강생에게 공유될 수 있으므로,</b></br>
-    반드시!<b>Sonya의 pdf(answer 포함)</b>만 추가하셔야 합니다.
-    </br></br><font color=red>스크립트는 클라우드 서버를 통해 분석 및 추가됩니다.
-    클라우드 서버에 없는 스크립트면, 앱을 사용하는 모든 수강생에게 공유됩니다</font>]]></string>
-
     <string name="common__finish_app">앱을 종료합니다</string>
+    <string name="common__maintain_server">서버 점검중입니다. </string>
     <string name="common__warning">Warning</string>
     <string name="common__del_comfirm"> 을(를) 삭제하시겠습니까?</string>
     <string name="common__network_err">네트웍이 불안정하거나, 서버로부터 응답이 느립니다. \n 잠시 후 다시 시도해주세요.</string>
-    <string name="common__failed_loading">오류가 발생하여 앱 로딩에 실패했어요. \n 앱을 종료합니다. 잠시 후 다시 시도해주세요. \n여러번 같은 증상이 반복되면 개발자에게 문의해주세요 ㅜ_ㅜ</string>
+    <string name="common__unknown_err">알 수 없는 오류로 앱을 종료합니다. \n 잠시 후 다시 시도해 주세요. </string>
+    <string name="cannot_remove_item">삭제할 수 없는 아이템이에요.</string>
+    <string name="common__fail_retry">오류가 발생했어요. \n 잠시후에 다시 시도해 주세요. </string>
+
+    <!-- App Init -->
+    <string name="init__data_loading_err">앱 로딩에 실패하여 앱을 종료합니다. \n잠시 후 다시 시도해주세요. </string>
+
+    <!-- tool bar -->
+    <string name="action_bar__send_report">Send Report</string>
+    <string name="action_bar__help">Help</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_menu__play_quiz">퀴즈 게임 하기</string>
@@ -28,90 +28,13 @@
     <string name="tools_text_account_information_username">UserName</string>
     <string name="tools_text_account_information_email">abc@abc.com</string>
 
-    <!-- folders -->
-    <string name="show_folders__get_folders__fail_defaut">폴더 리스트를 가져오는데 실패했습니다. \n잠시 후 다시 시도해 주세요.</string>
-
-    <string name="show_folders__change_folder_for_playing__title">게임용 폴더 변경 하기</string>
-    <string name="show_folders__change_folder_for_playing__confirm">을(를) 게임용으로 선택하시겠어요?</string>
-    <string name="show_folders__change_folder_for_playing__success">게임 플레이용 폴더 변경에 성공했어요.</string>
-    <string name="show_folders__change_folder_for_playing__fail_default">이 폴더를 게임플레이용으로 변경하는데 실패했어요.. \n앱 재 시작 후 다시 시도해주세요 ㅜ_ㅜ</string>
-    <string name="show_folders__change_folder_for_playing__fail_new_folder">폴더 만들기 버튼은 게임플레이용으로 지정할 수 없어요.</string>
-    <string name="show_folders__change_folder_for_playing__fail_no_script">스크립트가 들어있는 폴더만 게임플레이용으로 지정할 수 있어요. \n폴더에 스크립트를 먼저 추가해주세요.</string>
-
-    <string name="del_folder__title">폴더 삭제 하기</string>
-    <string name="del_folder__success">폴더가 삭제되었어요</string>
-    <string name="del_folder__fail">폴더 삭제에 실패했어요..</string>
-    <string name="del_folder__fail_noexist_folder">삭제할 폴더가 없어요.</string>
-    <string name="del_folder__fail_new_btn">폴더 만들기 버튼은 삭제할 수 없어요. </string>
-    <string name="del_folder__fail_playing_folder">플레이중인 폴더는 삭제할 수 없어요. \n다른 폴더를 플레이용으로 지정한 후 삭제해주세요. </string>
-
-    <string name="add_folder__title">새 폴더의 제목을 입력해주세요 </string>
-    <string name="add_folder__title_guide">* 제목은 최소 1자 이상, 30자 이하로 제한되어요.</string>
-    <string name="add_folder__success">새 폴더가 추가되었어요.</string>
-    <string name="add_folder__fail">일시적으로 폴더를 생성할 수 없어요.. \n잠시후 다시 시도해주세요 ㅜ_ㅜ</string>
-    <string name="add_folder__fail_title_re_input">제목을 다시 입력해주시겠어요? </string>
-    <string name="add_folder__fail_no_scripts_choice">최소 1개 이상의 스크립트가 선택되어야 해요.</string>
-    <string name="add_folder__fail_no_scripts_title">폴더에 들어갈 스크립트가 하나도 없어요.</string>
-    <string name="add_folder__fail_no_has_scripts">폴더에 넣을 스크립트가 아직 없어요 \n\n스크립트를 앱에 추가하세요. </string>
-
-    <string name="del_script_from_folder__title">스크립트를 폴더에서 빼기</string>
-    <string name="del_script_from_folder__confirm">을(를) 폴더에서 빼시겠어요?</string>
-    <string name="del_script_from_folder__fail_no_exist_script">폴더에서 뺄 스크립트가 없어요a</string>
-    <string name="del_script__from_folder_succ">스크립트를 폴더에서 뺐어요.</string>
-    <string name="add_script_into_folder__desc">그룹에 넣을 스크립트를 선택하세요.</string>
-    <string name="add_script_into_folder__succ">스크립트를 폴더에 넣었어요. \n\n (이미 폴더에 있는 스크립트는 무시됩니다)</string>
-    <string name="add_script_into_folder__fail">스크립트 폴더에 못 넣었어요. \n 잠시 후 다시 시도해주세요..ㅠ_ㅠ</string>
-    <string name="add_script_into_folder__fail_already_added">이미 폴더에 있는 스크립트에요.</string>
-    <string name="add_script_into_folder__fail_noexist_script">폴더에 넣을 스크립트가 없어요. \n\n앱에 스크립트를 추가하세요.</string>
-
-    <string name="script_option__title">스크립트 메뉴</string>
-    <string name="script_add_playing__success">퀴즈 게임에 스크립트를 추가했어요.</string>
-    <string name="script_add_playing__fail_default">퀴즈 게임에 스크립트를 추가하지 못했어요. 잠시 후 다시 시도해주세요.</string>
-    <string name="script_del_playing__success">퀴즈 게임에서 스크립트를 제외시켰어요.</string>
-    <string name="script_del_playing__fail_default">퀴즈 게임에서 스크립트를 제외시키지 못했어요. 잠시 후 다시 시도해주세요.</string>
-
-    <string name="create_script__succ">새 스크립트를 만들었어요.</string>
-    <string name="create_script__fail">새 스크립트를 만들지 못했어요. 잠시 후 다시 시도해주세요.</string>
-    <string name="del_script__succ">스크립트를 삭제했어요.</string>
-    <string name="del_script__fail">스크립트 삭제에 실패했어요..ㅜ_ㅜ</string>
-    <string name="del_script__fail_get_list">스크립트 리스트를 가져오는데 실패했어요 \n 잠시 후 다시 시도해 주세요 ㅠ_ㅠ</string>
-    <string name="del_script__fail_no_exist_script">삭제할 스크립트가 없어요a</string>
-    <string name="del_script__fail_no_allowed">삭제할 수 없는 아이템이에요.</string>
-
-    <string name="sentence__option_title">문장 메뉴</string>
-    <string name="sentence__edit_neutral_btn">수정 완료</string>
-    <string name="sentence__edit_title">문장을 수정합니다.</string>
-    <string name="sentence__edit_succ">문장이 수정되었어요.</string>
-    <string name="sentence__edit_fail">문장 수정에 실패했어요.. \n 잠시 후 다시 시도해주세요..OTL</string>
-    <string name="sentence__del_confirm">문장을 삭제합니다.. \n 진행하시겠어요?</string>
-    <string name="sentence__del_succ">문장이 삭제되었어요.</string>
-    <string name="sentence__del_fail_sentence_min_count">최소 1개 문장은 있어야해요.</string>
-    <string name="sentence__del_fail">문장 삭제에 실패했어요. \n 잠시 후 다시 시도해주세요 ㅠ_ㅠ</string>
-    <string name="sentence__fail_get_list">문장 리스트를 가져오는데 실패했어요.. \n 잠시 후 다시 시도해주세요 ㅠ_ㅠ</string>
-
-    <!-- add pdf script -->
-    <string name="add_pdf_script__cur_folder_path"> - 현재 폴더 위치: </string>
-    <string name="add_pdf_script__succ">스크립트 추가에 성공했어요.</string>
-    <string name="add_pdf_script__fail">오류가 발생했어요.. \n 잠시후에 다시 시도해 주세요 ㅠ_ㅠ</string>
-    <string name="add_pdf_script__fail_only_allow_pdf_format"> [pdf] 형식의 파일만 가능합니다. </string>
-    <string name="add_pdf_script__make_new_folder_btn">새 폴더 만들기</string>
-    <string name="add_pdf_script__choice_folder">스크립트를 넣을 폴더를 선택해주세요.</string>
-    <string name="add_pdf_script__fail_only_has_en_or_kn">스크립트를 추가할 수 없어요. \n\n\n 1. 선생님이 올려주시는 스크립트인가요? \n\n - 수업에서 제공되는 스크립트만 가능해요.  \n\n\n2. 한글이나 영어만 있는 스크립트인가요? \n\n - 한글, 영어 문장이 같이 있어야 하거든요. \n\n - 보통 선생님께서 제목에 (with answers)라고 붙인 스크립트가 한영문장이 함께 있어요. \n</string>
-    <string name="add_pdf_script__fail_add_script_into_folder">스크립트 추가에는 성공했지만, 지정한 폴더에 넣는 것은 실패했어요.. \n\n하지만 폴더에서 다시 추가할 수 있어요. \n(해당 폴더 내 Add Script..버튼 클릭)</string>
-    <string name="add_pdf_script__fail_add_folder">스크립트 추가에는 성공했지만, 새 폴더 만들기에 실패헀어요.. \n\nfolders 메뉴에서 새 폴더를 다시 만들 수 있어요. \n\n스크립트는 이미 앱에 추가되어 있으므로, 별도 작업 없이 폴더에서 추가할 수 있어요.</string>
-    <string name="add_pdf_script__no_exist_folder">스크립트를 넣을 폴더가 없어요. \n [새 폴더 만들기] 버튼을 눌러 새 폴더를 만드세요.</string>
-    <string name="add_pdf_script__input_folder_name">새 퀴즈폴더의 이름을 기입해주세요..</string>
-    <string name="add_pdf_script__folder_name_guide">최소 1글자 ~ 최대 30글자까지 가능합니다.</string>
-    <string name="add_pdf_script__loading_dialog_title">Add Script</string>
-    <string name="add_pdf_script__loading_dialog_text">서버에서 스크립트 분석중입니다.. *.*</string>
-    <string name="add_pdf_script__succ_dialog_title">스크립트 추가 완료!</string>
-
-    <!-- show scripts -->
-    <string name="show_scripts__fail_get_scripts">스크립트 리스트를 가져오는데 실패했어요. \n모바일 저장공간에서 앱 파일 및 폴더가 삭제된 것이 원인일 수 있어요.</string>
 
     <!-- sign in -->
     <string name="signin__title">계정 생성 하기</string>
-    <string name="signin__guide">수업에서 사용하는 영어이름을 입력해주세요. \n (영어,숫자만 가능. 최대 20자. \n 공백 및 특수문자 불가) \n\n계정은 게임데이터를 서버에 저장할 때 사용자를 구분하는 용도로만 사용합니다 :) </string>
+    <string name="signin__guide">수업에서 사용하는 영어이름을 입력해주세요.
+        \n 학원 수강생이 아닐경우 편한 영어 이름을 입력해 주세요.
+        \n(영어,숫자만 가능. 최대 20자. \n 공백 및 특수문자 불가)
+        \n\n계정은 게임데이터를 서버에 저장할 때 사용자를 구분하는 용도로만 사용합니다. </string>
     <string name="signin__neutral_btn">계정이 있어요!</string>
     <string name="signin__positive_btn">계정 생성</string>
     <string name="signin__fail">오류가 발생하여 앱을 종료합니다. \n 잠시후에 다시 시도해 주세요 ㅜ_ㅜ</string>
@@ -122,40 +45,123 @@
     <string name="login__title">로그인</string>
     <string name="login__guide">계정 영어 이름을 입력해주세요.</string>
     <string name="login__cancel">앱 진입은 로그인을 해야 가능해요. \n아쉽지만 곧 뵈길 바라며..!!</string>
-    <string name="login__fail_no_exist_user">등록된 이름이 아니에요.. ㅜ_ㅜ \n계정생성시 사용했던 영어이름을 다시 입력해주세요.</string>
-    <string name="login__fail_invalid_name">등록된 이름이 아니에요.. ㅜ_ㅜ \n계정생성시 사용했던 영어이름을 다시 입력해주세요.</string>
-    <string name="login__fail_network_err">네트웍이 불안정하여 게임데이터를 서버로부터 받아올 수 없어요..OTL  \n앱을 종료합니다.. 잠시 후 재 시작해 주세요 ㅠ_ㅠ</string>
-    <string name="login__fail">알 수 없는 오류로 로그인에 실패했어요. \n앱을 종료합니다.. 잠시 후 재 시작해 주세요 ㅠ_ㅠ</string>
+    <string name="login__fail_invalid_name">등록된 이름이 아닙니다. \n계정생성시 사용했던 영어이름을 다시 입력해주세요.</string>
+    <string name="login__fail">알 수 없는 오류로 로그인에 실패했어요. \n앱을 종료합니다. 잠시 후 재 시작해 주세요 ㅠ_ㅠ</string>
 
     <!-- play quiz -->
     <string name="play__no_exist_sentence">스크립트를 추가하여 영어 퀴즈 게임을 즐기세요 :D </string>
+    <string name="play__next_sentence_btn">NEXT</string>
 
-    <!-- report -->
-    <string name="report__send_title">문장 수정 요청 하기</string>
-    <string name="report__send_guide">현재 문장이 이상한가요? \n\n[수정요청] 버튼을 눌러 개발자에게 수정요청을 할 수 있어요.</string>
-    <string name="report__send_succ">수정 요청을 보냈어요. \n\n 수정 된 문장은 앱 접속시에 알림으로 업데이트 받을 수 있어요.</string>
-    <string name="report__send_fail_custom_sentence">직접 만든 문장은 수정요청 보낼 수 없어요.</string>
-    <string name="report__send_fali">일시적인 오류로 문장 수정 요청에 실패했어요 ㅜ_ㅜ</string>
+    <!-- script -->
+    <string name="script_tab_regular">학원</string>
+    <string name="script_tab_custom">내가 만든</string>
+    <string name="script_option__title">스크립트 메뉴</string>
+    <string name="script_add_playing__success">퀴즈 게임에 스크립트를 추가했어요.</string>
+    <string name="script_add_playing__fail_default">퀴즈 게임에 스크립트를 추가하지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="script_del_playing__success">퀴즈 게임에서 스크립트를 제외시켰어요.</string>
+    <string name="script_del_playing__fail_default">퀴즈 게임에서 스크립트를 제외시키지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="script__fail_get_scripts">스크립트 리스트를 가져오는데 실패했어요. \n모바일 저장공간에서 앱 파일 및 폴더가 삭제된 것이 원인일 수 있어요.</string>
+    <string name="script__fail_get_name">스크립트 이름을 가져올 수 없습니다.</string>
+    <string name="script__fail_get_filename">파일 이름을 가져올 수 없습니다.</string>
+
+    <string name="create_script__succ">새 스크립트를 만들었어요.</string>
+    <string name="create_script__fail">새 스크립트를 만들지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="create_script__fail_duplicated_name">이미 똑같은 이름의 스크립트가 있어요. \n 다른 이름을 지어주세요.</string>
+    <string name="del_script__succ">스크립트를 삭제했어요.</string>
+    <string name="del_script__fail">스크립트 삭제에 실패했어요. \n잠시 후 다시 시도해 주세요.</string>
+    <string name="del_script__fail_palying_state">퀴즈게임 중인 스크립트는 삭제할 수 없어요. \n먼저 퀴즈게임에서 제외시켜주세요.</string>
+    <string name="del_script__fail_get_list">스크립트 리스트를 가져오는데 실패했어요 \n잠시 후 다시 시도해 주세요 ㅠ_ㅠ</string>
+    <string name="del_script__fail_no_exist_script">삭제할 스크립트가 없어요a</string>
+
+    <!-- add pdf script from other location -->
+    <string name="add_pdf_script__cur_folder_path"> 현재 폴더 위치 \n </string>
+    <string name="add_pdf_script__go_parent_dir">.. 상위 폴더로 이동</string>
+    <string name="add_pdf_script__can_open_dir">폴더는 열 수 없습니다.</string>
+    <string name="add_pdf_script__added">[추가됨] </string>
+    <string name="add_pdf_script__add_btn">추 가</string>
+    <string name="add_pdf_script__add_script">스크립트 추가</string>
+    <string name="add_pdf_script__fail_only_allow_pdf_format"> [pdf] 형식의 파일만 가능합니다. </string>
+    <string name="add_pdf_script__fail_only_has_en_or_kn">
+        스크립트를 추가할 수 없어요.
+        \n\n\n 1. 선생님이 올려주시는 스크립트인가요?
+        \n\n - 수업에서 제공되는 스크립트만 가능해요.
+        \n\n\n2. 한글이나 영어만 있는 스크립트인가요?
+        \n\n - 한글, 영어 문장이 같이 있어야 하거든요.
+        \n\n - 보통 선생님께서 제목에 (with answers)라고 붙인 스크립트가 한영문장이 함께 있어요.
+        \n
+    </string>
+    <string name="add_pdf_script__loading_dialog_title">Add Script</string>
+    <string name="add_pdf_script__loading_dialog_text">서버에서 스크립트 분석중입니다.. *.*</string>
+    <string name="add_pdf_script__succ_dialog_title">스크립트 추가 완료!</string>
+    <string name="add_pdf_script__other_dir">다른 위치에서 스크립트 추가하기 \n(현재 위치: 카카오톡 다운로드)</string>
+
+
+    <!-- sentence -->
+    <string name="sentence__option_title">문장 메뉴</string>
+    <string name="sentence__create_listview_text_icon">+</string>
+    <string name="sentence__create_input_question">질문 문장 입력..</string>
+    <string name="sentence__create_input_answer">답 문장 입력..</string>
+    <string name="sentence__create_btn">새 문장 만들기</string>
+    <string name="sentence__create_succ">새 문장을 스크립트에 추가했어요.</string>
+    <string name="sentence__edit_title">문장을 수정합니다.</string>
+    <string name="sentence__edit_btn">수 정 완 료</string>
+    <string name="sentence__edit_succ">문장이 수정되었어요.</string>
+    <string name="sentence__edit_fail">문장 수정에 실패했어요.. \n 잠시 후 다시 시도해주세요..OTL</string>
+    <string name="sentence__del_confirm">문장을 삭제합니다.. \n 진행하시겠어요?</string>
+    <string name="sentence__del_succ">문장이 삭제되었어요.</string>
+    <string name="sentence__del_fail_sentence_min_count">최소 1개 문장은 있어야해요.</string>
+    <string name="sentence__del_fail">문장 삭제에 실패했어요. \n 잠시 후 다시 시도해주세요 ㅠ_ㅠ</string>
+    <string name="sentence__fail_get_list">문장 리스트를 가져오는데 실패했어요.. \n 잠시 후 다시 시도해주세요 ㅠ_ㅠ</string>
+    <string name="sentence__fail_invalied_sentence">잘못된 문장이에요.   \n 문장을 다시 입력해 주세요.</string>
+    <string name="sentence__fail_put_script">문장을 스크립트에 넣는 과정에서 오류가 발생했어요.  \n 잠시 후 다시 시도해 주세요.</string>
+
 
     <!-- sync -->
     <string name="sync__title">문장 업데이트</string>
     <string name="sync__sync_btn">업데이트</string>
     <string name="sync__description1_synced">문장 업데이트를 완료했습니다.</string>
     <string name="sync__description1_sync_ready">스크립트 문장을 최신으로 유지하세요!</string>
-    <string name="sync__description2_sync_ready">일부 문장들이 수정되었어요. [업데이트] 버튼을 눌러 공유받으세요.</string>
+    <string name="sync__description2_sync_ready"><![CDATA[
+        <h2>일부 문장들이 수정되었어요.
+         <br><font color=#FD920E>업데이트</font> 버튼을 눌러 공유받으세요.</h2>
+        ]]>
+    </string>
     <string name="sync__description3_sync_ready1">WIFI 접속이 아닌경우,\n 약 </string>
     <string name="sync__description3_sync_ready2">MB의 데이터가 소모됩니다.</string>
     <string name="sync__fail">동기화에 실패 했어요.\n 앱 재 시작 후 다시 시도해주세요 ㅜㅜ </string>
     <string name="sync__fail_apart1">일부 동기화에 실패 했어요 ㅜ ㅜ \n 앱 재 시작 후 다시 동기화 받을 수 있어요. </string>
     <string name="sync__fail_apart2">일부 동기화에 실패 했어요 ㅜ ㅜ </string>
 
+    <!-- permission -->
+    <string name="permission_request_title">권한 요청</string>
     <string name="permission_request">
-        영어문장 스크립트를 저장하고 열람하기 위해 \"저장공간\" 접근 허용이 필요해요.
-        \n\n권한 허용 후 앱을 이용할 수 있어요.
-        \n\n허용하시면 다음 창에서 \"사진, 미디어에 접근\" 이라 나오는데, 이것은 안드로이드 공용메세지에요. \n 실제로 전혀! 접근하지 않아요 :)
+         <![CDATA[
+         <h2>영어문장퀴즈 앱은 스크립트를 저장하고 열람하기 위해,
+         <br> <font color=#2196f3>[저장공간]</font> 접근 허용이 필요해요.</h2></b>
+        <br><h4><font color=#FD920E>권한 허용 후 앱을 이용할 수 있어요.</font></h4>
+        <br>*
+        <br><b>권한 허용</b>을 클릭하시면, 다음 창에서 <b>\"사진, 미디어에 접근\"</b> 메세지가 뜨는데, 이것은 안드로이드 공용메세지에요.
+        <u><i><b>실제로 전혀! 접근하지 않아요</b></i></u> :)
+        ]]>
     </string>
     <string name="permission_guide_final">
-        영어문장 스크립트를 저장하고 열람하기 위해 \"저장공간\" 접근 허용이 필요해요.
-        \n\n권한 허용 후 앱을 이용할 수 있어요.
-        \n\n설정 > 애플리케이션 관리자 > 앱권한에서 저장소 권한을 허용해주세요</string>
+        <![CDATA[
+        <h3>
+        앱을 사용하시려면,
+        <br><br><font color=#FD920E><b>권한 허용 설정 > 권한</b></font>에서 <font color=#2196f3><b>저장소(저장공간) 권한을 허용</b></font>해주세요
+        </h3>
+        ]]>
+    </string>
+
+    <!-- report -->
+    <string name="report__send_title">현재 문장이 이상한가요?</string>
+    <string name="report__send_guide">개발자에게 문장 수정 요청을 할 수 있어요.\n\n수정 된 문장은 앱 접속시에 알림으로 업데이트 받을 수 있어요.</string>
+    <string name="report__send_succ">수정 요청을 보냈어요. </string>
+    <string name="report__send_fail_custom_sentence">직접 만든 문장은 수정요청 보낼 수 없어요.</string>
+    <string name="report__send_fali">일시적인 오류로 문장 수정 요청에 실패했어요 ㅜ_ㅜ</string>
+
+    <!-- ad -->
+    <string name="ad_app_id">ca-app-pub-9587830245215690~2141406569</string>
+    <string name="ad_unit_id">ca-app-pub-9587830245215690/5035997363</string>
+    <string name="ad_unit_test_id_NativeExpress">ca-app-pub-3940256099942544/2793859312</string>
 </resources>

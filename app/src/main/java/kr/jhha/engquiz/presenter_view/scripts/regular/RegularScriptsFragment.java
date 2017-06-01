@@ -30,10 +30,10 @@ import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 import static kr.jhha.engquiz.model.local.Script.STATE_QUIZPLAYING_SCRIPT;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_FROM_OTHER_LOCATION;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SENTENCES;
+import static kr.jhha.engquiz.presenter_view.scripts.regular.RegularScriptsPresenter.DEFAUT_FILE_UPDOWN_SIZE;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -63,7 +63,7 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
         mActionListener = new RegularScriptsPresenter( this, ScriptRepository.getInstance() );
 
         // 액션 바
-        initToolbarOptionMenu();
+        initToolbar();
 
         // 롱클릭 액션
         String[] optionsType1 = new String[] {"퀴즈 게임에 추가", "앱에서 삭제"};
@@ -97,7 +97,7 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     @Override
     public void onResume() {
         super.onResume();
-        mToolbar.setToolBar(SCRIPT_TAB);
+        mToolbar.updateToolBar(SCRIPT_TAB);
     }
 
 
@@ -116,7 +116,7 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     @Override
     public void onFailGetScripts() {
         Toast.makeText(getActivity(),
-                getString(R.string.show_scripts__fail_get_scripts),
+                getString(R.string.script__fail_get_scripts),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -153,10 +153,12 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     {
         // 스크립트 추가 다이알로그 띄우기
         // 파일 사이즈가 이상할경우, UI에는 0.4MB로 표시 (업로드 + 다운로드)
-        fileSize = (fileSize <= 0) ? 0.4f : fileSize;
+        fileSize = (fileSize <= 0) ? DEFAUT_FILE_UPDOWN_SIZE : fileSize;
         String dialogMsg = (StringHelper.isNull(filename) ? "스크립트" : filename)
-                + "\n\n스크립트 분석을 위한 서버 통신 과정에서 "
-                + "\nWIFI 접속이 아닌경우 약 " + fileSize + "MB의 데이터가 소모됩니다.";
+                + "\n\n스크립트 분석을 위한 서버로의 파일 업/다운로드 과정에서  "
+                + fileSize + "MB의 데이터가 소모될 수 있으니, "
+                + "WIFI 환경에서 이용하시길 권장드려요."
+                + "\n\n스크립트를 추가하시겠어요?";
 
         final MyDialog dialog = new MyDialog(getActivity());
         dialog.setTitle("스크립트를 앱에 추가");
@@ -277,7 +279,7 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     @Override
     public void onShow_ParseScrpitFragment(){
         final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
-        final FragmentHandler.EFRAGMENT fragmentID = ADD_SCRIPT;
+        final FragmentHandler.EFRAGMENT fragmentID = ADD_SCRIPT_FROM_OTHER_LOCATION;
 
         fragmentHandler.changeViewFragment( fragmentID );
     }
@@ -285,7 +287,7 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     @Override
     public void onShow_ShowSentencesFragment(Integer scriptId, String scriptTitle ) {
         final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
-        final FragmentHandler.EFRAGMENT fragmentID = SHOW_SENTENCES_IN_SCRIPT;
+        final FragmentHandler.EFRAGMENT fragmentID = SENTENCES;
 
         // 스크립트 문장 디테일보기 프래그먼트는 인자값을 넘겨야함.
         SentenceFragment fragment = (SentenceFragment) fragmentHandler.getFragment(fragmentID);
@@ -307,6 +309,9 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
         dialog.showUp();
     }
 
+    /*
+        Floating Button
+     */
     @Override
     public void showSyncFloatingBtn() {
         mSyncFabBtn.setVisibility(View.VISIBLE);
@@ -316,6 +321,9 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
         mSyncFabBtn.setVisibility(View.GONE);
     }
 
+    /*
+        Show Sync Dialog
+     */
     Button.OnClickListener mClickListener = new View.OnClickListener()
     {
         public void onClick(View v) {
@@ -334,21 +342,24 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
         }
     };
 
+    @Override
+    public void onSynced() {
+        hideSyncFloatingBtn();
+    }
+
 
     /*
-     Action Bar
-  */
-    private void initToolbarOptionMenu() {
+        Action Bar
+       */
+    private void initToolbar() {
         // 액션 바 보이기
         mToolbar = MyToolbar.getInstance();
-        mToolbar.show();
         setHasOptionsMenu(true);
     }
 
     // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -356,25 +367,19 @@ public class RegularScriptsFragment extends Fragment implements RegularScriptsCo
     // 화면에 보여질때 마다 호출됨
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(false);
-        menu.getItem(1).setEnabled(true);
+        mToolbar.updateToolBarOptionMenu(SCRIPT_TAB, menu);
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_bar__help_quizplay:
+            case R.id.action_bar__help_webview:
                 mActionListener.helpBtnClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onSynced() {
-        hideSyncFloatingBtn();
     }
 }
 

@@ -4,22 +4,25 @@ import android.graphics.drawable.Drawable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.ScriptRepository;
+import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REPORT;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_QUIZFOLDERS;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
 
 /**
@@ -71,7 +74,7 @@ public class MyNavigationView {
         mNavigationViewLayout = (DrawerLayout) activity.findViewById(R.id.drawer_layout);
         mNavigationViewToggle = new ActionBarDrawerToggle(
                 activity, mNavigationViewLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                0, 0);
         mNavigationViewLayout.addDrawerListener(mNavigationViewToggle);
         mNavigationViewToggle.syncState();
 
@@ -113,20 +116,12 @@ public class MyNavigationView {
     {
         // Attach Alarm on Menu Item
         toggleAlarmIconOnMenu(menuId, View.VISIBLE);
-
-        // Attach Alarm on Hamburger Icon
-        final FragmentHandler handler = FragmentHandler.getInstance();
-        toggleHamburgerIcon( handler.getCurrentFragmentID() );
     }
 
     public void detachAlarmIcon(int menuId)
     {
         // Detach Alarm on Menu Item
         toggleAlarmIconOnMenu(menuId, View.INVISIBLE);
-
-        // Detach Alarm on Hamburger Icon
-        final FragmentHandler handler = FragmentHandler.getInstance();
-        toggleHamburgerIcon( handler.getCurrentFragmentID() );
     }
 
     private void toggleAlarmIconOnMenu(int menuId, int visibleToggle){
@@ -135,6 +130,7 @@ public class MyNavigationView {
             MyLog.e("NavigationView is null!!");
             return;
         }
+       // View view = navigationView.getTouchables().get(2);
 
         Menu menu = navigationView.getMenu();
         if( menu == null ){
@@ -147,7 +143,7 @@ public class MyNavigationView {
             MyLog.e("NavigationView.Menu.menuItem is null. menuItemId:"+menuId);
             return;
         }
-        //menuItem.setIcon(iconID);
+
         ImageView view = (ImageView) menuItem.getActionView();
         if( view == null ){
             MyLog.e("NavigationView.Menu.menuItem.ActionView is null. menuItemId:"+menuId);
@@ -155,40 +151,6 @@ public class MyNavigationView {
         }
 
         view.setVisibility( visibleToggle );
-    }
-
-    public void toggleHamburgerIcon(FragmentHandler.EFRAGMENT fragment)
-    {
-        final ScriptRepository scriptRepo = ScriptRepository.getInstance();
-        boolean showAlarmIcon = (scriptRepo.getSyncNeededCount() > 0 );
-        if( showAlarmIcon ) {
-            switch (fragment)
-            {
-                case INTRO:
-                case PLAYQUIZ:
-                    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_grey);
-                    //toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm_grey);
-                    break;
-               // default:
-                 //   toggleHamburgerIcon(R.drawable.ic_hamburge_orange);
-                //    toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_white);
-                   // toggleHamburgerIcon(R.drawable.ic_nav__hambergur_alarm);
-                //    break;
-            }
-            return;
-        }
-
-        switch (fragment)
-        {
-            case INTRO:
-            case PLAYQUIZ:
-                toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_grey);
-                break;
-          //  default:
-           //     toggleHamburgerIcon(R.drawable.ic_hamburge_orange);
-           //     toggleHamburgerIcon(R.drawable.ic_nav__hambergur_normal_white);
-           //     break;
-        }
     }
 
     private void toggleHamburgerIcon(int iconId)
@@ -207,5 +169,10 @@ public class MyNavigationView {
         NavigationView navigationView = (NavigationView) mMainActivity.findViewById(R.id.nav_view);
         Menu nav_Menu = navigationView.getMenu();
         nav_Menu.findItem(R.id.nav_report).setVisible(true);
+    }
+
+    public void setUserName(String userName){
+        TextView navHeaderUserName = (TextView) mMainActivity.findViewById(R.id.nav_header_username);
+        navHeaderUserName.setText(userName);
     }
 }

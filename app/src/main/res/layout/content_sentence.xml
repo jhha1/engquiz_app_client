@@ -6,15 +6,6 @@
     style="@style/MyFragment.MatchListView"
     tools:context=".presenter_view.sentences.SentenceFragment">
 
-    <TextView
-        android:id="@+id/sentences"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        android:layout_marginBottom="6dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="sentences" />
-
     <ListView style="@style/MyListView.EditText"
         android:id="@+id/sentence_listview"
         android:choiceMode="multipleChoice"

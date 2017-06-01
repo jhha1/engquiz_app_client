@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +19,7 @@ import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.presenter_view.scripts.custom.CustomScriptsFragment;
 import kr.jhha.engquiz.presenter_view.scripts.regular.RegularScriptsFragment;
 
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
 import static kr.jhha.engquiz.presenter_view.scripts.ScriptTabFragment.TabView.CUSTOM;
 import static kr.jhha.engquiz.presenter_view.scripts.ScriptTabFragment.TabView.REGULAR;
@@ -24,7 +28,7 @@ public class ScriptTabFragment extends Fragment
 {
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private FragmentTabHost mTabHost;
+    private MyToolbar mToolbar;
     public class TabView {
         public static final int REGULAR = 0;
         public static final int CUSTOM = 1;
@@ -33,6 +37,7 @@ public class ScriptTabFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initToolbar();
     }
 
     @Override
@@ -42,8 +47,8 @@ public class ScriptTabFragment extends Fragment
 
         // 탭 셋팅
         mTabLayout = (TabLayout) view.findViewById(R.id.layout_tab);
-        mTabLayout.addTab(mTabLayout.newTab().setText("학원"));
-        mTabLayout.addTab(mTabLayout.newTab().setText("내가 만든"));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.script_tab_regular)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.script_tab_custom)));
 
         // 탭 페이지 넘김 관련 (view pager) 셋팅
         mViewPager = (ViewPager) view.findViewById(R.id.tab_pager);
@@ -61,7 +66,7 @@ public class ScriptTabFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        MyToolbar.getInstance().setToolBar(SCRIPT_TAB);
+        mToolbar.updateToolBar(SCRIPT_TAB);
     }
 
     TabLayout.OnTabSelectedListener mTabSelectedListener = new TabLayout.OnTabSelectedListener()
@@ -118,7 +123,28 @@ public class ScriptTabFragment extends Fragment
         }
     }
 
+    /*
+         Action Bar
+        */
+    private void initToolbar() {
+        // 액션 바 보이기
+        mToolbar = MyToolbar.getInstance();
+        setHasOptionsMenu(true);
+    }
 
+    // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    // 화면에 보여질때 마다 호출됨
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        mToolbar.updateToolBarOptionMenu(SCRIPT_TAB, menu);
+        super.onPrepareOptionsMenu(menu);
+    }
 }
 
 

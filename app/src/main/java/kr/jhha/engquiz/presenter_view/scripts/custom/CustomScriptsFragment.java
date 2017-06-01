@@ -23,11 +23,13 @@ import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.MyToolbar;
 import kr.jhha.engquiz.presenter_view.scripts.custom.CustomScriptsAdapter.ScriptSummary;
 import kr.jhha.engquiz.presenter_view.sentences.SentenceFragment;
+import kr.jhha.engquiz.util.ui.Actions;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 import static kr.jhha.engquiz.model.local.Script.STATE_ADDED_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_FROM_OTHER_LOCATION;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SENTENCES;
 
 /**
  * Created by jhha on 2016-12-16.
@@ -56,7 +58,7 @@ public class CustomScriptsFragment extends Fragment implements CustomScriptsCont
         mActionListener = new CustomScriptsPresenter( getActivity(), this, ScriptRepository.getInstance() );
 
         // 액션 바
-        initToolbarOptionMenu();
+        initToolbar();
 
         String[] optionsType1 = new String[] {"퀴즈 게임에 추가", "앱에서 삭제"};
         String[] optionsType2 = new String[] {"퀴즈 게임에서 빼기", "앱에서 삭제"};
@@ -91,7 +93,7 @@ public class CustomScriptsFragment extends Fragment implements CustomScriptsCont
     @Override
     public void onResume() {
         super.onResume();
-        mToolbar.setToolBar(SCRIPT_TAB);
+        mToolbar.updateToolBar(SCRIPT_TAB);
     }
 
     @Override
@@ -218,7 +220,7 @@ public class CustomScriptsFragment extends Fragment implements CustomScriptsCont
     @Override
     public void onShowSentences(Integer scriptId, String scriptTitle ) {
         final FragmentHandler fragmentHandler = FragmentHandler.getInstance();
-        final FragmentHandler.EFRAGMENT fragmentID = SHOW_SENTENCES_IN_SCRIPT;
+        final FragmentHandler.EFRAGMENT fragmentID = SENTENCES;
 
         // 스크립트 문장 디테일보기 프래그먼트는 인자값을 넘겨야함.
         SentenceFragment fragment = (SentenceFragment) fragmentHandler.getFragment(fragmentID);
@@ -240,19 +242,17 @@ public class CustomScriptsFragment extends Fragment implements CustomScriptsCont
     }
 
     /*
-     Action Bar
-  */
-    private void initToolbarOptionMenu() {
+      Action Bar
+     */
+    private void initToolbar() {
         // 액션 바 보이기
         mToolbar = MyToolbar.getInstance();
-        mToolbar.show();
         setHasOptionsMenu(true);
     }
 
     // 메뉴버튼이 처음 눌러졌을 때 실행되는 콜백메서드
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -260,15 +260,14 @@ public class CustomScriptsFragment extends Fragment implements CustomScriptsCont
     // 화면에 보여질때 마다 호출됨
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(false);
-        menu.getItem(1).setEnabled(true);
+        mToolbar.updateToolBarOptionMenu(ADD_SCRIPT_FROM_OTHER_LOCATION, menu);
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_bar__help_quizplay:
+            case R.id.action_bar__help_webview:
                 mActionListener.helpBtnClicked();
                 return true;
             default:

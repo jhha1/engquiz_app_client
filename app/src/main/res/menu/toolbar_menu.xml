@@ -7,12 +7,14 @@
     <item android:id="@+id/action_bar__send_report"
         android:icon="@drawable/ic_report__send"
         android:title="@string/action_bar__send_report"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:visible="false"/>
 
-    <item android:id="@+id/action_bar__help_quizplay"
+    <item android:id="@+id/action_bar__help_webview"
         android:icon="@drawable/ic_question_gray1"
         android:title="@string/action_bar__help"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:visible="false"/>
 
     <!-- 오버플로우 공간 안에 있는 "셋팅" 액션 아이템
     <item

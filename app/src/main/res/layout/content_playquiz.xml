@@ -8,6 +8,17 @@
     android:background="@color/PlayQuizDark"
     tools:context=".presenter_view.playquiz.QuizPlayFragment">
 
+    <TextView
+        android:id="@+id/play_count"
+        android:layout_height="16dp"
+        android:layout_width="24dp"
+        android:layout_marginRight="14dp"
+        android:layout_marginBottom="8dp"
+        android:text="0"
+        android:textSize="16dp"
+        android:textColor="@color/gray_60"
+        android:layout_gravity="right"/>
+
     <android.support.v4.widget.NestedScrollView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fragment_playquiz_scroll"
@@ -57,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/img_playgame__btn_next_question"
-                android:text="Next"
+                android:text="@string/play__next_sentence_btn"
                 android:textColor="@color/black_alpha_40"
                 android:textSize="16sp"
                 android:visibility="invisible"/>
@@ -72,7 +83,7 @@
                 android:background="@drawable/img_playgame__btn_next_question"
                 android:text="스크립트\n추가하러가기"
                 android:textColor="@color/black_alpha_40"
-                android:textSize="32sp"
+                android:textSize="24sp"
                 android:visibility="invisible"/>
 
         </RelativeLayout>

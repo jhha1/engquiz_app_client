@@ -3,7 +3,6 @@ package kr.jhha.engquiz.presenter_view.scripts.custom;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.QuizPlayRepository;
 import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.ScriptRepository;
-import kr.jhha.engquiz.presenter_view.scripts.regular.RegularScriptsAdapter;
 import kr.jhha.engquiz.util.StringHelper;
 
 import static kr.jhha.engquiz.model.local.Script.STATE_NEWBUTTON;
@@ -84,7 +82,7 @@ public class CustomScriptsAdapter extends BaseAdapter {
         // "listview_item" Layout을 inflate하여 convertView 참조 획득.
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater)  mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.content_quizfolder_listview_item, parent, false);
+            convertView = inflater.inflate(R.layout.content_script_listview_item, parent, false);
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
@@ -111,7 +109,7 @@ public class CustomScriptsAdapter extends BaseAdapter {
                 resourceID = R.drawable.img_play_orange;
                 break;
             case STATE_NEWBUTTON:
-                resourceID = R.drawable.img_script_add_orange;
+                resourceID = R.drawable.img_script_add_blue;
                 break;
             default:
                 resourceID = R.drawable.presence_invisible;
@@ -125,7 +123,7 @@ public class CustomScriptsAdapter extends BaseAdapter {
     private void decoTitle(TextView titleTextView, Integer state){
         final Context context = mContext.getApplicationContext();
         if( state == STATE_NEWBUTTON) {
-            int color = ContextCompat.getColor(context, R.color.colorAccent);
+            int color = ContextCompat.getColor(context, R.color.holo_blue);
             titleTextView.setTextColor(color);
            // titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
         } else {

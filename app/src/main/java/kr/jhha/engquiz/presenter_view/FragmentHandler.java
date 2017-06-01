@@ -7,33 +7,26 @@ import android.support.v4.app.FragmentTransaction;
 import java.util.Stack;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.remote.EProtocol;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
+import kr.jhha.engquiz.presenter_view.scripts.custom.CustomScriptsFragment;
 import kr.jhha.engquiz.presenter_view.scripts.regular.AddScriptOtherDirectoryFragment;
 import kr.jhha.engquiz.presenter_view.scripts.regular.RegularScriptsFragment;
 import kr.jhha.engquiz.presenter_view.sentences.AddSentenceFragment;
 import kr.jhha.engquiz.presenter_view.admin.report.ReportFragment;
 import kr.jhha.engquiz.presenter_view.intro.IntroFragment;
 import kr.jhha.engquiz.presenter_view.playquiz.QuizPlayFragment;
-import kr.jhha.engquiz.z_legacy.quizfolder.AddQuizFolderFragment;
-import kr.jhha.engquiz.z_legacy.quizfolder.QuizFoldersFragment;
-import kr.jhha.engquiz.z_legacy.quizfolder.scripts.AddScriptIntoFolderFragment;
-import kr.jhha.engquiz.z_legacy.quizfolder.scripts.FolderScriptsFragment;
 import kr.jhha.engquiz.presenter_view.sentences.SentenceFragment;
 import kr.jhha.engquiz.util.ui.MyLog;
 import kr.jhha.engquiz.presenter_view.scripts.ScriptTabFragment;
 
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_INTO_QUIZFOLDER;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SCRIPT_FROM_OTHER_LOCATION;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.ADD_SENTENCE;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.CUSTOM_SCRIPTS;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.INTRO;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.NEW_QUIZFOLDER;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.PLAYQUIZ;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REPORT;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_QUIZFOLDERS;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.REGULAR_SCRIPTS;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SCRIPTS_IN_QUIZFOLDER;
-import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT;
+import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SENTENCES;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.SCRIPT_TAB;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
@@ -41,20 +34,25 @@ public class FragmentHandler {
 
     private MainActivity mMainActivity;
 
+    /*
+     Fragments
+      */
     private IntroFragment mIntroFragment;
+
     private QuizPlayFragment mPlayQuizFragment;
-    private AddScriptOtherDirectoryFragment mParseScriptFragment;
-    private RegularScriptsFragment mScriptsFragment;
-   // private AddSentenceFragment mAddSentenceFragment;
-    private QuizFoldersFragment mQuizFoldersFragment;
-    private FolderScriptsFragment mQuizFolderScriptListFragment;
-    private AddScriptIntoFolderFragment mQuizFolderAddScriptFragment;
-    private Fragment mAddQuizFolderFragment;
-    private ReportFragment mReportFragment;
-    private SentenceFragment mShowSentenceFragment;
-    private WebViewFragment mWebViewFragment;
 
     private ScriptTabFragment mScriptTabFragment;
+    private RegularScriptsFragment mScriptRegularFragment;
+    private CustomScriptsFragment mScriptCustomFragment;
+    private AddScriptOtherDirectoryFragment mAddScriptFromOtherLocationFragment;
+
+    private SentenceFragment mSentenceFragment;
+    private AddSentenceFragment mAddSentenceFragment;
+
+    private ReportFragment mReportFragment;
+
+    private WebViewFragment mWebViewFragment;
+
 
     // 현재 display되는 fragment가 어떤건지 알고싶어서.
     // onBackPressed 시에 특정 fragment에서만 뒤로가기시 종료하게 하고싶어서 넣음.
@@ -65,19 +63,14 @@ public class FragmentHandler {
         NONE,
         INTRO,
         PLAYQUIZ,
+        SCRIPT_TAB,
         REGULAR_SCRIPTS,
         CUSTOM_SCRIPTS,
-        ADD_SCRIPT,
+        ADD_SCRIPT_FROM_OTHER_LOCATION,
+        SENTENCES,
         ADD_SENTENCE,
-        SHOW_QUIZFOLDERS,
-        NEW_QUIZFOLDER,
-        SHOW_SCRIPTS_IN_QUIZFOLDER,
-        ADD_SCRIPT_INTO_QUIZFOLDER,
-        SHOW_SENTENCES_IN_SCRIPT,
         REPORT,
-        WEB_VIEW,
-
-        SCRIPT_TAB
+        WEB_VIEW
     }
 
     private static FragmentHandler ourInstance = new FragmentHandler();
@@ -93,18 +86,17 @@ public class FragmentHandler {
 
         mIntroFragment = new IntroFragment();
         mPlayQuizFragment = new QuizPlayFragment();
-        mParseScriptFragment = new AddScriptOtherDirectoryFragment();
-        mScriptsFragment = new RegularScriptsFragment();
-      //  mAddSentenceFragment = new AddSentenceFragment();
-        mQuizFoldersFragment = new QuizFoldersFragment();
-        mReportFragment = new ReportFragment();
-        mQuizFolderScriptListFragment = new FolderScriptsFragment();
-        mQuizFolderAddScriptFragment = new AddScriptIntoFolderFragment();
-        mAddQuizFolderFragment = new AddQuizFolderFragment();
-        mShowSentenceFragment = new SentenceFragment();
-        mWebViewFragment = new WebViewFragment();
 
         mScriptTabFragment = new ScriptTabFragment();
+        mScriptRegularFragment = new RegularScriptsFragment();
+        mScriptCustomFragment = new CustomScriptsFragment();
+        mAddScriptFromOtherLocationFragment = new AddScriptOtherDirectoryFragment();
+
+        mSentenceFragment = new SentenceFragment();
+        mAddSentenceFragment = new AddSentenceFragment();
+
+        mReportFragment = new ReportFragment();
+        mWebViewFragment = new WebViewFragment();
     }
 
     public EFRAGMENT getCurrentFragmentID(){
@@ -116,19 +108,24 @@ public class FragmentHandler {
         switch ( eFragment ){
             case PLAYQUIZ:
                 fragment = mPlayQuizFragment; break;
-            case NEW_QUIZFOLDER:
-                fragment = mAddQuizFolderFragment; break;
-            case SHOW_SCRIPTS_IN_QUIZFOLDER:
-                fragment = mQuizFolderScriptListFragment; break;
-            case ADD_SCRIPT_INTO_QUIZFOLDER:
-                fragment = mQuizFolderAddScriptFragment; break;
-            case SHOW_SENTENCES_IN_SCRIPT:
-                fragment = mShowSentenceFragment; break;
-            case ADD_SCRIPT:
-                fragment = mParseScriptFragment; break;
+            case SCRIPT_TAB:
+                fragment = mScriptTabFragment; break;
+            case REGULAR_SCRIPTS:
+                fragment = mScriptRegularFragment; break;
+            case CUSTOM_SCRIPTS:
+                fragment = mScriptCustomFragment; break;
+            case ADD_SCRIPT_FROM_OTHER_LOCATION:
+                fragment = mAddScriptFromOtherLocationFragment; break;
+            case SENTENCES:
+                fragment = mSentenceFragment; break;
+            case ADD_SENTENCE:
+                fragment = mAddSentenceFragment; break;
+            case REPORT:
+                fragment = mReportFragment; break;
             case WEB_VIEW:
                 fragment = mWebViewFragment; break;
-
+            case INTRO:
+                fragment = mIntroFragment; break;
         }
         return fragment;
     }
@@ -159,13 +156,25 @@ public class FragmentHandler {
                 bAddStack = false;
                 transaction.replace(R.id.container, mPlayQuizFragment, PLAYQUIZ.toString());
                 break;
-            case ADD_SCRIPT:
+            case SCRIPT_TAB:
                 transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mParseScriptFragment, ADD_SCRIPT.toString());
+                transaction.replace(R.id.container, mScriptTabFragment, SCRIPT_TAB.toString());
                 break;
             case REGULAR_SCRIPTS:
                 transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mScriptsFragment, REGULAR_SCRIPTS.toString());
+                transaction.replace(R.id.container, mScriptRegularFragment, REGULAR_SCRIPTS.toString());
+                break;
+            case CUSTOM_SCRIPTS:
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.container, mScriptCustomFragment, CUSTOM_SCRIPTS.toString());
+                break;
+            case ADD_SCRIPT_FROM_OTHER_LOCATION:
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.container, mAddScriptFromOtherLocationFragment, ADD_SCRIPT_FROM_OTHER_LOCATION.toString());
+                break;
+            case SENTENCES:
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.container, mSentenceFragment, SENTENCES.toString());
                 break;
             case ADD_SENTENCE:
                 AddSentenceFragment newFragment = new AddSentenceFragment();
@@ -173,37 +182,13 @@ public class FragmentHandler {
                 transaction.addToBackStack(null);
                 transaction.replace(R.id.container, newFragment, ADD_SENTENCE.toString());
                 break;
-            case SHOW_QUIZFOLDERS:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mQuizFoldersFragment, SHOW_QUIZFOLDERS.toString());
-                break;
             case REPORT:
                 transaction.addToBackStack(null);
                 transaction.replace(R.id.container, mReportFragment, REPORT.toString());
                 break;
-            case NEW_QUIZFOLDER:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mAddQuizFolderFragment, NEW_QUIZFOLDER.toString());
-                break;
-            case SHOW_SCRIPTS_IN_QUIZFOLDER:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mQuizFolderScriptListFragment, SHOW_SCRIPTS_IN_QUIZFOLDER.toString());
-                break;
-            case SHOW_SENTENCES_IN_SCRIPT:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mShowSentenceFragment, SHOW_SENTENCES_IN_SCRIPT.toString());
-                break;
-            case ADD_SCRIPT_INTO_QUIZFOLDER:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mQuizFolderAddScriptFragment, ADD_SCRIPT_INTO_QUIZFOLDER.toString());
-                break;
             case WEB_VIEW:
                 transaction.addToBackStack(null);
                 transaction.replace(R.id.container, mWebViewFragment, WEB_VIEW.toString());
-                break;
-            case SCRIPT_TAB:
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.container, mScriptTabFragment, SCRIPT_TAB.toString());
                 break;
             default:
                 // quiz play fragment

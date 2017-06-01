@@ -13,11 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.Sentence;
-import kr.jhha.engquiz.util.ui.MyLog;
-
-import static kr.jhha.engquiz.model.local.Sentence.STATE_NEW_BUTTON;
 
 /**
  * Created by thyone on 2017-03-30.
@@ -70,31 +66,29 @@ public class SentenceAdapter extends BaseAdapter {
         TextView textViewEn = (TextView) convertView.findViewById(R.id.sentece_edit_textView2);
 
         // 아이템 내 각 위젯에 데이터 반영
-        setIconText(numView, item.state, position);
+        setIconText(numView, item.type, position);
         setText(textViewKo, textViewEn, item);
-        MyLog.d( "ReportAdapter.getView() " +
-                "Item:"+ item.toString()
-        +", textViewKo:"+textViewKo.getText());
         return convertView;
     }
 
-    private void setIconText(TextView numView, int state, Integer position){
-        if( state == STATE_NEW_BUTTON){
-            numView.setText("+");
-            int color = ContextCompat.getColor(mContext, R.color.orange);
+    private void setIconText(TextView numView, Sentence.TYPE type, Integer position){
+        if( type.equals(Sentence.TYPE.NEW_BUTTON)){
+            numView.setText(mContext.getString(R.string.sentence__create_listview_text_icon));
+            int color = ContextCompat.getColor(mContext, R.color.holo_blue);
             numView.setTextColor(color);
         } else {
-            int color = ContextCompat.getColor(mContext, R.color.black_alpha_70);
+            //int color = ContextCompat.getColor(mContext, R.color.black_alpha_70);
+            int color = ContextCompat.getColor(mContext, R.color.black_alpha_30);
             numView.setTextColor(color);
             numView.setText(Integer.toString(position + 1));
         }
     }
 
     private void setText( TextView textViewKo, TextView textViewEn, Sentence item ){
-       if( item.state == STATE_NEW_BUTTON )
+       if( item.type.equals(Sentence.TYPE.NEW_BUTTON) )
        {
-           textViewKo.setText("새 문장 만들기");
-           int color = ContextCompat.getColor(mContext, R.color.orange);
+           textViewKo.setText(mContext.getString(R.string.sentence__create_btn));
+           int color = ContextCompat.getColor(mContext, R.color.holo_blue);
            textViewKo.setTextColor(color);
            textViewKo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
            textViewEn.setVisibility(View.GONE);
@@ -102,7 +96,7 @@ public class SentenceAdapter extends BaseAdapter {
        else
        {
            textViewKo.setText(item.textKo);
-           int color = ContextCompat.getColor(mContext, R.color.black_alpha_45);
+           int color = ContextCompat.getColor(mContext, R.color.black_alpha_40);
            textViewKo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
            textViewKo.setTextColor(color);
            textViewEn.setVisibility(View.VISIBLE);
@@ -129,7 +123,7 @@ public class SentenceAdapter extends BaseAdapter {
     private Sentence makeNewButton()
     {
         Sentence newbutton = new Sentence();
-        newbutton.state = STATE_NEW_BUTTON;
+        newbutton.type = Sentence.TYPE.NEW_BUTTON;
         return newbutton;
     }
 }

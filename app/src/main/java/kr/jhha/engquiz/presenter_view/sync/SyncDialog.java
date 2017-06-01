@@ -1,24 +1,16 @@
 package kr.jhha.engquiz.presenter_view.sync;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.List;
-
 import kr.jhha.engquiz.R;
-import kr.jhha.engquiz.model.local.Report;
-import kr.jhha.engquiz.model.local.ScriptRepository;
-import kr.jhha.engquiz.presenter_view.MyToolbar;
-import kr.jhha.engquiz.util.exception.EResultCode;
+import kr.jhha.engquiz.model.local.SyncRepository;
+import kr.jhha.engquiz.presenter_view.MyNavigationView;
+import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.ui.MyDialog;
 
 
@@ -39,7 +31,7 @@ public class SyncDialog implements SyncContract.View
 
     public SyncDialog(Context context) {
         mContext = context;
-        mActionListener = new SyncPresenter( context, this, ScriptRepository.getInstance() );
+        mActionListener = new SyncPresenter( context, this, SyncRepository.getInstance() );
     }
 
     public void show( SyncedCallback callback ){
@@ -65,16 +57,13 @@ public class SyncDialog implements SyncContract.View
 
         // 텍스트 뷰
         TextView mSyncReadyTextView = (TextView) view.findViewById(R.id.sync_textview);
-        TextView mDescription2 = (TextView) view.findViewById(R.id.update_text_description2);
         TextView mDescription1 = (TextView) view.findViewById(R.id.update_text_description1);
 
-        int msgId = R.string.sync__description1_sync_ready;
-        mDescription1.setText(mContext.getString(msgId));
-        mDescription2.setVisibility(View.VISIBLE);
-        String msg = mContext.getString(R.string.sync__description3_sync_ready1)
+        String msg = mContext.getString(R.string.sync__description2_sync_ready);
+        mDescription1.setText(StringHelper.formatHtml(msg));
+        mSyncReadyTextView.setText(mContext.getString(R.string.sync__description3_sync_ready1)
                 + " " + sizeMB
-                + mContext.getString(R.string.sync__description3_sync_ready2);
-        mSyncReadyTextView.setText(msg);
+                + mContext.getString(R.string.sync__description3_sync_ready2));
 
         // 버튼 클릭 이벤트 셋팅
         Button mDownloadButton = (Button) view.findViewById(R.id.sync_btn_download);
@@ -102,10 +91,37 @@ public class SyncDialog implements SyncContract.View
         dialog.showUp();
     }
 
-    public void onSuccessSync(){
+    public void onSuccessSync()
+    {
+        detachSyncAlarmIcons();
+
         mSyncedCallback.onSynced();
+
         Toast.makeText(mContext,
                 mContext.getString(R.string.sync__description1_synced),
                 Toast.LENGTH_SHORT).show();
+    }
+
+    private void detachSyncAlarmIcons(){
+        // 알람 아이콘 떼기 : 네비게이션 메뉴
+        final MyNavigationView navigationView = MyNavigationView.getInstance();
+        navigationView.detachAlarmIcon(R.id.nav_scripts);
+        // 알람 아이콘 떼기 : floating btn
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate(R.layout.content_scripts, null);
+        FloatingActionButton mSyncFabBtn = (FloatingActionButton) view.findViewById(R.id.script_sync_fab);
+        mSyncFabBtn.setVisibility(View.GONE);
+    }
+
+    public static void attachSyncAlarmIcons(Context context){
+        // 알람 띄우기 : 네비게이션 메뉴
+        final MyNavigationView navigationView = MyNavigationView.getInstance();
+        navigationView.attachAlarmIcon(R.id.nav_scripts);
+
+        // 알람 아이콘 : floating btn
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate(R.layout.content_scripts, null);
+        FloatingActionButton mSyncFabBtn = (FloatingActionButton) view.findViewById(R.id.script_sync_fab);
+        mSyncFabBtn.setVisibility(View.VISIBLE);
     }
 }

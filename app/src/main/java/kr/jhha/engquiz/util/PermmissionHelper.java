@@ -1,9 +1,9 @@
 package kr.jhha.engquiz.util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -27,23 +27,16 @@ import kr.jhha.engquiz.util.ui.MyDialog;
 public class PermmissionHelper {
 
     public static final int PERMISSION_STORAGE = 1;
-    private static int mPermissionRefuseCount = 0;
 
-    public static boolean isMaxPermissionRefused(){
-        // 한번 이상 거부시에 앱 종료 창으로.
-        return (mPermissionRefuseCount >= 1);
-    }
+    public static final String[] permissions = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,  // 파일 r/w . write에  read도 포함됨.
+            Manifest.permission.INTERNET
+    };
 
-    public static void increasePermissionRefuseCount(){
-        ++mPermissionRefuseCount;
-    }
+    public static boolean bAlreadyCheckAndShowDialog = false;
 
-    public static boolean checkAndPermission(final Fragment fragment, final int permissionRequestCode, String... permissions)
-    {
-        final String[] requiredPermissions = getRequiredPermissions(fragment.getContext() != null ?
-                fragment.getContext() : fragment.getActivity(), permissions);
-
-        return (requiredPermissions.length > 0 && fragment.isAdded());
+    public static boolean checkAndRequestPermission(Activity activity) {
+        return checkAndRequestPermission(activity, PERMISSION_STORAGE, permissions);
     }
 
     public static boolean checkAndRequestPermission(Activity activity, int permissionRequestCode, String... permissions) {
@@ -55,6 +48,10 @@ public class PermmissionHelper {
         } else {
             return true;
         }
+    }
+
+    public static boolean checkAndRequestPermission(Fragment fragment) {
+        return checkAndRequestPermission(fragment, PERMISSION_STORAGE, permissions);
     }
 
     public static boolean checkAndRequestPermission(final Fragment fragment, final int permissionRequestCode, String... permissions)
@@ -100,8 +97,9 @@ public class PermmissionHelper {
     public static void showRequestPermissionDialog(final Context context, final Fragment fragment,
                                                    final String[] requiredPermissions, final int permissionRequestCode) {
         final MyDialog dialog = new MyDialog(context);
-        dialog.setTitle("영어문장퀴즈는 [저장공간] 권한을 필요로 해요.");
-        dialog.setMessage(context.getString(R.string.permission_request));
+        dialog.setTitle(context.getString(R.string.permission_request_title));
+        String msg = context.getString(R.string.permission_request);
+        dialog.setMessage(StringHelper.formatHtml(msg));
         dialog.setPositiveButton("권한 허용",  new View.OnClickListener() {
             public void onClick(View arg0)
             {
@@ -119,12 +117,14 @@ public class PermmissionHelper {
 
     public static void showGoToAppSettingForPermissionDialog(final Context context) {
         final MyDialog dialog = new MyDialog(context);
-        dialog.setTitle("영어문장퀴즈는 [저장공간] 권한을 필요로 해요.");
-        dialog.setMessage(context.getString(R.string.permission_guide_final));
+        dialog.setTitle(context.getString(R.string.permission_request_title));
+        String msg = context.getString(R.string.permission_guide_final);
+        dialog.setMessage(StringHelper.formatHtml(msg));
         dialog.setPositiveButton("권한 허용 설정",  new View.OnClickListener() {
             public void onClick(View arg0)
             {
                 dialog.dismiss(); // 다이알로그 닫기
+                bAlreadyCheckAndShowDialog = false;
                 try {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                             .setData(Uri.parse("package:" + context.getPackageName()));

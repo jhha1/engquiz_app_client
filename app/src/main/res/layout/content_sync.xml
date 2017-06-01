@@ -17,8 +17,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginTop="10dp"
-            android:textColor="@color/orange"
-            android:textSize="20dp"/>
+            android:text="@string/sync__description2_sync_ready"/>
 
         <TextView
             android:id="@+id/update_text_description2"
@@ -31,7 +30,8 @@
             android:text="@string/sync__description2_sync_ready"
             android:textColor="@color/black_alpha_40"
             android:textSize="16dp"
-            android:lineSpacingExtra="6dp"/>
+            android:lineSpacingExtra="6dp"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <TextView

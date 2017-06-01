@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true"
     android:orientation="vertical"
     android:padding="10dp"
-    android:scrollbarStyle="outsideOverlay">
+    android:scrollbarStyle="outsideOverlay"
+    android:windowSoftInputMode="adjustResize">
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,57 +15,20 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="128dp"
-        android:background="@drawable/img_shape_stroke_2dp_gray30">
+    <EditText style="@style/MyText.EditText.MultiLine"
+        android:id="@+id/report_modify__edit_ko" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-        </LinearLayout>
-
-        <EditText style="@style/MyText.EditText.MultiLine"
-            android:id="@+id/report_modify__edit_ko" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="128dp"
-        android:background="@drawable/img_shape_stroke_2dp_gray30"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-            <View style="@style/MyLine1"/>
-        </LinearLayout>
-
-        <EditText style="@style/MyText.EditText.MultiLine"
-            android:id="@+id/report_modify__edit_en" />
-    </RelativeLayout>
-
+    <EditText style="@style/MyText.EditText.MultiLine"
+        android:layout_marginTop="10dp"
+        android:id="@+id/report_modify__edit_en" />
 
     <!-- complate button  -->
     <Button
         android:id="@+id/report_modify__update_btn"
         style="@style/MyButton.Small"
         android:layout_height="48dp"
-        android:text="수 정 완 료"
+        android:layout_marginTop="10dp"
+        android:text="@string/sentence__edit_btn"
         android:textSize="16sp"
         android:textColor="@color/gray_30"/>
 
@@ -83,6 +45,7 @@
         android:id="@+id/report_modify__del_btn"
         style="@style/MyButton.Small"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="5dp"
         android:layout_height="48dp"
         android:text="DEL"
         android:textSize="16sp"
@@ -92,52 +55,16 @@
         android:id="@+id/report_modify__extra_edit_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:orientation="vertical"
         android:visibility="gone">
 
-        <RelativeLayout
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:background="@drawable/img_shape_stroke_2dp_gray30">
+        <EditText style="@style/MyText.EditText.MultiLine"
+            android:id="@+id/report_sentence_extra_edit_ko" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-            </LinearLayout>
-
-            <EditText style="@style/MyText.EditText.MultiLine"
-                android:id="@+id/report_sentence_extra_edit_ko" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:background="@drawable/img_shape_stroke_2dp_gray30"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-                <View style="@style/MyLine1"/>
-            </LinearLayout>
-
-            <EditText style="@style/MyText.EditText.MultiLine"
-                android:id="@+id/report_sentence_extra_edit_en" />
-        </RelativeLayout>
+        <EditText style="@style/MyText.EditText.MultiLine"
+            android:layout_marginTop="10dp"
+            android:id="@+id/report_sentence_extra_edit_en" />
 
         <Button
             android:id="@+id/report_modify__complete_extra_edit_btn"
@@ -152,18 +79,11 @@
             android:id="@+id/report_modify__close_btn"
             style="@style/MyButton.Small"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="5dp"
             android:layout_height="48dp"
             android:text="Close"
             android:textSize="16sp"
             android:textColor="@color/gray_30"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_modify__help_scoll_working"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:orientation="vertical"
-        android:visibility="gone">
     </LinearLayout>
 
 </LinearLayout>

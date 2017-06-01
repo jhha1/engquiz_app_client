@@ -13,7 +13,6 @@ import kr.jhha.engquiz.util.StringHelper;
 import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyLog;
 
-import static kr.jhha.engquiz.model.local.Sentence.STATE_NEW_BUTTON;
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
 
 /**
@@ -34,12 +33,12 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     }
 
     @Override
-    public void initToolbarTitle(Integer scriptID) {
+    public void updateToolbarTitle(Integer scriptID) {
         String title = mScriptModel.getScriptTitleById(scriptID);
         if(StringHelper.isNull(title)){
             title = "Sentences";
         }
-        mView.showTitle(title);
+        mView.showToolbarTitle(title);
     }
 
     // toolbar option menu
@@ -47,7 +46,7 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     public void helpBtnClicked() {
         FragmentHandler handler = FragmentHandler.getInstance();
         WebViewFragment fragment = (WebViewFragment)handler.getFragment(WEB_VIEW);
-        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.SHOW_SENTENCES_IN_SCRIPT);
+        fragment.setHelpWhat(FragmentHandler.EFRAGMENT.SENTENCES);
         handler.changeViewFragment(WEB_VIEW);
     }
 
@@ -69,7 +68,8 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
 
             @Override
             public void onFail(EResultCode resultCode) {
-                mView.onFailGetSentences();
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.sentence__fail_get_list);
+                mView.onFailGetSentences(msgId);
             }
         };
     }
@@ -90,7 +90,7 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
     @Override
     public void sentenceSingleClicked(Sentence item) {
         // 새 문장 만들기 버튼
-        if( item.state == STATE_NEW_BUTTON ){
+        if( item.type == Sentence.TYPE.NEW_BUTTON ){
             mView.showAddSentenceFragment(item);
             return;
         }
@@ -126,7 +126,8 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
             @Override
             public void onFail(EResultCode resultCode) {
                 MyLog.e("onFailSendReport() code: " + resultCode.stringCode());
-                mView.onFailSendReport(R.string.report__send_fali);
+                int msgId = EResultCode.commonMsgHandler(resultCode, R.string.report__send_fali);
+                mView.onFailSendReport(msgId);
             }
         };
     }
@@ -139,7 +140,7 @@ public class SentencePresenter implements SentenceContract.ActionsListener {
         Sentence sentence = new Sentence();
         sentence.scriptId = mSelectedSentence.scriptId;
         sentence.sentenceId = mSelectedSentence.sentenceId;
-        sentence.state = mSelectedSentence.state;
+        sentence.type = mSelectedSentence.type;
         sentence.textKo = ko;
         sentence.textEn = en;
         scriptRepo.updateSentence(sentence, onUpdateSentence());

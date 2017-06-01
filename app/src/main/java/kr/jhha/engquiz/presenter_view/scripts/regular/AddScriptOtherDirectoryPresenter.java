@@ -1,9 +1,12 @@
 package kr.jhha.engquiz.presenter_view.scripts.regular;
 
+import android.content.Context;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.jhha.engquiz.R;
 import kr.jhha.engquiz.model.local.Script;
 import kr.jhha.engquiz.model.local.ScriptRepository;
 import kr.jhha.engquiz.model.local.UserRepository;
@@ -18,6 +21,7 @@ import kr.jhha.engquiz.util.ui.MyLog;
 
 public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectoryContract.ActionsListener {
 
+    private final Context mContext;
     private final AddScriptOtherDirectoryContract.View mView;
     private final ScriptRepository mModel;
 
@@ -34,9 +38,11 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
 
     public static String TEXT_ALREADY_ADDED = "[추가됨] ";
 
-    public AddScriptOtherDirectoryPresenter(AddScriptOtherDirectoryContract.View view, ScriptRepository model ) {
+    public AddScriptOtherDirectoryPresenter(Context context, AddScriptOtherDirectoryContract.View view, ScriptRepository model ) {
         mView = view;
         mModel = model;
+        mContext = context;
+        TEXT_ALREADY_ADDED = mContext.getString(R.string.add_pdf_script__added);
     }
 
     @Override
@@ -56,7 +62,7 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
 
         if ( file.isDirectory() ) {
             // it's dir.
-            mCurrentDirectoryPath = fileFullPath;
+            mCurrentDirectoryPath = fileFullPath +"/";
             updataDirectory(mCurrentDirectoryPath, fileFullPath);
             return;
         } else {
@@ -85,7 +91,7 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
 
         // 현재 디렉토리가 루트가 아니면, 현재폴더 상위 디렉토리를 뷰 리스트에 삽입
         if (false == FileHelper.getInstance().isRootDirectory(dirName)) {
-            mItems.add("../"); // 상위 디렉토리로 이동 텍스트
+            mItems.add(mContext.getString(R.string.add_pdf_script__go_parent_dir)); // 상위 디렉토리로 이동 텍스트
             String parentDir = FileHelper.getInstance().getParentDirectoryName(dirName);
             mFilepath.add(parentDir); // 상위 디렉토리 경로 삽입
         }
@@ -124,7 +130,7 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
     private void checkFile(){
         final String filename = mSelectedScriptName;
         if( false == mModel.checkFileFormat(filename) ) { // 파일 형식 체크
-            mView.showErrorDialog(1);
+            mView.showErrorDialog(R.string.add_pdf_script__fail_only_allow_pdf_format);
             return;
         }
 
@@ -144,7 +150,7 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
     private void showFileSizeConfirmDialog(){
         String fileName = mSelectedScriptName;
         final FileHelper file = FileHelper.getInstance();
-        float filesize = file.getFileMegaSize(mCurrentDirectoryPath, fileName );
+        float filesize = file.getFileMegaSize(mCurrentDirectoryPath, fileName ) * 2;  // *2 == upload and download
         mView.showAddScriptConfirmDialog(fileName, filesize);
     }
 
@@ -153,7 +159,7 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
         String msgForLog = "pdfFilePath:"+ mCurrentDirectoryPath + ", pdfFileName:"+pdfFileName;
         mView.showLoadingDialog();
         Integer userId = UserRepository.getInstance().getUserID();
-        mModel.addPDFScript( userId,
+        mModel.addRegularScript( userId,
                 mCurrentDirectoryPath,
                 pdfFileName,
                 onAddScriptCallback( msgForLog ) );
@@ -165,21 +171,22 @@ public class AddScriptOtherDirectoryPresenter implements AddScriptOtherDirectory
 
             @Override
             public void onSuccess( Script script ) {
-                MyLog.d("addPDFScript onSuccess()  user: " + msgForLog);
+                MyLog.d("addRegularScript onSuccess()  user: " + msgForLog);
 
                 mView.showAddScriptSuccessDialog();
             }
 
             @Override
             public void onFail(EResultCode resultCode) {
-                MyLog.d("addPDFScript onFail() " +
+                MyLog.d("addRegularScript onFail() " +
                         "resultCode:"+resultCode.toString()+", user: " + msgForLog);
                 switch (resultCode) {
                     case SCRIPT__NO_HAS_KR_OR_EN:
-                        mView.showErrorDialog(4);
+                        mView.showErrorDialog(R.string.add_pdf_script__fail_only_has_en_or_kn);
                         break;
                     default:
-                        mView.showErrorDialog(2);
+                        int msgId = EResultCode.commonMsgHandler(resultCode, R.string.common__fail_retry);
+                        mView.showErrorDialog(msgId);
                         break;
                 }
             }

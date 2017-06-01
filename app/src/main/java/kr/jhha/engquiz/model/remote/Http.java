@@ -31,7 +31,7 @@ public class Http
     final private static String url = "http://52.78.150.139:8080/engquiz/servlet";
 
     private static final int CONN_TIMEOUT = 3000;
-    private static final int SO_TIMEOUT = 5000;
+    private static final int SO_TIMEOUT = 25000;
 
     public static String requestPost(String requestString )
     {

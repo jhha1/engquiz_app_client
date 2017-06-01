@@ -12,6 +12,7 @@ import kr.jhha.engquiz.presenter_view.FragmentHandler;
 import kr.jhha.engquiz.presenter_view.help.WebViewFragment;
 import kr.jhha.engquiz.presenter_view.scripts.custom.ScriptFactory;
 import kr.jhha.engquiz.util.StringHelper;
+import kr.jhha.engquiz.util.exception.EResultCode;
 import kr.jhha.engquiz.util.ui.MyLog;
 
 import static kr.jhha.engquiz.presenter_view.FragmentHandler.EFRAGMENT.WEB_VIEW;
@@ -50,7 +51,7 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
                                    String ko, String en )
     {
         if( ! checkSentences(ko, en) ) {
-            mView.showErrorDialog(7);
+            mView.showErrorDialog(R.string.sentence__fail_invalied_sentence);
             return;
         }
 
@@ -61,7 +62,7 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
         {
             Script script = checkHasParentScript( parentScriptId );
             if( Script.isNull(script) ) {
-                mView.showErrorDialog(2);
+                mView.showErrorDialog(R.string.sentence__fail_put_script);
                 return;
             }
             createSentence( script );
@@ -119,18 +120,23 @@ public class AddSentencePresenter implements AddSentenceContract.ActionsListener
         createSentence( script );
     }
 
-    private void createSentence( Script script )
+    private void createSentence( final Script script )
     {
-        // Make Sentence
-        Sentence newSentence = new Sentence();
-        newSentence.textEn = mSentenceEn;
-        newSentence.textKo = mSentenceKo;
-        newSentence.state = Sentence.STATE_MADE_BY_USER;
+        mScriptModel.createSentence(script.scriptId,
+                mSentenceKo,
+                mSentenceEn,
+                Sentence.TYPE.CUSTOM,
+                new ScriptRepository.CreateSenteceCallback() {
+                    @Override
+                    public void onSuccess(Integer sentenceId) {
+                        MyLog.d("Sentence Created. " +
+                                "Id:" + sentenceId);
+                        mView.showSentenceFragment( script.scriptId, script.title );
+                    }
 
-        newSentence.scriptId = script.scriptId;
-        newSentence.sentenceId = Sentence.makeSenetenceId( script.scriptId, script.sentences );
-        script.sentences.add( newSentence );
-
-        mView.showAddSentenceSuccessDialog( script.title );
+                    @Override
+                    public void onFail(EResultCode result) {
+                        mView.showErrorDialog(R.string.create_script__fail);
+                    }});
     }
 }

@@ -8,11 +8,12 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".presenter_view.scripts.regular.AddScriptOtherDirectoryFragment">
 
-        <!-- explain how to use -->
+        <!-- explain how to use
         <TextView
             android:id="@+id/add_script_howtouse"
             style="@style/MyText.MediumTitle"
             android:text="* 추가할 스크립트를 선택해주세요."/>
+            -->
 
         <!-- file location -->
         <TextView
@@ -22,8 +23,9 @@
             android:paddingTop="2dip"
             android:paddingLeft="5dp"
             android:paddingBottom="2dip"
+            android:layout_marginBottom="15dp"
             android:textColor="@color/black_alpha_40"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:background="@drawable/img_shape_solid_grey15"/>
 
         <!-- hr line
@@ -38,11 +40,12 @@
             style="@style/MyListView.SimpleText"
             android:id="@+id/add_script_filebrower"
             android:choiceMode="singleChoice"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <Button
             style="@style/MyButton.WideBig"
             android:id="@+id/add_script_btn_ok"
-            android:layout_marginTop="20dip"/>
+            android:layout_marginTop="20dip"
+            android:text="@string/add_pdf_script__add_btn"/>
 
 </LinearLayout>
